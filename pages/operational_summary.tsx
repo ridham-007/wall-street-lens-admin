@@ -17,6 +17,7 @@ import {
   MenuItem,
   Button,
 } from "@material-tailwind/react";
+import { financialInitData } from "@/utils/data";
 
 
 const TEAMS = gql`
@@ -77,10 +78,9 @@ const LEAGUES = gql`
 
 
 export default function TeamsPage() {
-
+  const [addUpdateParameter, setAddUpdateParameter] = useState(false);
+  const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
   const [isOpen, setIsOpen] = useState('');
-  const [addUpdateTeam, setAddUpdateTeam] = useState(false);
-  const [addInOtherLeague, setAddInOtherLeague] = useState(false);
   const [searchKey, setSearchKey] = useState('');
   const [isOpenAction, setIsOpenAction] = useState('');
   const [leagueId, setLeagueId] = useState('');
@@ -146,19 +146,15 @@ export default function TeamsPage() {
     setFilteredTeams(filteredData(searchKey))
   }, [allTeamData]);
 
-  const onAddUpdateTeam = () => {
-    setUpdateTeam(null);
-    setAddUpdateTeam(false);
-    setAddInOtherLeague(false);
-    refetch();
-  };
 
-  const onAddUpdateTeamClose = () => {
-    setUpdateTeam(null);
-    setAddUpdateTeam(false);
-    setAddInOtherLeague(false);
+  const onAddUpdateParameter = () => {
+    setAddUpdateParameter(false);
+    setAddUpdateQuarter(false)
   };
-
+  const onAddUpdateParameterClose = () => {
+    setAddUpdateParameter(false);
+    setAddUpdateQuarter(false)
+  };
   const filteredData = (key: string) => {
     const filteredTeam = allTeamData.filter((team: any) => {
       const teamName = `${team.name}`.toLocaleLowerCase();
@@ -230,7 +226,7 @@ export default function TeamsPage() {
   })
 
   return (
-    <Layout title="Teams" page={LayoutPages.teams}>
+    <Layout title="Operational Summary" page={LayoutPages.operational_summary}>
       <>
         <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden flex justify-between pb-4 pt-2">
           <div className="relative w-1/2">
@@ -244,49 +240,65 @@ export default function TeamsPage() {
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg aria-hidden="true" className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
               </div>
-              <div className="ml-4">
-                <div className="flex align-self-right">
-                  <div
-                    className="border border-gray-30 w-[160px]"
-
-                    style={{
-                      borderRadius: '8px',
-                      height: '42px',
-                      color: 'grey',
-                    }}>
-                    <select
-                      className="w-[158px]"
-                      name="leagueId"
-                      id="leagueId"
-                      value={leagueId}
-                      onChange={(e) => setLeagueId(e.target.value)}
-                      style={{
-                        borderRadius: '8px',
-                        padding: '8px',
-                      }}
-                    >
-                      <option>Select a league</option>
-                      <option>UnAssigned</option>
-                      {leaguesData?.getLeagues?.code === 200 &&
-                        leaguesData?.getLeagues?.data?.map((league: any) => (
-                          <option key={league?._id} value={league?._id}>
-                            {league?.name}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
-          {
-            userRole == 'admin' && (<button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-700 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
-              onClick={() => setAddUpdateTeam(true)}
+          <div className="flex flex-row-reverse pr-4 gap-4">
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => setAddUpdateParameter(true)}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
-              Add a Team
-            </button>)
-          }
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="ionicon w-7 h-7"
+                viewBox="0 0 512 512"
+              >
+                <path
+                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="32"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="32"
+                  d="M256 176v160M336 256H176"
+                />
+              </svg>
+              <span>Add a Parameter</span>
+            </button>
+
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => setAddUpdateQuarter(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="ionicon w-7 h-7"
+                viewBox="0 0 512 512"
+              >
+                <path
+                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="32"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="32"
+                  d="M256 176v160M336 256H176"
+                />
+              </svg>
+              <span>Add a Quarter Details</span>
+            </button>
+          </div>
 
         </div>
 
@@ -344,14 +356,10 @@ export default function TeamsPage() {
                                   <MenuList>
                                     <MenuItem onClick={() => {
                                       setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
-                                      setAddUpdateTeam(true);
-                                      setIsOpenAction('');
                                     }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Edit</MenuItem>
                                     <MenuItem onClick={() => {
                                       setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
-                                      setAddUpdateTeam(true);
                                       setIsOpenAction('');
-                                      setAddInOtherLeague(true);
                                     }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Add in other league</MenuItem>
                                     <MenuItem onClick={() => {
                                       toggleTeam(team?._id)
@@ -790,328 +798,257 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
           </table>
         </div>
 
-        {
-          addUpdateTeam && (
-            <AddUpdateTeam
-              key={uuidv4()}
-              onClose={onAddUpdateTeamClose}
-              onSuccess={onAddUpdateTeam}
-              team={updateTeam}
-              data={data?.getTeams?.data}
-              addInOtherLeague={addInOtherLeague}
-            ></AddUpdateTeam>
-          )
-        }
+        {addUpdateParameter && (
+          <AddUpdateParaMeter
+            onSuccess={onAddUpdateParameter}
+            onClose={onAddUpdateParameterClose}
+          ></AddUpdateParaMeter>
+        )}
+        {addUpdateQuarter && (
+          <AddUpdateParaQuarter
+            onSuccess={onAddUpdateParameter}
+            onClose={onAddUpdateParameterClose}
+          ></AddUpdateParaQuarter>
+        )}
       </>
     </Layout >
   );
 }
 
-const LEAGUE_DROPDOWN = gql`
-  query GetLeagues {
-                          getLeagues {
-                          code
-      success
-                        message
-                        data {
-                          _id
-        name
-      }
-    }
-  }
-                        `;
-
-const COACH_DROPDOWN = gql`
-  query GetCoaches {
-    getCoaches {
-    code
-    success
-    message
-    data {
-      _id
-      firstName
-      lastName
-    }
-  }
-}`;
-
-const ADD_UPDATE_LEAGUE = gql`
-                        mutation CreateOrUpdateTeam(
-                        $name: String!
-                        $active: Boolean!
-                        $coachId: String!
-                        $leagueId: String!
-                        $reamoveLeagueId: String
-                        $changeLeague: Boolean
-                        $reamoveCoachId: String
-                        $id: String
-                        ) {
-                          createOrUpdateTeam(
-                            name: $name
-                        active: $active
-                        coachId: $coachId
-                        leagueId: $leagueId
-                        reamoveLeagueId: $reamoveLeagueId
-                        changeLeague: $changeLeague
-                        reamoveCoachId: $reamoveCoachId
-                        id: $id
-                        ) {
-                          code
-      success
-                        message
-                        data {
-                          _id
-                        }
-    }
-  }
-                        `;
-
-interface AddUpdateTeamOnSuccess {
+interface AddUpdateParameterOnSuccess {
   (id: string): void;
 }
 
-interface AddUpdateTeamOnClose {
+interface AddUpdateParameterOnClose {
   (): void;
 }
 
-interface AddUpdateTeamProps {
-  team?: ITeam;
-  onSuccess?: AddUpdateTeamOnSuccess;
-  onClose?: AddUpdateTeamOnClose;
-  data?: any;
-  addInOtherLeague?: Boolean;
+interface AddUpdateParameterProps {
+  onSuccess?: AddUpdateParameterOnSuccess;
+  onClose?: AddUpdateParameterOnClose;
 }
 
-function AddUpdateTeam(props: AddUpdateTeamProps) {
-  const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
-  const coachesQuery = useQuery(COACH_DROPDOWN);
-  const [name, setName] = useState(props.team?.name || "");
-  const [leagueId, setLeagueId] = useState(props.team?.league?._id || "");
-  const [coachId, setCoachId] = useState(props.team?.coach?._id || "");
-  const [active, setActive] = useState(
-    props?.team ? props?.team?.active + "" : "true"
-  );
+function AddUpdateParaMeter(props: AddUpdateParameterProps) {
+  const [val, setVal] = useState({
+    company: "",
+    title: "",
+    unit: 0,
+    subIndustry: "",
+    industry: "",
+    operationType: ""
+  })
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setVal((prevVal) => ({
+      ...prevVal,
+      [name]: value
+    }));
+  };
 
-  const [addUpdateTeam, { data, error, loading }] = useMutation(
-    ADD_UPDATE_LEAGUE,
-    {
-      variables: {
-        name,
-        leagueId,
-        coachId,
-        active: active === "true" ? true : false,
-        changeLeague: props.addInOtherLeague ? false : props?.team?.league?._id !== leagueId || props?.team?.coach?._id !== coachId,
-        reamoveCoachId: props?.team?.coach?._id !== coachId ? props?.team?.coach?._id : '',
-        reamoveLeagueId: props?.team?.league?._id !== leagueId ? props?.team?.league?._id : '',
-        id: props?.team?._id,
-      },
-    }
-  );
+  const handleOnSave = () => {
+    console.log({ val });
 
-  useEffect(() => {
-
-    if (data?.createOrUpdateTeam?.code === 200) {
-      props?.onSuccess && props.onSuccess(data?.createOrUpdateTeam?.data?._id);
-    }
-  }, [data, error]);
-
-  let updatedLeagues: { _id: any; }[] = [];
-  if (props?.addInOtherLeague) {
-    leaguesQuery?.data?.getLeagues?.data?.map((current: { _id: any; }) => {
-      const find = props?.team?.teamLeaguesData?.find((curTeam: { _id: any; }) => curTeam?._id === current?._id);
-      if (!find) {
-        updatedLeagues.push(current);
-      }
-    })
-  } else {
-    updatedLeagues = leaguesQuery?.data?.getLeagues?.data;
-  }
+    props.onClose && props.onClose()
+  };
 
 
   return (
-    <>
-      <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
-        <form className="form w-100">
-          <div className="flex flex-row flex-wrap">
-            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-              <label htmlFor="name" className="font-bold">
-                Name
-              </label>
+    <Modal
+      showModal={true}
+      handleOnSave={handleOnSave}
+      title="Add Parameter"
+      onClose={() => props.onClose && props.onClose()}
+    >
+      <form className="form w-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <label htmlFor="company" className="text-sm font-medium text-gray-700">
+              Company
+            </label>
+            <input
+              type="text"
+              id="company"
+              name="company"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.company}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="title" className="text-sm font-medium text-gray-700">
+              Title
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.title}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="unit" className="text-sm font-medium text-gray-700">
+              Unit
+            </label>
+            <input
+              type="number"
+              id="unit"
+              name="unit"
+              min={0}
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.unit}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="subIndustry" className="text-sm font-medium text-gray-700">
+              Sub-Industry
+            </label>
+            <input
+              type="text"
+              id="subIndustry"
+              name="subIndustry"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.subIndustry}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="industry" className="text-sm font-medium text-gray-700">
+              Industry
+            </label>
+            <input
+              type="text"
+              id="industry"
+              name="industry"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.industry}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="operationType" className="text-sm font-medium text-gray-700">
+              Operation Type
+            </label>
+            <select
+              id="operationType"
+              name="operationType"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.operationType}
+              onChange={handleInputChange}
+            >
+              <option value="">Select an option</option>
+              <option value="Option 1">Option 1</option>
+              <option value="Option 2">Option 2</option>
+              <option value="Option 3">Option 3</option>
+            </select>
+          </div>
+        </div>
+      </form>
 
-              <div>
+    </Modal >
+  );
+}
+
+
+const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
+  const [val, setVal] = useState(financialInitData)
+  const currentYear = new Date().getFullYear();
+  const minYear = 1880;
+  const [year, setYear] = useState(currentYear);
+  const [selectedQuarter, setSelectedQuarter] = useState('Q1');
+
+  const handleQuarterChange = (e) => {
+    setSelectedQuarter(e.target.value);
+  };
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseInt(e.target.value);
+    if (!isNaN(newValue)) {
+      setYear(Math.max(minYear, Math.min(currentYear, newValue)));
+    }
+  };
+  const handleOnSave = () => {
+    console.log({ val, year, selectedQuarter });
+  };
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
+    setVal(prevVal => (
+      prevVal.map(val => val.id === id ? { ...val, value: e.target.value } : { ...val })
+    ))
+
+  };
+  return (
+    <Modal
+      showModal={true}
+      handleOnSave={handleOnSave}
+      title="Add Quarter Details"
+      onClose={() => props.onClose && props.onClose()}
+    >
+      <>
+        <div>
+          <h1 className="text-xl font-semibold mb-2">Basic details</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label htmlFor="year" className="text-sm font-medium text-gray-700">
+                Year
+              </label>
+              <input
+                type="number"
+                id="year"
+                name="year"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={year}
+                min={minYear}
+                max={currentYear}
+                onChange={handleYearChange}
+              />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+                Quarter
+              </label>
+              <select
+                id="quarter"
+                name="quarter"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={selectedQuarter}
+                onChange={handleQuarterChange}
+              >
+                <option value="Q1">Q1</option>
+                <option value="Q2">Q2</option>
+                <option value="Q3">Q3</option>
+                <option value="Q4">Q4</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <h1 className="text-xl font-semibold mb-2 mt-4">Parameter</h1>
+        <form className="form w-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {val?.map(item => (
+              <div key={item.id} className="flex flex-col">
+                <label
+                  htmlFor={`value-${item.id}`}
+                  className="text-sm font-medium text-gray-700"
+                >
+                  {item.title}
+                </label>
                 <input
                   type="text"
-                  name="name"
-                  id="name"
-                  placeholder="Team Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  id={`value-${item.id}`}
+                  name={`value-${item.id}`}
+                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={item.value}
+                  onChange={(e) => handleOnChange(e, item.id)}
                 />
               </div>
-            </div>
-
-            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-              <label htmlFor="leagueId" className="font-bold">
-                League
-              </label>
-
-              <div>
-                <select
-                  name="leagueId"
-                  id="leagueId"
-                  value={leagueId}
-                  onChange={(e) => setLeagueId(e.target.value)}
-                >
-                  <option>Select a league</option>
-                  {updatedLeagues?.map((league: any) => (
-                    <option key={league?._id} value={league?._id}>
-                      {league?.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-              <label htmlFor="coachId" className="font-bold">
-                Coach
-              </label>
-
-              <div>
-                <select
-                  name="coachId"
-                  id="coachId"
-                  value={coachId}
-                  onChange={(e) => setCoachId(e.target.value)}
-                >
-                  <option>Select a coach</option>
-                  {coachesQuery?.data?.getCoaches?.code === 200 &&
-                    coachesQuery?.data?.getCoaches?.data?.map((coach: any) => (
-                      <option key={coach?._id} value={coach?._id}>
-                        <>
-                          {coach?.firstName}&nbsp;{coach?.lastName}
-                        </>
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-
-            {props?.team && (
-              <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-                <label htmlFor="active" className="font-bold">
-                  Active
-                </label>
-
-                <div>
-                  <select
-                    name="active"
-                    id="active"
-                    value={active}
-                    onChange={(e) => setActive(e.target.value)}
-                  >
-                    <option value={"true"}>Yes</option>
-                    <option value={"false"}>No</option>
-                  </select>
-                </div>
-              </div>
-            )}
+            ))}
           </div>
 
-          <hr />
-
-          <div className="my-2">
-            {props?.team ? (
-              <button
-                className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
-                type="button"
-                onClick={() => {
-                  let isNameError = false;
-                  let isSameCoachError = false;
-                  let alreadyRegister = false;
-                  props?.data?.forEach((current: {
-                    league: any; name: string; coach: { _id: string; };
-                  }) => {
-                    if (props?.addInOtherLeague) {
-                      if (!alreadyRegister && current?.league?._id === leagueId && current?.name === props?.team?.name) {
-                        alreadyRegister = true;
-                      }
-                    }
-                    if (current?.league?._id === leagueId) {
-                      if (name !== props?.team?.name && current?.name === name && !isNameError) {
-                        isNameError = true;
-                      }
-                      if (coachId !== props?.team?.coach?._id && !isSameCoachError && current?.coach?._id === coachId) {
-                        isSameCoachError = true
-                      }
-                    }
-                  });
-
-                  if (isNameError) {
-                    toast('Team name is already registred in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-                  } else if (isSameCoachError) {
-                    toast('This coach is already assign to another team in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-                  } else {
-                    if (props?.addInOtherLeague) {
-                      if (alreadyRegister) {
-                        toast('This team already register for same league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-                      } else {
-                        addUpdateTeam();
-                      }
-                    } else if(coachId?.length === 0){
-                      toast('Please select the league & coach.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-                    }
-                    else {
-                      addUpdateTeam();
-                    }
-                  }
-                }}
-              >
-                {props?.addInOtherLeague ? "Add In Another League" : "Update Team"}
-              </button>
-            ) : (
-              <button
-                className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
-                type="button"
-                onClick={() => {
-                  let isNameError = false;
-                  let isSameCoachError = false;
-                  props?.data?.forEach((current: {
-                    _id: string; league: any; name: string; coach: { _id: string; };
-                  }) => {
-                    if (current?.league?._id === leagueId) {
-
-                      if (current?.name === name && !isNameError) {
-                        isNameError = true;
-                      }
-                      if (!isSameCoachError && current?.coach?._id === coachId) {
-                        isSameCoachError = true
-                      }
-                    }
-                  })
-                  if (isNameError) {
-                    toast('Team name is already registred in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-                  } else if (isSameCoachError) {
-                    toast('This coach is already assign to another team in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-                  } else if (coachId?.length === 0) {
-                    toast('Please select the league & coach.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-                  }
-                  else {
-                    addUpdateTeam();
-                  }
-                }}
-              >
-                Add Team
-              </button>
-            )}
-
-            <button onClick={props.onClose} className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
-              Cancel
-            </button>
-          </div>
         </form>
-      </Modal>
-      <ToastContainer />
-    </>
+      </>
+    </Modal >
   );
 }

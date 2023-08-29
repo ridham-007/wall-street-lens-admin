@@ -10,7 +10,7 @@ import { ToastContainer } from "react-toastify";
 
 export enum LayoutPages {
   "financial_summary" = "financial_summary",
-  "teams" = "teams",
+  "operational_summary" = "operational_summary",
   "coaches" = "coaches",
   "players" = "players",
   "matches" = "matches",
@@ -296,11 +296,10 @@ export default function Layout(props: LayoutProps) {
             <div className="flex-1 py-4 space-y-1 bg-slate-700 divide-y divide-gray-200 dark:divide-gray-700">
               <Link href="/financial_summary">
                 <button
-                  className={` flex items-center text-md text-l text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
-                    props?.page == LayoutPages.financial_summary
-                      ? "bg-slate-800 border-l-4 border-green-500"
-                      : "bg-slate-700"
-                  }`}
+                  className={` flex items-center text-md text-l text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.financial_summary
+                    ? "bg-slate-800 border-l-4 border-green-500"
+                    : "bg-slate-700"
+                    }`}
                 >
                   <svg
                     version="1.0"
@@ -389,17 +388,16 @@ c-25 -24 -25 -27 -25 -200 l0 -175 80 0 80 0 0 120 0 120 520 0 520 0 0 -120
                       />
                     </g>
                   </svg>
-                  financial_summary
+                  Financial Summary
                 </button>
               </Link>
 
-              <Link href="/teams">
+              <Link href="/operational_summary">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
-                    props?.page == LayoutPages.teams
-                      ? "bg-slate-800 border-l-4 border-green-500"
-                      : "bg-slate-700"
-                  }`}
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.operational_summary
+                    ? "bg-slate-800 border-l-4 border-green-500"
+                    : "bg-slate-700"
+                    }`}
                 >
                   <svg
                     version="1.0"
@@ -504,18 +502,17 @@ m-3019 -210 c133 -89 297 -175 460 -242 l115 -46 3 -77 c2 -42 0 -76 -3 -76
                       />
                     </g>
                   </svg>
-                  Teams
+                  Operational Summary
                 </button>
               </Link>
 
               {user?.role === "admin" && (
                 <Link href="/coaches">
                   <button
-                    className={`text-l flex items-center text-left px-4 py-4  hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
-                      props?.page == LayoutPages.coaches
-                        ? "bg-slate-800 border-l-4 border-green-500"
-                        : "bg-slate-700"
-                    }`}
+                    className={`text-l flex items-center text-left px-4 py-4  hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.coaches
+                      ? "bg-slate-800 border-l-4 border-green-500"
+                      : "bg-slate-700"
+                      }`}
                   >
                     <svg
                       version="1.0"
@@ -567,11 +564,10 @@ l-20 -24 -140 126 c-186 167 -178 158 -133 139 80 -33 167 -6 214 65 l26 39
 
               <Link href="/players">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
-                    props?.page == LayoutPages.players
-                      ? "bg-slate-800 border-l-4 border-green-500"
-                      : "bg-slate-700"
-                  }`}
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.players
+                    ? "bg-slate-800 border-l-4 border-green-500"
+                    : "bg-slate-700"
+                    }`}
                 >
                   <svg
                     version="1.0"
@@ -768,11 +764,10 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
 
               <Link href={"/matches"}>
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
-                    props?.page == LayoutPages.matches
-                      ? "bg-slate-800 border-l-4 border-green-500"
-                      : "bg-slate-700"
-                  }`}
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.matches
+                    ? "bg-slate-800 border-l-4 border-green-500"
+                    : "bg-slate-700"
+                    }`}
                 >
                   <svg
                     version="1.0"
