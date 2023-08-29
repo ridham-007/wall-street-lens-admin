@@ -15,8 +15,8 @@ import { financialInitData } from "@/utils/data";
 import { ADD_FINANCIAL_SUMMARY_PARAMETER, GET_FINANCIAL_SUMMARY_PARAMETERS } from "@/utils/query";
 import Loader from "@/components/loader";
 import { TabButton } from "@/components/TabButton";
-import ParameterTable from "@/components/table/ParameterTable";
-import QuarterTable from "@/components/table/QuarterTable";
+import ParameterTable from "@/components/table/financial/ParameterTable";
+import QuarterTable from "@/components/table/financial/QuarterTable";
 
 const selectedCompany = [{
   id: 1,

@@ -19,8 +19,8 @@ import {
 } from "@material-tailwind/react";
 import { financialInitData, oprationalInitData } from "@/utils/data";
 import { TabButton } from "@/components/TabButton";
-import ParameterTable from "@/components/table/ParameterTable";
-import QuarterTable from "@/components/table/QuarterTable";
+import ParameterTable from "@/components/table/financial/ParameterTable";
+import QuarterTable from "@/components/table/financial/QuarterTable";
 
 
 const TEAMS = gql`

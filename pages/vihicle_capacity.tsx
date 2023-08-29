@@ -16,8 +16,8 @@ import {
 } from "@material-tailwind/react";
 import { Modal } from "@/components/model";
 import { TabButton } from "@/components/TabButton";
-import ParameterTable from "@/components/table/ParameterTable";
-import QuarterTable from "@/components/table/QuarterTable";
+import ParameterTable from "@/components/table/financial/ParameterTable";
+import QuarterTable from "@/components/table/financial/QuarterTable";
 
 export default function PlayersPage() {
 
