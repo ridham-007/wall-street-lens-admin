@@ -12,29 +12,16 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { financialInitData } from "@/utils/data";
-import { ADD_FINANCIAL_SUMMARY_PARAMETER } from "@/utils/query";
+import { ADD_FINANCIAL_SUMMARY_PARAMETER, GET_FINANCIAL_SUMMARY_PARAMETERS } from "@/utils/query";
 import Loader from "@/components/loader";
 import { TabButton } from "@/components/TabButton";
 import ParameterTable from "@/components/table/ParameterTable";
 import QuarterTable from "@/components/table/QuarterTable";
 
-const LEAGUES = gql`
-  query GetLeagues($userId: String) {
-    getLeagues(userId: $userId) {
-      code
-      success
-      message
-      data {
-        _id
-        name
-        startDate
-        endDate
-        active
-        playerLimit
-      }
-    }
-  }
-`;
+const selectedCompany = [{
+  id: 1,
+  name: 'TESLA',
+}]
 
 export default function LeaguesPage() {
   const [showLoader, setShowLoader] = useState(false);
@@ -54,11 +41,12 @@ export default function LeaguesPage() {
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
   };
-  const [getLeaguesData, { data, error, loading, refetch }] = useLazyQuery(
-    LEAGUES,
+
+  const [getParametersData, { data, error, loading, refetch }] = useLazyQuery(
+    GET_FINANCIAL_SUMMARY_PARAMETERS,
     {
       variables: {
-        userId: userRole !== "admin" && userRole !== "player" ? userID : null,
+        companyName: selectedCompany[0]?.name,
       },
     }
   );
@@ -69,12 +57,9 @@ export default function LeaguesPage() {
     setUserData(localStorageData?._id);
   };
 
-  useEffect(() => {
-    getDatafromLocalStorage();
-  }, []);
 
   useEffect(() => {
-    getLeaguesData();
+    getParametersData();
   }, [userID]);
 
   const closePopups = () => {
@@ -272,6 +257,7 @@ export default function LeaguesPage() {
           <AddUpdateParaMeter
             onSuccess={onAddUpdateParameter}
             onClose={closePopups}
+            selectedCompany={selectedCompany}
           ></AddUpdateParaMeter>
         )}
         {addUpdateQuarter && (
@@ -285,23 +271,15 @@ export default function LeaguesPage() {
   );
 }
 
-
-interface AddUpdateParameterOnSuccess {
-  (id: string): void;
-}
-
-interface AddUpdateParameterOnClose {
-  (): void;
-}
-
 interface AddUpdateParameterProps {
-  onSuccess?: AddUpdateParameterOnSuccess;
-  onClose?: AddUpdateParameterOnClose;
+  onSuccess?: any;
+  onClose?: any;
+  selectedCompany?: any;
 }
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [val, setVal] = useState({
-    company: "",
+    company: props?.selectedCompany[0].name,
     title: "",
     unit: "",
     isVisible: false
@@ -339,9 +317,9 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             <input
               type="text"
               id="company"
-
               name="company"
-              value={val.company}
+              value={props?.selectedCompany[0].name}
+              disabled={true} // need to update when we will have more companies
               onChange={handleOnChange}
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
