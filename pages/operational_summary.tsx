@@ -17,7 +17,7 @@ import {
   MenuItem,
   Button,
 } from "@material-tailwind/react";
-import { financialInitData } from "@/utils/data";
+import { financialInitData, oprationalInitData } from "@/utils/data";
 
 
 const TEAMS = gql`
@@ -938,10 +938,12 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               value={val.operationType}
               onChange={handleInputChange}
             >
-              <option value="">Select an option</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
+              <option value="" disabled>Select an option</option>
+              <option value="production">Production</option>
+              <option value="productionTooling">Production
+                Tooling</option>
+              <option value="pilotProduction">Pilot production</option>
+              <option value="inDevelopment">In development</option>
             </select>
           </div>
         </div>
@@ -953,7 +955,8 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
 
 const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
-  const [val, setVal] = useState(financialInitData)
+  const [val, setVal] = useState(oprationalInitData)
+
   const currentYear = new Date().getFullYear();
   const minYear = 1880;
   const [year, setYear] = useState(currentYear);
@@ -1039,7 +1042,7 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
                   type="text"
                   id={`value-${item.id}`}
                   name={`value-${item.id}`}
-                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 min-w-[280px] focus:border-blue-500 outline-none"
                   value={item.value}
                   onChange={(e) => handleOnChange(e, item.id)}
                 />

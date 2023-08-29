@@ -94,3 +94,67 @@ export const financialInitData = [
         title: "Income from operations"
     }
 ];
+
+
+export const oprationalInitData = [
+    {
+        id: 1,
+        title: "Model S/X production",
+        value: ""
+    },
+    {
+        id: 2,
+        title: "Model 3/Y production",
+        value: ""
+    },
+    {
+        id: 3,
+        title: "Total production",
+        value: ""
+    },
+    {
+        id: 4,
+        title: "Model 3/Y deliveries",
+        value: ""
+    },
+    {
+        id: 5,
+        title: "Model S/X deliveries",
+        value: ""
+    },
+    {
+        id: 6,
+        title: "Total deliveries",
+        value: ""
+    },
+    {
+        id: 7,
+        title: "Solar deployed (MW)",
+        value: ""
+    },
+    {
+        id: 8,
+        title: "Storage deployed (MWh)",
+        value: ""
+    },
+    {
+        id: 9,
+        title: "Tesla locations",
+        value: ""
+    },
+    {
+        id: 10,
+        title: "Mobile service fleet",
+        value: ""
+    },
+    {
+        id: 11,
+        title: "Supercharger stations",
+        value: ""
+    },
+    {
+        id: 12,
+        title: "Supercharger connectors",
+        value: ""
+    }
+]
