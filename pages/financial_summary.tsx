@@ -13,6 +13,7 @@ import {
   MenuItem,
   Button,
 } from "@material-tailwind/react";
+import { financialInitData } from "@/utils/data";
 
 const LEAGUES = gql`
   query GetLeagues($userId: String) {
@@ -540,12 +541,18 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
 
 const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
-  const [val, setVal] = useState([])
+  const [val, setVal] = useState(financialInitData)
+  console.log({ val });
+
   const handleOnSave = () => {
 
   };
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
+    setVal(prevVal => (
+      prevVal.map(val => val.id === id ? { ...val, value: e.target.value } : { ...val })
+    ))
+
   };
   return (
     <Modal
@@ -555,6 +562,26 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
       onClose={() => props.onClose && props.onClose()}
     >
       <form className="form w-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {val?.map(item => (
+            <div key={item.id} className="flex flex-col">
+              <label
+                htmlFor={`value-${item.id}`}
+                className="text-sm font-medium text-gray-700"
+              >
+                {item.title}
+              </label>
+              <input
+                type="text"
+                id={`value-${item.id}`}
+                name={`value-${item.id}`}
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={item.value}
+                onChange={(e) => handleOnChange(e, item.id)}
+              />
+            </div>
+          ))}
+        </div>
 
       </form>
     </Modal>
