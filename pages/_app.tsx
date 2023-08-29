@@ -6,14 +6,6 @@ import { LoginService } from "@/utils/login";
 import { UserContext } from "@/config/auth";
 import { useEffect, useState } from "react";
 
-/**
- * Login info
- */
-
-/**
- * GraphQL Client
- */
-
 export default function App({ Component, pageProps }: AppProps) {
   const [user, setUser] = useState(null);
   const [mounted] = useState(true);

@@ -3,8 +3,6 @@ import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
-import { format } from "date-fns";
-import { useRouter } from "next/router";
 import { LoginService } from "@/utils/login";
 import {
   Menu,
@@ -15,6 +13,7 @@ import {
 } from "@material-tailwind/react";
 import { financialInitData } from "@/utils/data";
 import { ADD_FINANCIAL_SUMMARY_PARAMETER } from "@/utils/query";
+import Loader from "@/components/loader";
 
 const LEAGUES = gql`
   query GetLeagues($userId: String) {
@@ -35,6 +34,7 @@ const LEAGUES = gql`
 `;
 
 export default function LeaguesPage() {
+  const [showLoader, setShowLoader] = useState(false);
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
   const [updateLeague, setUpdateLeague] = useState(null);
@@ -70,8 +70,13 @@ export default function LeaguesPage() {
     getLeaguesData();
   }, [userID]);
 
-  const router = useRouter();
+  const closePopups = () => {
+    setAddUpdateParameter(false);
+    setAddUpdateQuarter(false);
+  }
+
   const onAddUpdateParameter = async (data: any) => {
+    setShowLoader(true);
     await addParameter({
       variables: {
         summaryInfo: {
@@ -82,16 +87,18 @@ export default function LeaguesPage() {
         }
       },
     })
-    setAddUpdateParameter(false);
-    setAddUpdateQuarter(false);
+    setShowLoader(false);
+    closePopups()
   };
+
+  const onAddUpdateQuarter = () => {
+
+  }
 
   const ref = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const checkIfClickedOutside = (e: { target: any }) => {
-      // If the menu is open and the clicked target is not within the menu,
-      // then close the menu
       if (
         isOpenAction?.length > 0 &&
         ref.current &&
@@ -109,18 +116,10 @@ export default function LeaguesPage() {
     };
   }, [isOpenAction]);
 
-  // useEffect(() => {
-  //   refetch();
-  // }, [router.asPath])
-
   useEffect(() => {
     setAllLeaguesData(data?.getLeagues?.data ?? []);
   }, [data]);
 
-  const onAddUpdateParameterClose = () => {
-    setAddUpdateParameter(false);
-    setAddUpdateQuarter(false)
-  };
 
   const filteredData = (key: string) => {
     const filteredLeague = allLeaguesData.filter((league: any) => {
@@ -160,6 +159,7 @@ export default function LeaguesPage() {
   return (
     <Layout title="Financial Summary" page={LayoutPages.financial_summary}>
       <>
+        {showLoader && (<Loader/>)}
         <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden flex justify-between pb-4 pt-2">
           <div className="relative w-1/2">
             <div className="relative  m-2">
@@ -425,14 +425,14 @@ c-25 -24 -25 -27 -25 -200 l0 -175 80 0 80 0 0 120 0 120 520 0 520 0 0 -120
         {addUpdateParameter && (
           <AddUpdateParaMeter
             onSuccess={onAddUpdateParameter}
-            onClose={onAddUpdateParameterClose}
+            onClose={closePopups}
           ></AddUpdateParaMeter>
         )}
         {addUpdateQuarter && (
-          <AddUpdateParaQuarter
-            onSuccess={onAddUpdateParameter}
-            onClose={onAddUpdateParameterClose}
-          ></AddUpdateParaQuarter>
+          <AddUpdateQuarter
+            onSuccess={onAddUpdateQuarter}
+            onClose={closePopups}
+          ></AddUpdateQuarter>
         )}
       </>
     </Layout>
@@ -558,7 +558,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 }
 
 
-const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
+const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
   const [val, setVal] = useState(financialInitData)
   const currentYear = new Date().getFullYear();
   const minYear = 1880;
@@ -622,10 +622,10 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
                 value={selectedQuarter}
                 onChange={handleQuarterChange}
               >
-                <option value="Q1">Q1</option>
-                <option value="Q2">Q2</option>
-                <option value="Q3">Q3</option>
-                <option value="Q4">Q4</option>
+                <option value="1">Q1</option>
+                <option value="2">Q2</option>
+                <option value="3">Q3</option>
+                <option value="4">Q4</option>
               </select>
             </div>
           </div>
