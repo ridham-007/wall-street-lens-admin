@@ -451,7 +451,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     props.onClose && props.onClose()
   };
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
     const name = e.target.name;
 
@@ -507,14 +507,18 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             <label htmlFor="unit" className="text-sm font-medium text-gray-700">
               Unit
             </label>
-            <input
-              type="number"
+            <select
               id="unit"
-              value={val.unit}
-              onChange={handleOnChange}
               name="unit"
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
+              value={val.unit}
+              onChange={handleOnChange}
+            >
+              <option value="number">Number</option>
+              <option value="%">%</option>
+              <option value="KWH">KWH</option>
+              <option value="m">million</option>
+            </select>
           </div>
           <div className="flex flex-row items-center w-full h-full gap-2">
             <input

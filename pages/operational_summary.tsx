@@ -836,7 +836,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     subIndustry: "",
     industry: "",
   })
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const { name, value } = e.target;
     setVal((prevVal) => ({
       ...prevVal,
@@ -890,15 +890,18 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             <label htmlFor="unit" className="text-sm font-medium text-gray-700">
               Unit
             </label>
-            <input
-              type="number"
+            <select
               id="unit"
               name="unit"
-              min={0}
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
               value={val.unit}
               onChange={handleInputChange}
-            />
+            >
+              <option value="number">Number</option>
+              <option value="%">%</option>
+              <option value="KWH">KWH</option>
+              <option value="m">million</option>
+            </select>
           </div>
           <div className="flex flex-col">
             <label htmlFor="subIndustry" className="text-sm font-medium text-gray-700">

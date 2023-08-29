@@ -214,9 +214,8 @@ export default function MatchesPage() {
   const filteredData = (key: string) => {
     const filteredMatchs = allMatchsData.filter((match: any) => {
       const MatchName = `${match.league.name}`.toLocaleLowerCase();
-      const teamNames = `${
-        match.teamA?.name + match.teamB?.name
-      }`.toLocaleLowerCase();
+      const teamNames = `${match.teamA?.name + match.teamB?.name
+        }`.toLocaleLowerCase();
       return (
         MatchName.includes(key.toLocaleLowerCase()) ||
         teamNames.includes(key.toLocaleLowerCase())
@@ -240,7 +239,7 @@ export default function MatchesPage() {
   };
 
   return (
-    <Layout title="Matches" page={LayoutPages.matches}>
+    <Layout title="Matches" page={LayoutPages.outlook}>
       <>
         <div className="w-[calc((w-screen)-(w-1/5)) overflow-y-hidden flex justify-between pb-4 pt-2">
           <div className="relative w-1/2">
@@ -380,28 +379,28 @@ export default function MatchesPage() {
                                   current?._id === match?.teamAId &&
                                   current?.leagueId === match?.leagueId
                               ) && (
-                                <MatchLink
-                                  matchId={match?._id}
-                                  teamId={match?.teamAId}
-                                  title={match?.teamA?.name}
-                                  label="Team A: "
-                                  marginEnable={false}
-                                ></MatchLink>
-                              )}
+                                  <MatchLink
+                                    matchId={match?._id}
+                                    teamId={match?.teamAId}
+                                    title={match?.teamA?.name}
+                                    label="Team A: "
+                                    marginEnable={false}
+                                  ></MatchLink>
+                                )}
                               <br />
                               {teamsData?.getTeams?.data?.find(
                                 (current: { leagueId: any; _id: any }) =>
                                   current?._id === match?.teamBId &&
                                   current?.leagueId === match?.leagueId
                               ) && (
-                                <MatchLink
-                                  matchId={match?._id}
-                                  teamId={match?.teamBId}
-                                  title={match?.teamB?.name}
-                                  label="Team B: "
-                                  marginEnable={true}
-                                ></MatchLink>
-                              )}
+                                  <MatchLink
+                                    matchId={match?._id}
+                                    teamId={match?.teamBId}
+                                    title={match?.teamB?.name}
+                                    label="Team B: "
+                                    marginEnable={true}
+                                  ></MatchLink>
+                                )}
                             </div>
                           </TD>
                           <TD>
@@ -455,28 +454,28 @@ export default function MatchesPage() {
                                 current?._id === match?.teamAId &&
                                 current?.leagueId === match?.leagueId
                             ) && (
-                              <MatchLink
-                                matchId={match?._id}
-                                teamId={match?.teamAId}
-                                title={match?.teamA?.name}
-                                label="Team A: "
-                                marginEnable={false}
-                              ></MatchLink>
-                            )}
+                                <MatchLink
+                                  matchId={match?._id}
+                                  teamId={match?.teamAId}
+                                  title={match?.teamA?.name}
+                                  label="Team A: "
+                                  marginEnable={false}
+                                ></MatchLink>
+                              )}
                             <br />
                             {teamsData?.getTeams?.data?.find(
                               (current: { leagueId: any; _id: any }) =>
                                 current?._id === match?.teamBId &&
                                 current?.leagueId === match?.leagueId
                             ) && (
-                              <MatchLink
-                                matchId={match?._id}
-                                teamId={match?.teamBId}
-                                title={match?.teamB?.name}
-                                label="Team B: "
-                                marginEnable={true}
-                              ></MatchLink>
-                            )}
+                                <MatchLink
+                                  matchId={match?._id}
+                                  teamId={match?.teamBId}
+                                  title={match?.teamB?.name}
+                                  label="Team B: "
+                                  marginEnable={true}
+                                ></MatchLink>
+                              )}
                           </div>
                         </TD>
                         <TD>

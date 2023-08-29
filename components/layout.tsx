@@ -13,7 +13,7 @@ export enum LayoutPages {
   "operational_summary" = "operational_summary",
   "coaches" = "coaches",
   "vihicle_capacity" = "vihicle_capacity",
-  "matches" = "matches",
+  "outlook" = "outlook",
 }
 
 export interface LayoutProps {
@@ -292,7 +292,7 @@ export default function Layout(props: LayoutProps) {
         </div>
 
         <div className="flex flex-row overflow-auto" style={{ height: "90%" }}>
-          <div className="w-1/6 drop-shadow-xl  border-r border-gray-200 pb-5">
+          <div className="w-1/6  border-r border-gray-200 pb-5">
             <div className="flex-1 py-4 space-y-1  divide-y divide-gray-200 dark:divide-gray-700">
               <Link href="/financial_summary">
                 <button
@@ -776,10 +776,10 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
                 </button>
               </Link>
 
-              <Link href={"/matches"}>
+              <Link href={"/outlook"}>
                 <button
 
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.matches
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.outlook
                     ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
                     : "bg-slate-50 text-black"
                     }`}
@@ -793,7 +793,7 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
                   >
                     <g
                       transform="translate(0.000000,256.000000) scale(0.100000,-0.100000)"
-                      fill={`${props?.page === LayoutPages.matches
+                      fill={`${props?.page === LayoutPages.outlook
                         ? "white"
                         : "black"
                         }`}
@@ -873,7 +873,7 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
                       <path d="M2063 663 c15 -2 37 -2 50 0 12 2 0 4 -28 4 -27 0 -38 -2 -22 -4z" />
                     </g>
                   </svg>
-                  Matches
+                  Outlook
                 </button>
               </Link>
             </div>
