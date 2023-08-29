@@ -242,7 +242,7 @@ export default function TeamsPage() {
               </div>
             </div>
           </div>
-          <div className="flex flex-row-reverse pr-4 gap-4">
+          <div className="flex pr-4 gap-4">
             <button
               type="button"
               className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"

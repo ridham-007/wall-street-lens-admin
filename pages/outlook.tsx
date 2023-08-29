@@ -4,7 +4,6 @@ import { Modal } from "@/components/model";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import { format } from "date-fns";
-import { MatchLink } from "@/components/matches/link";
 import { v4 as uuidv4 } from "uuid";
 import { IMatch } from "@/types/match";
 import { toast } from "react-toastify";
@@ -373,37 +372,6 @@ export default function MatchesPage() {
                           <TD>{match?.netRange}</TD>
                           <TD>{match?.active ? "Yes" : "No"}</TD>
                           <TD>
-                            <div>
-                              {teamsData?.getTeams?.data?.find(
-                                (current: { leagueId: any; _id: any }) =>
-                                  current?._id === match?.teamAId &&
-                                  current?.leagueId === match?.leagueId
-                              ) && (
-                                  <MatchLink
-                                    matchId={match?._id}
-                                    teamId={match?.teamAId}
-                                    title={match?.teamA?.name}
-                                    label="Team A: "
-                                    marginEnable={false}
-                                  ></MatchLink>
-                                )}
-                              <br />
-                              {teamsData?.getTeams?.data?.find(
-                                (current: { leagueId: any; _id: any }) =>
-                                  current?._id === match?.teamBId &&
-                                  current?.leagueId === match?.leagueId
-                              ) && (
-                                  <MatchLink
-                                    matchId={match?._id}
-                                    teamId={match?.teamBId}
-                                    title={match?.teamB?.name}
-                                    label="Team B: "
-                                    marginEnable={true}
-                                  ></MatchLink>
-                                )}
-                            </div>
-                          </TD>
-                          <TD>
                             <div className="flex justify-center">
                               <button
                                 className="bg-blue-500 text-white font-bold rounded bg-transparent"
@@ -447,37 +415,6 @@ export default function MatchesPage() {
                         <TD>{match?.pairLimit}</TD>
                         <TD>{match?.netRange}</TD>
                         <TD>{match?.active ? "Yes" : "No"}</TD>
-                        <TD>
-                          <div>
-                            {teamsData?.getTeams?.data?.find(
-                              (current: { leagueId: any; _id: any }) =>
-                                current?._id === match?.teamAId &&
-                                current?.leagueId === match?.leagueId
-                            ) && (
-                                <MatchLink
-                                  matchId={match?._id}
-                                  teamId={match?.teamAId}
-                                  title={match?.teamA?.name}
-                                  label="Team A: "
-                                  marginEnable={false}
-                                ></MatchLink>
-                              )}
-                            <br />
-                            {teamsData?.getTeams?.data?.find(
-                              (current: { leagueId: any; _id: any }) =>
-                                current?._id === match?.teamBId &&
-                                current?.leagueId === match?.leagueId
-                            ) && (
-                                <MatchLink
-                                  matchId={match?._id}
-                                  teamId={match?.teamBId}
-                                  title={match?.teamB?.name}
-                                  label="Team B: "
-                                  marginEnable={true}
-                                ></MatchLink>
-                              )}
-                          </div>
-                        </TD>
                         <TD>
                           <div className="flex justify-center">
                             <button

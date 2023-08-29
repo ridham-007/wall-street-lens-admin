@@ -2,8 +2,6 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
-import AddUpdatePlayer from "@/components/players/add-update-player";
-import AddPlayers from "@/components/players/add-players";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from "next/router";
 import _, { constant } from 'lodash';

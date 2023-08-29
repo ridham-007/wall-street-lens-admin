@@ -169,7 +169,7 @@ export default function Layout(props: LayoutProps) {
           style={{ height: "10%" }}
         >
           <h1 className="text-3xl text-center font-normal p-2">
-            Greetings | Spikeball league
+            Greetings | Wall Street Lens
           </h1>
 
           <div className="flex align-right items-center">

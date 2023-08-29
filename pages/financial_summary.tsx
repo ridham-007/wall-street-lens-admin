@@ -14,6 +14,7 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { financialInitData } from "@/utils/data";
+import { ADD_FINANCIAL_SUMMARY_PARAMETER } from "@/utils/query";
 
 const LEAGUES = gql`
   query GetLeagues($userId: String) {
@@ -44,6 +45,8 @@ export default function LeaguesPage() {
   const [userID, setUserData] = useState("");
   const [userRole, setUserRole] = useState("");
 
+  const [addParameter, { parameterData }] = useMutation(ADD_FINANCIAL_SUMMARY_PARAMETER);
+
   const [getLeaguesData, { data, error, loading, refetch }] = useLazyQuery(
     LEAGUES,
     {
@@ -68,9 +71,19 @@ export default function LeaguesPage() {
   }, [userID]);
 
   const router = useRouter();
-  const onAddUpdateParameter = () => {
+  const onAddUpdateParameter = async (data: any) => {
+    await addParameter({
+      variables: {
+        summaryInfo: {
+            company: data.company,
+            linkTo: data.title,
+            unit: data.unit,
+            isVisibleToChart: data.isVisible
+        }
+      },
+    })
     setAddUpdateParameter(false);
-    setAddUpdateQuarter(false)
+    setAddUpdateQuarter(false);
   };
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -173,7 +186,7 @@ export default function LeaguesPage() {
               </div>
             </div>
           </div>
-          <div className="flex flex-row-reverse pr-4 gap-4">
+          <div className="flex pr-4 gap-4">
             <button
               type="button"
               className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -448,6 +461,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     isVisible: false
   })
   const handleOnSave = () => {
+    props.onSuccess && props.onSuccess(val)
     props.onClose && props.onClose()
   };
 
@@ -551,7 +565,7 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
   const [year, setYear] = useState(currentYear);
   const [selectedQuarter, setSelectedQuarter] = useState('Q1');
 
-  const handleQuarterChange = (e) => {
+  const handleQuarterChange = (e: { target: { value: SetStateAction<string>; }; }) => {
     setSelectedQuarter(e.target.value);
   };
 
