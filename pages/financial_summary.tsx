@@ -1,18 +1,8 @@
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
-import { gql, useMutation, useLazyQuery } from "@apollo/client";
-import { TD, TDR, TH, THR } from "@/components/table";
-import { LoginService } from "@/utils/login";
-import {
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Button,
-} from "@material-tailwind/react";
-import { financialInitData } from "@/utils/data";
-import { ADD_FINANCIAL_SUMMARY_PARAMETER, GET_FINANCIAL_SUMMARY_PARAMETERS } from "@/utils/query";
+import { useMutation, useLazyQuery } from "@apollo/client";
+import { ADD_FINANCIAL_SUMMARY_PARAMETER, ADD_QUARTERS_DETAILS, GET_FINANCIAL_SUMMARY_PARAMETERS } from "@/utils/query";
 import Loader from "@/components/loader";
 import { TabButton } from "@/components/TabButton";
 import ParameterTable from "@/components/table/financial/ParameterTable";
@@ -23,20 +13,17 @@ const selectedCompany = [{
   name: 'TESLA',
 }]
 
-export default function LeaguesPage() {
+export default function FinancialPage() {
   const [showLoader, setShowLoader] = useState(false);
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
-  const [updateLeague, setUpdateLeague] = useState(null);
+  const [perametersData, setPerametersData] = useState<any[]>([]);
   const [searchKey, setSearchKey] = useState("");
-  const [filteredLeagues, setFilteredLeagues] = useState<any[]>([]);
-  const [allLeaguesData, setAllLeaguesData] = useState<any[]>([]);
   const [isOpenAction, setIsOpenAction] = useState("");
-  const [userID, setUserData] = useState("");
-  const [userRole, setUserRole] = useState("");
   const [activeTab, setActiveTab] = useState('Parameter');
 
-  const [addParameter, { parameterData }] = useMutation(ADD_FINANCIAL_SUMMARY_PARAMETER);
+  const [addParameter, { data: parameterData }] = useMutation(ADD_FINANCIAL_SUMMARY_PARAMETER);
+  const [addQuarters, { data: quartersData }] = useMutation(ADD_QUARTERS_DETAILS);
 
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
@@ -51,16 +38,24 @@ export default function LeaguesPage() {
     }
   );
 
-  const getDatafromLocalStorage = async () => {
-    const localStorageData = await LoginService.getUser();
-    setUserRole(localStorageData?.role);
-    setUserData(localStorageData?._id);
-  };
+  useEffect(() => {
+    if (data && data.getFinancialSummaryByCompany){
+      const updatedData = data.getFinancialSummaryByCompany?.map((current: { id: any; linkTo: any; unit: any; }) => {
+        return {
+          id: current?.id,
+          title: current?.linkTo,
+          value: '',
+          unit: current?.unit
+        }
+      });
+      setPerametersData(updatedData)
+    }
+  }, [data])
 
 
   useEffect(() => {
     getParametersData();
-  }, [userID]);
+  }, [getParametersData, parameterData]);
 
   const closePopups = () => {
     setAddUpdateParameter(false);
@@ -80,10 +75,34 @@ export default function LeaguesPage() {
       },
     })
     setShowLoader(false);
+    refetch();
     closePopups()
   };
 
-  const onAddUpdateQuarter = () => {
+  const onAddUpdateQuarter = async(perameters: any) => {
+    const {
+      year,
+      selectedQuarter,
+      val,
+    } = perameters;
+
+    const mutationData: { quarter: any; year: any; value: any; financialSummaryId: any; }[] = [];
+    val.forEach((current: { value: any; id: any; }) => {
+      mutationData.push({
+        quarter: selectedQuarter,
+        year,
+        value: current?.value,
+        financialSummaryId: current?.id, 
+      })
+    })
+
+    await addQuarters({
+      variables:{
+        addQuarters: {
+          quarters: mutationData
+        },
+      }
+    })
 
   }
 
@@ -108,43 +127,10 @@ export default function LeaguesPage() {
     };
   }, [isOpenAction]);
 
-  useEffect(() => {
-    setAllLeaguesData(data?.getLeagues?.data ?? []);
-  }, [data]);
-
-
-  const filteredData = (key: string) => {
-    const filteredLeague = allLeaguesData.filter((league: any) => {
-      const leagueName = `${league.name}`.toLocaleLowerCase();
-      return leagueName.includes(key.toLocaleLowerCase());
-    });
-    return filteredLeague;
-  };
 
   const onKeyPress = (event: any) => {
     if (event.key === "Enter") {
       setSearchKey(event.target.value);
-      setFilteredLeagues(filteredData(event.target.value));
-    }
-  };
-
-  const toggleMenu = (teamId: SetStateAction<string>) => {
-    if (isOpenAction?.length > 0) {
-      setIsOpenAction("");
-    } else {
-      setIsOpenAction(teamId);
-    }
-  };
-
-  const toggleMatch = (leagueId: SetStateAction<string>) => {
-    window.location.href = "/operational_summary?leagueId=" + leagueId;
-  };
-
-  const getLeaguesForDisplay = () => {
-    if (searchKey !== "") {
-      return filteredLeagues;
-    } else {
-      return allLeaguesData;
     }
   };
 
@@ -264,6 +250,7 @@ export default function LeaguesPage() {
           <AddUpdateQuarter
             onSuccess={onAddUpdateQuarter}
             onClose={closePopups}
+            financialInitData={perametersData}
           ></AddUpdateQuarter>
         )}
       </>
@@ -275,6 +262,7 @@ interface AddUpdateParameterProps {
   onSuccess?: any;
   onClose?: any;
   selectedCompany?: any;
+  financialInitData?: any;
 }
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
@@ -383,14 +371,14 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
 
 const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
-  const [val, setVal] = useState(financialInitData)
+  const [val, setVal] = useState(props.financialInitData)
   const currentYear = new Date().getFullYear();
   const minYear = 1880;
   const [year, setYear] = useState(currentYear);
-  const [selectedQuarter, setSelectedQuarter] = useState('Q1');
+  const [selectedQuarter, setSelectedQuarter] = useState(1);
 
   const handleQuarterChange = (e: { target: { value: SetStateAction<string>; }; }) => {
-    setSelectedQuarter(e.target.value);
+    setSelectedQuarter(Number(e.target.value));
   };
 
   const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -400,14 +388,13 @@ const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
     }
   };
   const handleOnSave = () => {
-    console.log({ val, year, selectedQuarter });
+    props.onSuccess && props.onSuccess({ val, year, selectedQuarter })
   };
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
-    setVal(prevVal => (
-      prevVal.map(val => val.id === id ? { ...val, value: e.target.value } : { ...val })
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>, id: any) => {
+    setVal((prevVal: any[]) => (
+      prevVal.map((val: { id: any; }) => val.id === id ? { ...val, value: Number(e.target.value) } : { ...val })
     ))
-
   };
   return (
     <Modal
@@ -446,10 +433,10 @@ const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
                 value={selectedQuarter}
                 onChange={handleQuarterChange}
               >
-                <option value="1">Q1</option>
-                <option value="2">Q2</option>
-                <option value="3">Q3</option>
-                <option value="4">Q4</option>
+                <option value={1}>Q1</option>
+                <option value={2}>Q2</option>
+                <option value={3}>Q3</option>
+                <option value={4}>Q4</option>
               </select>
             </div>
           </div>
@@ -457,7 +444,7 @@ const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
         <h1 className="text-xl font-semibold mb-2 mt-4">Parameter</h1>
         <form className="form w-100">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {val?.map(item => (
+            {val?.map((item: { id: Key | null | undefined; title: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; value: string | number | readonly string[] | undefined; }) => (
               <div key={item.id} className="flex flex-col">
                 <label
                   htmlFor={`value-${item.id}`}
@@ -466,12 +453,12 @@ const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
                   {item.title}
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   id={`value-${item.id}`}
                   name={`value-${item.id}`}
                   className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                   value={item.value}
-                  onChange={(e) => handleOnChange(e, item.id)}
+                  onChange={(e) => { item.id && handleOnChange(e, item.id)}}
                 />
               </div>
             ))}

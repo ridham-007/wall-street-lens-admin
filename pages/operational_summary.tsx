@@ -1,130 +1,23 @@
 import { SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { TD, TDR, TH, THR } from "@/components/table";
-import { v4 as uuidv4 } from 'uuid';
-import { ITeam } from "@/types/team";
-import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
-import { useRouter } from "next/router";
-import { LoginService } from "@/utils/login";
-import {
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Button,
-} from "@material-tailwind/react";
-import { financialInitData, oprationalInitData } from "@/utils/data";
+
+import { oprationalInitData } from "@/utils/data";
 import { TabButton } from "@/components/TabButton";
 import ParameterTable from "@/components/table/operational/ParameterTable";
 import QuarterTable from "@/components/table/operational/QuarterTable";
 
 
-const TEAMS = gql`
-  query GetTeams(
-    $userId: String
-  ) {
-    getTeams(
-      userId: $userId
-    ) {
-      code
-      success
-      data {
-        _id
-        name
-        active
-        coach {
-          _id
-          firstName
-          lastName
-          login {
-            email
-          }
-        }
-        league {
-          _id
-          name
-        }
-      }
-      teamWithLeagues{
-        teamId
-        leagueIds
-      }
-    }
-  }
-`;
-
-const LEAGUES = gql`
-  query GetLeagues(
-    $userId: String
-  ) {
-    getLeagues(
-      userId: $userId
-    ) {
-      code
-      success
-      message
-      data {
-        _id
-        name
-        startDate
-        endDate
-        active
-        playerLimit
-      }
-    }
-  }
-`;
-
-
 export default function TeamsPage() {
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
-  const [isOpen, setIsOpen] = useState('');
   const [searchKey, setSearchKey] = useState('');
   const [isOpenAction, setIsOpenAction] = useState('');
-  const [leagueId, setLeagueId] = useState('');
-  const [filteredTeams, setFilteredTeams] = useState<any[]>([]);
-  const [allTeamData, setAllTeamData] = useState<any[]>([]);
-  const [updateTeam, setUpdateTeam] = useState<any>(null);
-  // const { data, error, loading, refetch } = useQuery(TEAMS);
+
   const [activeTab, setActiveTab] = useState('Parameter');
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
   };
-  const router = useRouter();
-  const [userID, setUserID] = useState('');
-  const [userRole, setUserRole] = useState('');
-
-  const [getTeamsData, { data, error, loading, refetch }] = useLazyQuery(TEAMS,
-    {
-      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
-    }
-  );
-
-  const [getLeaguesData, { data: leaguesData }] = useLazyQuery(LEAGUES,
-    {
-      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
-    }
-  );
-
-  const getDatafromLocalStorage = async () => {
-    const localStorageData = await LoginService.getUser();
-    setUserRole(localStorageData?.role);
-    setUserID(localStorageData?._id);
-  }
-
-  useEffect(() => {
-    getDatafromLocalStorage();
-  }, []);
-
-  useEffect(() => {
-    getTeamsData();
-    getLeaguesData();
-  }, [userID]);
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -145,13 +38,6 @@ export default function TeamsPage() {
   }, [isOpenAction])
 
 
-  useEffect(() => {
-    setAllTeamData(data?.getTeams?.data ?? []);
-  }, [data]);
-
-  useEffect(() => {
-    setFilteredTeams(filteredData(searchKey))
-  }, [allTeamData]);
 
 
   const onAddUpdateParameter = () => {
@@ -162,75 +48,14 @@ export default function TeamsPage() {
     setAddUpdateParameter(false);
     setAddUpdateQuarter(false)
   };
-  const filteredData = (key: string) => {
-    const filteredTeam = allTeamData.filter((team: any) => {
-      const teamName = `${team.name}`.toLocaleLowerCase();
-      return teamName.includes(key.toLocaleLowerCase());
-    });
-    return filteredTeam;
-  }
 
   const onKeyPress = (event: any) => {
     if (event.key === "Enter") {
       setSearchKey(event.target.value)
-      setFilteredTeams(filteredData(event.target.value));
-    }
-  }
-
-  const getTeamsForDisplay = () => {
-    if (searchKey !== "") {
-      return filteredTeams;
-    } else {
-      return allTeamData;
     }
   }
 
 
-  const toggleMenu = (teamId: SetStateAction<string>) => {
-    if (isOpenAction?.length > 0) {
-      setIsOpenAction('');
-    } else {
-      setIsOpenAction(teamId);
-    }
-  };
-
-  const toggleTeam = (teamId: SetStateAction<string>) => {
-    []
-    window.location.href = "/players?teamId=" + teamId;
-  }
-
-  const displayTeams = getTeamsForDisplay()?.filter(current => router?.query?.leagueId ? current?.league?._id === router?.query?.leagueId?.toString() : true)
-  const teamsTableData: any[] = [];
-  const mappingData = data?.getTeams?.teamWithLeagues;
-  displayTeams?.forEach(current => {
-    const teamLeagues = mappingData?.find((cur: { teamId: any; }) => cur?.teamId === current?._id)?.leagueIds;
-    let teamLeaguesData = [];
-    if (teamLeagues?.length > 0) {
-      teamLeaguesData = teamLeagues?.map((teamCurrent: any) => {
-        const findLeague = leaguesData?.getLeagues?.data?.find((leagueCurrent: { _id: any; }) => leagueCurrent?._id === teamCurrent);
-        return findLeague;
-      });
-      const find = teamLeaguesData?.find((curleague: { _id: any; }) => curleague?._id === current?.league?._id);
-      if (!find) {
-        teamLeaguesData.push(current?.league);
-      }
-    } else {
-      teamLeaguesData.push(current?.league);
-    }
-    teamsTableData.push({ ...current, teamLeaguesData })
-  })
-
-  const updatedTeamsTableData: any[] = [];
-  teamsTableData?.forEach(cur => {
-    const filterMapping = cur?.teamLeaguesData?.find((curdata: { _id: string; }) =>
-      router?.query?.leagueId ? curdata?._id === router?.query?.leagueId?.toString() : leagueId?.length > 0 && leagueId !== "Select a league" ? curdata?._id === leagueId : true);
-
-    if (filterMapping) {
-      updatedTeamsTableData.push({
-        ...cur,
-      })
-    }
-  })
 
   return (
     <Layout title="Operational Summary" page={LayoutPages.operational_summary}>
@@ -371,8 +196,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   };
 
   const handleOnSave = () => {
-    console.log({ val });
-
     props.onClose && props.onClose()
   };
 
@@ -472,7 +295,7 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
   const [year, setYear] = useState(currentYear);
   const [selectedQuarter, setSelectedQuarter] = useState('Q1');
 
-  const handleQuarterChange = (e) => {
+  const handleQuarterChange = (e: { target: { value: SetStateAction<string>; }; }) => {
     setSelectedQuarter(e.target.value);
   };
 
@@ -483,7 +306,7 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
     }
   };
   const handleOnSave = () => {
-    console.log({ val, year, selectedQuarter });
+
   };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {

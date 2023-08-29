@@ -5,7 +5,7 @@ import { TabButton } from "@/components/TabButton";
 import ParameterTable from "@/components/table/vihicle/ParameterTable";
 import QuarterTable from "@/components/table/vihicle/QuarterTable";
 
-export default function PlayersPage() {
+export default function Capacity() {
 
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
@@ -42,7 +42,7 @@ export default function PlayersPage() {
     }
   }, [isOpenAction])
   return (
-    <Layout title="Players" page={LayoutPages.vihicle_capacity}>
+    <Layout title="Capasity" page={LayoutPages.vihicle_capacity}>
       <>
         <div className="flex justify-between mb-4">
           <div className="relative w-1/3">
@@ -183,8 +183,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   })
   const handleOnSave = () => {
     props.onClose && props.onClose()
-    console.log(val);
-
   };
 
 
@@ -311,10 +309,10 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               value={val.selectedQuarter}
               onChange={handleOnChange}
             >
-              <option value="Q1">Q1</option>
-              <option value="Q2">Q2</option>
-              <option value="Q3">Q3</option>
-              <option value="Q4">Q4</option>
+              <option value={1}>Q1</option>
+              <option value={2}>Q2</option>
+              <option value={3}>Q3</option>
+              <option value={4}>Q4</option>
             </select>
           </div>
 

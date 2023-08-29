@@ -6,8 +6,6 @@ const QuarterTable = () => {
     const ref = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
         const checkIfClickedOutside = (e: { target: any; }) => {
-            // If the menu is open and the clicked target is not within the menu,
-            // then close the menu
             if (isOpenAction && ref.current && !ref.current.contains(e.target)) {
                 setIsOpenAction(false)
             }
@@ -34,11 +32,14 @@ const QuarterTable = () => {
                 <thead className="w-full sticky top-0 z-20">
                     <THR>
                         <>
-                            <TH>title</TH>
+                            <TH>Quarter</TH>
                             <TH>Company</TH>
-                            <TH>Summary</TH>
-                            <TH>Updated At</TH>
-                            <TH >Actions</TH>
+                            <TH>Quarter summary</TH>
+                            <TH>Region</TH>
+                            <TH>Modal</TH>
+                            <TH>Capacity</TH>
+                            <TH>Operation Type</TH>
+                            <TH >Action</TH>
                         </>
                     </THR>
                 </thead>
@@ -46,6 +47,9 @@ const QuarterTable = () => {
                 <tbody className="w-full">
                     <TDR >
                         <>
+                            <TD></TD>
+                            <TD></TD>
+                            <TD></TD>
                             <TD></TD>
                             <TD></TD>
                             <TD></TD>
@@ -60,7 +64,7 @@ const QuarterTable = () => {
 
                                     </button>
                                     {(isOpenAction && (
-                                        <div ref={ref} className="z-auto absolute right-[150px] mt-2   rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                        <div ref={ref} className="z-auto absolute right-[85px] mt-2   rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                                 <a
                                                     // onClick={() => {}}
@@ -79,6 +83,6 @@ const QuarterTable = () => {
             </table>
         </div >
     </>
-
 }
+
 export default QuarterTable;
