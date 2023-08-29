@@ -1,23 +1,9 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { TD, TDR, TH, THR } from "@/components/table";
-import { v4 as uuidv4 } from 'uuid';
-import { useRouter } from "next/router";
-import _, { constant } from 'lodash';
-import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
-import { LoginService } from "@/utils/login";
-import {
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Button,
-} from "@material-tailwind/react";
 import { Modal } from "@/components/model";
 import { TabButton } from "@/components/TabButton";
-import ParameterTable from "@/components/table/ParameterTable";
-import QuarterTable from "@/components/table/QuarterTable";
+import ParameterTable from "@/components/table/vihicle/ParameterTable";
+import QuarterTable from "@/components/table/vihicle/QuarterTable";
 
 export default function PlayersPage() {
 
@@ -25,33 +11,7 @@ export default function PlayersPage() {
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
   const [title, setTitle] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState('Parameter');
-
-  const [isOpen, setIsOpen] = useState('');
-  const [userRole, setUserRole] = useState('');
-  const [userID, setUserData] = useState('');
-
-  const [teamId, setTeamId] = useState('');
-  const [leagueId, setLeagueId] = useState('');
-  const [searchKey, setSearchKey] = useState('');
   const [isOpenAction, setIsOpenAction] = useState('');
-  const [addUpdatePlayer, setAddUpdatePlayer] = useState(false);
-  const [addPlayers, setAddPlayers] = useState(false);
-  const [updatePlayer, setUpdatePlayer] = useState(null);
-  const [updatedPlayers, setUpdatedPlayers] = useState<any[]>([]);
-
-  const router = useRouter();
-  const [refetchAfterRankUpdate, setRefetchAfterRankUpdate] = useState(false);
-  const [addInAnotherLeague, setAddInAnotherLeague] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
-
-
-
-  const getDatafromLocalStorage = async () => {
-    const localStorageData = await LoginService.getUser();
-    setUserRole(localStorageData?.role);
-    setUserData(localStorageData?._id);
-  }
-
 
   const onAddUpdateParameter = () => {
     setAddUpdateParameter(false);
@@ -66,18 +26,10 @@ export default function PlayersPage() {
     setActiveTab(tabName);
   };
 
-  useEffect(() => {
-    getDatafromLocalStorage();
-  }, []);
-
-
-
   const ref = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const checkIfClickedOutside = (e: { target: any; }) => {
-      // If the menu is open and the clicked target is not within the menu,
-      // then close the menu
       if (isOpenAction?.length > 0 && ref.current && !ref.current.contains(e.target)) {
         setIsOpenAction('')
       }
@@ -86,7 +38,6 @@ export default function PlayersPage() {
     document.addEventListener("mousedown", checkIfClickedOutside)
 
     return () => {
-      // Cleanup the event listener
       document.removeEventListener("mousedown", checkIfClickedOutside)
     }
   }, [isOpenAction])
@@ -228,14 +179,13 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     capacity: "",
     operationType: "",
     selectedQuarter: 'Q1',
-    title: ""
+    summary: ""
   })
   const handleOnSave = () => {
     props.onClose && props.onClose()
     console.log(val);
 
   };
-  console.log(props.title)
 
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
@@ -257,6 +207,22 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     >
       <form className="form w-100">
         <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <label htmlFor="summary" className="text-sm font-medium text-gray-700">
+              Quarter summary
+            </label>
+            <select
+              id="summary"
+              name="summary"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.summary}
+              onChange={handleOnChange}
+            >
+              {props.title?.map((item: string, index: number) => {
+                return <option value={item} key={index}>{item}</option>
+              })}
+            </select>
+          </div>
           <div className="flex flex-col">
             <label htmlFor="company" className="text-sm font-medium text-gray-700">
               Company
@@ -351,22 +317,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               <option value="Q4">Q4</option>
             </select>
           </div>
-          <div className="flex flex-col">
-            <label htmlFor="title" className="text-sm font-medium text-gray-700">
-              Title
-            </label>
-            <select
-              id="title"
-              name="title"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.title}
-              onChange={handleOnChange}
-            >
-              {props.title?.map((item: string, index: number) => {
-                return <option value={item} key={index}>{item}</option>
-              })}
-            </select>
-          </div>
+
         </div>
       </form>
     </Modal>

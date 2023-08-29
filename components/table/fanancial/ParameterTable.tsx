@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { TD, TDR, TH, THR } from "../table";
+import { TD, TDR, TH, THR } from "../../table";
 
 const ParameterTable = () => {
     const [isOpenAction, setIsOpenAction] = useState(false);

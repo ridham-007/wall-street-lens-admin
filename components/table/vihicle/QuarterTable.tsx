@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { TD, TDR, TH, THR } from "../table";
+import { TD, TDR, TH, THR } from "../../table";
 
 const QuarterTable = () => {
     const [isOpenAction, setIsOpenAction] = useState(false);
@@ -8,8 +8,8 @@ const QuarterTable = () => {
         const checkIfClickedOutside = (e: { target: any; }) => {
             // If the menu is open and the clicked target is not within the menu,
             // then close the menu
-            if (isOpenAction?.length > 0 && ref.current && !ref.current.contains(e.target)) {
-                setIsOpenAction('')
+            if (isOpenAction && ref.current && !ref.current.contains(e.target)) {
+                setIsOpenAction(false)
             }
         }
 
@@ -34,8 +34,9 @@ const QuarterTable = () => {
                 <thead className="w-full sticky top-0 z-20">
                     <THR>
                         <>
-                            <TH>Quarter</TH>
-                            <TH>Year</TH>
+                            <TH>title</TH>
+                            <TH>Company</TH>
+                            <TH>Summary</TH>
                             <TH>Updated At</TH>
                             <TH >Actions</TH>
                         </>
@@ -45,6 +46,7 @@ const QuarterTable = () => {
                 <tbody className="w-full">
                     <TDR >
                         <>
+                            <TD></TD>
                             <TD></TD>
                             <TD></TD>
                             <TD></TD>
