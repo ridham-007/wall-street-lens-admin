@@ -542,10 +542,23 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
 const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
   const [val, setVal] = useState(financialInitData)
-  console.log({ val });
+  const currentYear = new Date().getFullYear();
+  const minYear = 1880;
+  const [year, setYear] = useState(currentYear);
+  const [selectedQuarter, setSelectedQuarter] = useState('Q1');
 
+  const handleQuarterChange = (e) => {
+    setSelectedQuarter(e.target.value);
+  };
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseInt(e.target.value);
+    if (!isNaN(newValue)) {
+      setYear(Math.max(minYear, Math.min(currentYear, newValue)));
+    }
+  };
   const handleOnSave = () => {
-
+    console.log({ val, year, selectedQuarter });
   };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
@@ -561,6 +574,44 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
       title="Add Quarter Details"
       onClose={() => props.onClose && props.onClose()}
     >
+      <div>
+        <h1 className="text-xl font-semibold mb-2">Basic details</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <label htmlFor="year" className="text-sm font-medium text-gray-700">
+              Year
+            </label>
+            <input
+              type="number"
+              id="year"
+              name="year"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={year}
+              min={minYear}
+              max={currentYear}
+              onChange={handleYearChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+              Quarter
+            </label>
+            <select
+              id="quarter"
+              name="quarter"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={selectedQuarter}
+              onChange={handleQuarterChange}
+            >
+              <option value="Q1">Q1</option>
+              <option value="Q2">Q2</option>
+              <option value="Q3">Q3</option>
+              <option value="Q4">Q4</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <h1 className="text-xl font-semibold mb-2 mt-4">Parameter</h1>
       <form className="form w-100">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {val?.map(item => (
@@ -584,6 +635,6 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
         </div>
 
       </form>
-    </Modal>
+    </Modal >
   );
 }
