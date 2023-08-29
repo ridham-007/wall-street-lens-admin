@@ -8,7 +8,7 @@ import ParameterTable from "@/components/table/operational/ParameterTable";
 import QuarterTable from "@/components/table/operational/QuarterTable";
 
 
-export default function TeamsPage() {
+export default function OperationPage() {
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
   const [searchKey, setSearchKey] = useState('');
