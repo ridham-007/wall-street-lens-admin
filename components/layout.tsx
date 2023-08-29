@@ -589,7 +589,7 @@ l-20 -24 -140 126 c-186 167 -178 158 -133 139 80 -33 167 -6 214 65 l26 39
                   >
                     <g
                       transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                      fill={`${props?.page === LayoutPages.operational_summary
+                      fill={`${props?.page === LayoutPages.vihicle_capacity
                         ? "white"
                         : "black"
                         }`}

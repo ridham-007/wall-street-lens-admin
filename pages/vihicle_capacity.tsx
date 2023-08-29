@@ -926,7 +926,8 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     region: "",
     modal: "",
     capacity: "",
-    operationType: ""
+    operationType: "",
+    selectedQuarter: 'Q1'
   })
   const handleOnSave = () => {
     props.onClose && props.onClose()
@@ -976,7 +977,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             <input
               type="text"
               id="region"
-
               name="region"
               value={val.region}
               onChange={handleOnChange}
@@ -1029,6 +1029,23 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 Tooling</option>
               <option value="pilotProduction">Pilot production</option>
               <option value="inDevelopment">In development</option>
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+              Quarter
+            </label>
+            <select
+              id="quarter"
+              name="selectedQuarter"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.selectedQuarter}
+              onChange={handleOnChange}
+            >
+              <option value="Q1">Q1</option>
+              <option value="Q2">Q2</option>
+              <option value="Q3">Q3</option>
+              <option value="Q4">Q4</option>
             </select>
           </div>
         </div>
