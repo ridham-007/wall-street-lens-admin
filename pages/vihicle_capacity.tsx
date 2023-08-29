@@ -15,12 +15,16 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { Modal } from "@/components/model";
+import { TabButton } from "@/components/TabButton";
+import ParameterTable from "@/components/table/ParameterTable";
+import QuarterTable from "@/components/table/QuarterTable";
 
 export default function PlayersPage() {
 
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
   const [title, setTitle] = useState<string[]>([])
+  const [activeTab, setActiveTab] = useState('Parameter');
 
   const [isOpen, setIsOpen] = useState('');
   const [userRole, setUserRole] = useState('');
@@ -56,6 +60,10 @@ export default function PlayersPage() {
   const onAddUpdateParameterClose = () => {
     setAddUpdateParameter(false);
     setAddUpdateQuarter(false)
+  };
+
+  const handleTabClick = (tabName: string) => {
+    setActiveTab(tabName);
   };
 
   useEffect(() => {
@@ -159,27 +167,21 @@ export default function PlayersPage() {
             </button>
           </div>
         </div>
-        <div style={{
-          maxHeight: 'calc(100vh - 270px)'
-        }} className="w-[calc((w-screen)-(w-1/5)) overflow-scroll">
-          <table className="app-table w-full">
-            <thead className="w-full sticky top-0 z-20">
-              <THR>
-                <>
-                  <TH></TH>
-                  <TH>Name</TH>
-                  <TH>Email</TH>
-                  <TH>Shirt Number</TH>
-                  <TH>Rank</TH>
-                  <TH>Team</TH>
-                  <TH>League</TH>
-                  <TH>Active</TH>
-                  <TH>Actions</TH>
-                </>
-              </THR>
-            </thead>
-
-          </table >
+        <div className="flex mb-4">
+          <TabButton
+            label="Parameter"
+            activeTab={activeTab}
+            onClick={() => handleTabClick('Parameter')}
+          />
+          <TabButton
+            label="Quarter"
+            activeTab={activeTab}
+            onClick={() => handleTabClick('Quarter')}
+          />
+        </div>
+        <div>
+          {activeTab === 'Parameter' && <ParameterTable />}
+          {activeTab === 'Quarter' && <QuarterTable />}
         </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter

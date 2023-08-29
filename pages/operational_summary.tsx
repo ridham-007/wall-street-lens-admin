@@ -18,6 +18,9 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { financialInitData, oprationalInitData } from "@/utils/data";
+import { TabButton } from "@/components/TabButton";
+import ParameterTable from "@/components/table/ParameterTable";
+import QuarterTable from "@/components/table/QuarterTable";
 
 
 const TEAMS = gql`
@@ -88,6 +91,10 @@ export default function TeamsPage() {
   const [allTeamData, setAllTeamData] = useState<any[]>([]);
   const [updateTeam, setUpdateTeam] = useState<any>(null);
   // const { data, error, loading, refetch } = useQuery(TEAMS);
+  const [activeTab, setActiveTab] = useState('Parameter');
+  const handleTabClick = (tabName: string) => {
+    setActiveTab(tabName);
+  };
   const router = useRouter();
   const [userID, setUserID] = useState('');
   const [userRole, setUserRole] = useState('');
@@ -301,7 +308,22 @@ export default function TeamsPage() {
           </div>
 
         </div>
-
+        <div className="flex mb-4">
+          <TabButton
+            label="Parameter"
+            activeTab={activeTab}
+            onClick={() => handleTabClick('Parameter')}
+          />
+          <TabButton
+            label="Quarter"
+            activeTab={activeTab}
+            onClick={() => handleTabClick('Quarter')}
+          />
+        </div>
+        <div>
+          {activeTab === 'Parameter' && <ParameterTable />}
+          {activeTab === 'Quarter' && <QuarterTable />}
+        </div>
         <div style={{
           maxHeight: 'calc(100vh - 200px)'
         }} className="w-[calc((w-screen)-(w-1/5)) overflow-scroll">
@@ -797,6 +819,9 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
             </tbody>
           </table>
         </div>
+
+
+
 
         {addUpdateParameter && (
           <AddUpdateParaMeter
