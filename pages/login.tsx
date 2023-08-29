@@ -2,8 +2,8 @@ import { LoginService } from "@/utils/login";
 import { gql, useMutation } from "@apollo/client";
 import Head from "next/head";
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
 
 const LOGIN = gql`
@@ -23,31 +23,31 @@ const LOGIN = gql`
             email
           }
           player {
-          shirtNumber
-          rank
-          teamId
-          leagueId
+            shirtNumber
+            rank
+            teamId
+            leagueId
 
-          league {
-            _id
-            name
-          }
-
-          team {
-            _id
-            name
-          }
-        }
-        coach {
-          team {
-            name
-            _id
             league {
               _id
               name
             }
+
+            team {
+              _id
+              name
+            }
           }
-        }
+          coach {
+            team {
+              name
+              _id
+              league {
+                _id
+                name
+              }
+            }
+          }
           active
         }
       }
@@ -58,7 +58,7 @@ const LOGIN = gql`
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loginFunction, { data, error, loading }] = useMutation(LOGIN,)
+  const [loginFunction, { data, error, loading }] = useMutation(LOGIN);
 
   const onLogin = () => {
     loginFunction({
@@ -67,7 +67,7 @@ export default function LoginPage() {
         password,
       },
     });
-  }
+  };
 
   useEffect(() => {
     LoginService.deleteToken();
@@ -76,18 +76,28 @@ export default function LoginPage() {
       const loginData = data?.login?.data;
       LoginService.saveUser({ ...loginData.user, timeStamp: new Date() });
       LoginService.saveToken(loginData.token);
-      toast('Login Sucessfully.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'success' });
-      window.location.href = "/leagues";
+      toast("Login Sucessfully.", {
+        toastId: "blockuser",
+        hideProgressBar: false,
+        autoClose: 7000,
+        type: "success",
+      });
+      window.location.href = "/financial_summary";
     } else if (data?.login?.code == 404) {
-      toast('Email or Password is Invalid.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
+      toast("Email or Password is Invalid.", {
+        toastId: "blockuser",
+        hideProgressBar: false,
+        autoClose: 7000,
+        type: "error",
+      });
     }
   }, [data]);
 
   const onKeyPress = (event: any) => {
-    if (event?.key === 'Enter') {
+    if (event?.key === "Enter") {
       onLogin();
     }
-  }
+  };
   return (
     <>
       <Head>

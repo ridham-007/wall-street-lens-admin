@@ -5,11 +5,11 @@ import { UserContext } from "@/config/auth";
 import Link from "next/link";
 import { LoginService } from "@/utils/login";
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export enum LayoutPages {
-  "leagues" = "leagues",
+  "financial_summary" = "financial_summary",
   "teams" = "teams",
   "coaches" = "coaches",
   "players" = "players",
@@ -23,8 +23,16 @@ export interface LayoutProps {
 }
 
 const CHANGE_PASSWORD = gql`
-  mutation ChangePassword($id: String!, $oldPassword: String!, $newPassword: String) {
-    changePassword(id: $id, oldPassword: $oldPassword, newPassword: $newPassword) {
+  mutation ChangePassword(
+    $id: String!
+    $oldPassword: String!
+    $newPassword: String
+  ) {
+    changePassword(
+      id: $id
+      oldPassword: $oldPassword
+      newPassword: $newPassword
+    ) {
       code
       success
       message
@@ -38,12 +46,11 @@ const CHANGE_PASSWORD = gql`
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
 
-
   const [isOpenAction, setIsOpenAction] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [reEnterPassword, setReEnterPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [reEnterPassword, setReEnterPassword] = useState("");
   const ref = useRef<HTMLInputElement | null>(null);
 
   const [updatePassword, { data, error, loading }] = useMutation(
@@ -59,31 +66,42 @@ export default function Layout(props: LayoutProps) {
 
   useEffect(() => {
     if (data?.changePassword?.code === 200) {
-      toast('Password updated successfully!', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      toast("Password updated successfully!", {
+        hideProgressBar: false,
+        autoClose: 7000,
+        type: "error",
+      });
       LoginService.deleteUser();
-      window.location.href = "/login";
+      // window.location.href = "/login";
     } else if (data?.changePassword?.code === 300) {
-      toast('Entered password is wrong!', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      toast("Entered password is wrong!", {
+        hideProgressBar: false,
+        autoClose: 7000,
+        type: "error",
+      });
     }
-  }, [data])
+  }, [data]);
 
   useEffect(() => {
-    const checkIfClickedOutside = (e: { target: any; }) => {
+    const checkIfClickedOutside = (e: { target: any }) => {
       // If the menu is open and the clicked target is not within the menu,
       // then close the menu
-      if (isOpenAction === true && ref.current && !ref.current.contains(e.target)) {
-        setIsOpenAction(false)
+      if (
+        isOpenAction === true &&
+        ref.current &&
+        !ref.current.contains(e.target)
+      ) {
+        setIsOpenAction(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", checkIfClickedOutside)
+    document.addEventListener("mousedown", checkIfClickedOutside);
 
     return () => {
       // Cleanup the event listener
-      document.removeEventListener("mousedown", checkIfClickedOutside)
-    }
-  }, [isOpenAction])
-
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, [isOpenAction]);
 
   useEffect(() => {
     try {
@@ -92,32 +110,40 @@ export default function Layout(props: LayoutProps) {
       const currentTime = new Date().getTime();
       const dateDiffInMinutes = (currentTime - timeStamp) / (60 * 1000);
       if (!user || dateDiffInMinutes > 120) {
-        window.location.href = "/login";
+        // window.location.href = "/login";
       }
     } catch (err) {
-      if (!user) window.location.href = "/login";
+      // if (!user) window.location.href = "/login";
     }
   });
 
   const logout = () => {
     LoginService.deleteToken();
     LoginService.deleteUser();
-    window.location.href = "/login";
-  }
+    // window.location.href = "/login";
+  };
 
   const handleOpen = () => {
     setIsOpenAction(true);
-  }
+  };
 
   const onSubmit = () => {
     if (newPassword?.length < 6) {
-      toast('Password length should not be less than 6', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      toast("Password length should not be less than 6", {
+        hideProgressBar: false,
+        autoClose: 7000,
+        type: "error",
+      });
     } else if (newPassword !== reEnterPassword) {
-      toast('Re entered password is not same', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      toast("Re entered password is not same", {
+        hideProgressBar: false,
+        autoClose: 7000,
+        type: "error",
+      });
     } else {
       updatePassword();
     }
-  }
+  };
 
   return (
     <>
@@ -140,42 +166,125 @@ export default function Layout(props: LayoutProps) {
       >
         <div
           className="flex items-center flex-row shadow-md overflow-hidden bg-white border-b border-gray-200 px-6 py-2 items-center justify-between"
-          style={{ height: "10%" }}>
+          style={{ height: "10%" }}
+        >
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Spikeball league
           </h1>
 
           <div className="flex align-right items-center">
             <button onClick={handleOpen}>
-              <svg enable-background="new 0 0 64 64" className="h-9 w-9" version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g id="Layer_1"><g><circle cx="32" cy="32" fill="#4F5D73" r="32" /></g><g opacity="0.2"><g><path d="M43.905,47.543c-3.821-1.66-5.217-4.242-5.643-6.469c2.752-2.215,4.943-5.756,6.148-9.573     c1.239-1.579,1.96-3.226,1.96-4.62c0-0.955-0.347-1.646-0.955-2.158c-0.203-8.106-5.942-14.613-13.039-14.714     C32.322,10.009,32.268,10,32.213,10c-0.022,0-0.043,0.004-0.065,0.004c-7.052,0.039-12.783,6.41-13.125,14.409     c-0.884,0.528-1.394,1.305-1.394,2.469c0,1.641,0.992,3.63,2.663,5.448c1.187,3.327,3.118,6.38,5.5,8.438     c-0.354,2.292-1.699,5.039-5.697,6.776c-2.159,0.938-6.105,1.781-7.808,2.649c4.362,4.769,12.624,7.769,19.589,7.805l0.099,0.003     C31.983,57.999,31.992,58,32,58c7.014,0,15.325-3.01,19.713-7.808C50.01,49.324,46.063,48.481,43.905,47.543z" fill="#231F20" /></g></g><g><g><path d="M43.905,45.543c-3.821-1.66-5.217-4.242-5.643-6.469c2.752-2.215,4.943-5.756,6.148-9.573     c1.239-1.579,1.96-3.226,1.96-4.62c0-0.955-0.347-1.646-0.955-2.158C45.213,14.618,39.474,8.11,32.378,8.01     C32.322,8.009,32.268,8,32.213,8c-0.022,0-0.043,0.004-0.065,0.004c-7.052,0.039-12.783,6.41-13.125,14.409     c-0.884,0.528-1.394,1.305-1.394,2.469c0,1.641,0.992,3.63,2.663,5.448c1.187,3.327,3.118,6.38,5.5,8.438     c-0.354,2.292-1.699,5.039-5.697,6.776c-2.159,0.938-6.105,1.781-7.808,2.649c4.362,4.769,12.624,7.769,19.589,7.805l0.099,0.003     C31.983,55.999,31.992,56,32,56c7.014,0,15.325-3.01,19.713-7.808C50.01,47.324,46.063,46.481,43.905,45.543z" fill="#FFFFFF" /></g></g></g><g id="Layer_2" /></svg>
+              <svg
+                enable-background="new 0 0 64 64"
+                className="h-9 w-9"
+                version="1.1"
+                viewBox="0 0 64 64"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g id="Layer_1">
+                  <g>
+                    <circle cx="32" cy="32" fill="#4F5D73" r="32" />
+                  </g>
+                  <g opacity="0.2">
+                    <g>
+                      <path
+                        d="M43.905,47.543c-3.821-1.66-5.217-4.242-5.643-6.469c2.752-2.215,4.943-5.756,6.148-9.573     c1.239-1.579,1.96-3.226,1.96-4.62c0-0.955-0.347-1.646-0.955-2.158c-0.203-8.106-5.942-14.613-13.039-14.714     C32.322,10.009,32.268,10,32.213,10c-0.022,0-0.043,0.004-0.065,0.004c-7.052,0.039-12.783,6.41-13.125,14.409     c-0.884,0.528-1.394,1.305-1.394,2.469c0,1.641,0.992,3.63,2.663,5.448c1.187,3.327,3.118,6.38,5.5,8.438     c-0.354,2.292-1.699,5.039-5.697,6.776c-2.159,0.938-6.105,1.781-7.808,2.649c4.362,4.769,12.624,7.769,19.589,7.805l0.099,0.003     C31.983,57.999,31.992,58,32,58c7.014,0,15.325-3.01,19.713-7.808C50.01,49.324,46.063,48.481,43.905,47.543z"
+                        fill="#231F20"
+                      />
+                    </g>
+                  </g>
+                  <g>
+                    <g>
+                      <path
+                        d="M43.905,45.543c-3.821-1.66-5.217-4.242-5.643-6.469c2.752-2.215,4.943-5.756,6.148-9.573     c1.239-1.579,1.96-3.226,1.96-4.62c0-0.955-0.347-1.646-0.955-2.158C45.213,14.618,39.474,8.11,32.378,8.01     C32.322,8.009,32.268,8,32.213,8c-0.022,0-0.043,0.004-0.065,0.004c-7.052,0.039-12.783,6.41-13.125,14.409     c-0.884,0.528-1.394,1.305-1.394,2.469c0,1.641,0.992,3.63,2.663,5.448c1.187,3.327,3.118,6.38,5.5,8.438     c-0.354,2.292-1.699,5.039-5.697,6.776c-2.159,0.938-6.105,1.781-7.808,2.649c4.362,4.769,12.624,7.769,19.589,7.805l0.099,0.003     C31.983,55.999,31.992,56,32,56c7.014,0,15.325-3.01,19.713-7.808C50.01,47.324,46.063,46.481,43.905,45.543z"
+                        fill="#FFFFFF"
+                      />
+                    </g>
+                  </g>
+                </g>
+                <g id="Layer_2" />
+              </svg>
             </button>
-            {(isOpenAction) && (
-              <div ref={ref} className="w-full z-40 absolute right-5 top-[50px] mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                  <div className="block h-[60px] items-center flex px-4 py-2 text-md bg-slate-200 text-gray-700 " role="menuitem">
+            {isOpenAction && (
+              <div
+                ref={ref}
+                className="w-full z-40 absolute right-5 top-[50px] mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+              >
+                <div
+                  className="py-1"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="options-menu"
+                >
+                  <div
+                    className="block h-[60px] items-center flex px-4 py-2 text-md bg-slate-200 text-gray-700 "
+                    role="menuitem"
+                  >
                     {user && (
                       <div>
                         <b>
-                          {user?.role === 'admin' ? 'Admin' : user?.firstName}
+                          {user?.role === "admin" ? "Admin" : user?.firstName}
                         </b>
                       </div>
                     )}
                   </div>
-                  <a onClick={() => {
-                    setIsChangePassword(true)
-                    setIsOpenAction(false)
-                  }} className="block h-[60px] px-4 py-2 items-center flex text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">
-
-                    <svg className="w-7 h-7 mt-2 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path opacity="0.4" d="M19.7906 4.22007C16.8306 1.27007 12.0306 1.27007 9.09063 4.22007C7.02063 6.27007 6.40063 9.22007 7.20063 11.8201L2.50063 16.5201C2.17063 16.8601 1.94063 17.5301 2.01063 18.0101L2.31063 20.1901C2.42063 20.9101 3.09063 21.5901 3.81063 21.6901L5.99063 21.9901C6.47063 22.0601 7.14063 21.8401 7.48063 21.4901L8.30063 20.6701C8.50063 20.4801 8.50063 20.1601 8.30063 19.9601L6.36063 18.0201C6.07063 17.7301 6.07063 17.2501 6.36063 16.9601C6.65063 16.6701 7.13063 16.6701 7.42063 16.9601L9.37063 18.9101C9.56063 19.1001 9.88063 19.1001 10.0706 18.9101L12.1906 16.8001C14.7806 17.6101 17.7306 16.9801 19.7906 14.9301C22.7406 11.9801 22.7406 7.17007 19.7906 4.22007ZM14.5006 12.0001C13.1206 12.0001 12.0006 10.8801 12.0006 9.50007C12.0006 8.12007 13.1206 7.00007 14.5006 7.00007C15.8806 7.00007 17.0006 8.12007 17.0006 9.50007C17.0006 10.8801 15.8806 12.0001 14.5006 12.0001Z" fill="#292D32" />
-                      <path d="M14.5 12C15.8807 12 17 10.8807 17 9.5C17 8.11929 15.8807 7 14.5 7C13.1193 7 12 8.11929 12 9.5C12 10.8807 13.1193 12 14.5 12Z" fill="#292D32" />
-                    </svg> Change Password</a>
-                  <a onClick={() => {
-                    logout()
-                  }} className="block h-[60px] px-4 py-2 items-center flex text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">
-
-                    <svg className="svg-icon ml-1 mr-4" style={{ width: '20px', height: '20px', verticalAlign: 'middle', fill: 'red', overflow: 'hidden', }} viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M768 106V184c97.2 76 160 194.8 160 328 0 229.6-186.4 416-416 416S96 741.6 96 512c0-133.2 62.8-251.6 160-328V106C121.6 190.8 32 341.2 32 512c0 265.2 214.8 480 480 480s480-214.8 480-480c0-170.8-89.6-321.2-224-406z" fill="" /><path d="M512 32c-17.6 0-32 14.4-32 32v448c0 17.6 14.4 32 32 32s32-14.4 32-32V64c0-17.6-14.4-32-32-32z" fill="" /></svg>
-                    Logout</a>
+                  <a
+                    onClick={() => {
+                      setIsChangePassword(true);
+                      setIsOpenAction(false);
+                    }}
+                    className="block h-[60px] px-4 py-2 items-center flex text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+                    role="menuitem"
+                  >
+                    <svg
+                      className="w-7 h-7 mt-2 mr-2"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        opacity="0.4"
+                        d="M19.7906 4.22007C16.8306 1.27007 12.0306 1.27007 9.09063 4.22007C7.02063 6.27007 6.40063 9.22007 7.20063 11.8201L2.50063 16.5201C2.17063 16.8601 1.94063 17.5301 2.01063 18.0101L2.31063 20.1901C2.42063 20.9101 3.09063 21.5901 3.81063 21.6901L5.99063 21.9901C6.47063 22.0601 7.14063 21.8401 7.48063 21.4901L8.30063 20.6701C8.50063 20.4801 8.50063 20.1601 8.30063 19.9601L6.36063 18.0201C6.07063 17.7301 6.07063 17.2501 6.36063 16.9601C6.65063 16.6701 7.13063 16.6701 7.42063 16.9601L9.37063 18.9101C9.56063 19.1001 9.88063 19.1001 10.0706 18.9101L12.1906 16.8001C14.7806 17.6101 17.7306 16.9801 19.7906 14.9301C22.7406 11.9801 22.7406 7.17007 19.7906 4.22007ZM14.5006 12.0001C13.1206 12.0001 12.0006 10.8801 12.0006 9.50007C12.0006 8.12007 13.1206 7.00007 14.5006 7.00007C15.8806 7.00007 17.0006 8.12007 17.0006 9.50007C17.0006 10.8801 15.8806 12.0001 14.5006 12.0001Z"
+                        fill="#292D32"
+                      />
+                      <path
+                        d="M14.5 12C15.8807 12 17 10.8807 17 9.5C17 8.11929 15.8807 7 14.5 7C13.1193 7 12 8.11929 12 9.5C12 10.8807 13.1193 12 14.5 12Z"
+                        fill="#292D32"
+                      />
+                    </svg>{" "}
+                    Change Password
+                  </a>
+                  <a
+                    onClick={() => {
+                      logout();
+                    }}
+                    className="block h-[60px] px-4 py-2 items-center flex text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+                    role="menuitem"
+                  >
+                    <svg
+                      className="svg-icon ml-1 mr-4"
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        verticalAlign: "middle",
+                        fill: "red",
+                        overflow: "hidden",
+                      }}
+                      viewBox="0 0 1024 1024"
+                      version="1.1"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M768 106V184c97.2 76 160 194.8 160 328 0 229.6-186.4 416-416 416S96 741.6 96 512c0-133.2 62.8-251.6 160-328V106C121.6 190.8 32 341.2 32 512c0 265.2 214.8 480 480 480s480-214.8 480-480c0-170.8-89.6-321.2-224-406z"
+                        fill=""
+                      />
+                      <path
+                        d="M512 32c-17.6 0-32 14.4-32 32v448c0 17.6 14.4 32 32 32s32-14.4 32-32V64c0-17.6-14.4-32-32-32z"
+                        fill=""
+                      />
+                    </svg>
+                    Logout
+                  </a>
                 </div>
               </div>
             )}
@@ -185,17 +294,28 @@ export default function Layout(props: LayoutProps) {
         <div className="flex flex-row overflow-auto" style={{ height: "90%" }}>
           <div className="w-1/6 drop-shadow-xl bg-slate-700 border-r border-gray-200 pb-5">
             <div className="flex-1 py-4 space-y-1 bg-slate-700 divide-y divide-gray-200 dark:divide-gray-700">
-              <Link href="/leagues">
+              <Link href="/financial_summary">
                 <button
-                  className={` flex items-center text-md text-l text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.leagues ? "bg-slate-800 border-l-4 border-green-500" : "bg-slate-700"
-                    }`}
+                  className={` flex items-center text-md text-l text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
+                    props?.page == LayoutPages.financial_summary
+                      ? "bg-slate-800 border-l-4 border-green-500"
+                      : "bg-slate-700"
+                  }`}
                 >
-                  <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                    className="w-8 h-8 mr-4" viewBox="0 0 512.000000 512.000000"
-                    preserveAspectRatio="xMidYMid meet">
-                    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff" stroke="none">
-                      <path d="M1635 4940 c-210 -70 -295 -264 -282 -640 8 -217 44 -365 135 -545
+                  <svg
+                    version="1.0"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-8 h-8 mr-4"
+                    viewBox="0 0 512.000000 512.000000"
+                    preserveAspectRatio="xMidYMid meet"
+                  >
+                    <g
+                      transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                      fill="#ffffff"
+                      stroke="none"
+                    >
+                      <path
+                        d="M1635 4940 c-210 -70 -295 -264 -282 -640 8 -217 44 -365 135 -545
 91 -183 186 -299 412 -500 98 -88 116 -110 159 -190 27 -49 76 -132 110 -183
 l61 -92 -75 -187 c-41 -103 -75 -198 -75 -211 0 -12 11 -34 25 -47 l24 -25
 431 0 431 0 24 25 c14 13 25 35 25 47 0 13 -34 108 -75 211 l-75 187 61 92
@@ -214,62 +334,87 @@ m-515 -229 l-20 -80 -338 0 -338 0 -20 80 -20 80 378 0 378 0 -20 -80z m-284
 -240 240 0 63 23 114 75 165 70 71 145 90 239 63z m166 -708 l0 -80 -240 0
 -240 0 0 80 0 80 240 0 240 0 0 -80z m-11 -827 c24 -60 45 -114 48 -120 4 -10
 -55 -13 -277 -13 -222 0 -281 3 -277 13 3 6 24 60 48 120 l42 107 187 0 187 0
-42 -107z"/>
-                      <path d="M2505 3975 c-50 -49 -15 -135 55 -135 19 0 40 9 55 25 16 15 25 36
-25 55 0 19 -9 40 -25 55 -15 16 -36 25 -55 25 -19 0 -40 -9 -55 -25z"/>
-                      <path d="M1305 2855 l-25 -24 0 -376 0 -375 -295 0 -296 0 -24 -25 c-25 -24
+42 -107z"
+                      />
+                      <path
+                        d="M2505 3975 c-50 -49 -15 -135 55 -135 19 0 40 9 55 25 16 15 25 36
+25 55 0 19 -9 40 -25 55 -15 16 -36 25 -55 25 -19 0 -40 -9 -55 -25z"
+                      />
+                      <path
+                        d="M1305 2855 l-25 -24 0 -376 0 -375 -295 0 -296 0 -24 -25 c-25 -24
 -25 -27 -25 -200 l0 -175 80 0 80 0 0 120 0 120 520 0 520 0 0 -120 0 -120 80
 0 80 0 0 175 c0 173 0 176 -25 200 l-24 25 -256 0 -255 0 0 320 0 320 280 0
-280 0 0 80 0 80 -335 0 -336 0 -24 -25z"/>
-                      <path d="M3120 2800 l0 -80 280 0 280 0 0 -320 0 -320 -255 0 -256 0 -24 -25
+280 0 0 80 0 80 -335 0 -336 0 -24 -25z"
+                      />
+                      <path
+                        d="M3120 2800 l0 -80 280 0 280 0 0 -320 0 -320 -255 0 -256 0 -24 -25
 c-25 -24 -25 -27 -25 -200 l0 -175 80 0 80 0 0 120 0 120 520 0 520 0 0 -120
 0 -120 80 0 80 0 0 175 c0 173 0 176 -25 200 l-24 25 -296 0 -295 0 0 375 0
-376 -25 24 -24 25 -336 0 -335 0 0 -80z"/>
-                      <path d="M485 1434 c-116 -47 -217 -93 -226 -104 -25 -29 -53 -260 -46 -378
+376 -25 24 -24 25 -336 0 -335 0 0 -80z"
+                      />
+                      <path
+                        d="M485 1434 c-116 -47 -217 -93 -226 -104 -25 -29 -53 -260 -46 -378
 15 -256 108 -433 354 -675 159 -156 147 -156 310 6 146 143 208 222 262 332
 84 170 107 342 76 566 -12 83 -24 137 -34 149 -18 22 -435 190 -466 189 -11 0
 -114 -39 -230 -85z m405 -147 l155 -63 13 -74 c21 -119 11 -267 -26 -373 -43
 -125 -83 -187 -204 -311 l-108 -111 -107 110 c-121 124 -171 201 -209 320 -32
-99 -41 254 -22 365 l13 74 155 63 c85 34 162 62 170 62 8 0 85 -28 170 -62z"/>
-                      <path d="M1685 1434 c-115 -47 -217 -93 -226 -104 -10 -12 -22 -66 -34 -149
+99 -41 254 -22 365 l13 74 155 63 c85 34 162 62 170 62 8 0 85 -28 170 -62z"
+                      />
+                      <path
+                        d="M1685 1434 c-115 -47 -217 -93 -226 -104 -10 -12 -22 -66 -34 -149
 -37 -267 3 -466 132 -665 25 -39 108 -133 187 -213 183 -186 167 -185 328 -25
 143 140 213 229 268 339 83 166 106 338 75 564 -12 83 -24 137 -34 149 -18 22
 -435 190 -466 189 -11 0 -114 -39 -230 -85z m405 -147 l155 -63 13 -74 c19
 -111 10 -266 -22 -365 -38 -119 -88 -196 -208 -320 l-108 -110 -107 110 c-121
 124 -171 201 -209 320 -32 99 -41 254 -22 365 l13 74 155 63 c85 34 162 62
-170 62 8 0 85 -28 170 -62z"/>
-                      <path d="M2965 1433 c-115 -46 -216 -91 -224 -99 -20 -18 -50 -216 -50 -329
+170 62 8 0 85 -28 170 -62z"
+                      />
+                      <path
+                        d="M2965 1433 c-115 -46 -216 -91 -224 -99 -20 -18 -50 -216 -50 -329
 -1 -171 51 -344 146 -489 26 -39 110 -135 188 -214 182 -185 166 -184 327 -24
 248 243 340 418 355 674 7 118 -21 349 -46 378 -18 22 -435 190 -466 189 -11
 0 -114 -39 -230 -86z m405 -146 l155 -63 13 -74 c21 -119 11 -267 -26 -373
 -43 -125 -83 -187 -204 -311 l-108 -111 -107 110 c-121 124 -171 201 -209 320
 -32 99 -41 254 -22 365 l13 74 155 63 c85 34 162 62 170 62 8 0 85 -28 170
--62z"/>
-                      <path d="M4165 1433 c-115 -46 -216 -91 -224 -99 -20 -18 -50 -216 -50 -329
+-62z"
+                      />
+                      <path
+                        d="M4165 1433 c-115 -46 -216 -91 -224 -99 -20 -18 -50 -216 -50 -329
 -1 -171 51 -344 146 -489 26 -39 110 -135 187 -214 187 -188 166 -188 351 0
 78 79 162 176 189 216 94 142 147 320 145 491 0 110 -31 307 -50 325 -19 19
 -438 186 -464 185 -11 0 -114 -39 -230 -86z m405 -146 l155 -63 13 -74 c21
 -117 10 -269 -26 -374 -43 -124 -83 -186 -204 -310 l-108 -111 -107 111 c-122
 124 -162 186 -205 311 -37 106 -47 254 -26 373 l13 74 155 63 c85 34 162 62
-170 62 8 0 85 -28 170 -62z"/>
+170 62 8 0 85 -28 170 -62z"
+                      />
                     </g>
                   </svg>
-                  Leagues
+                  financial_summary
                 </button>
               </Link>
 
               <Link href="/teams">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.teams ? "bg-slate-800 border-l-4 border-green-500" : "bg-slate-700"
-                    }`}
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
+                    props?.page == LayoutPages.teams
+                      ? "bg-slate-800 border-l-4 border-green-500"
+                      : "bg-slate-700"
+                  }`}
                 >
-                  <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                    className="w-8 h-8 mr-4" viewBox="0 0 512.000000 512.000000"
-                    preserveAspectRatio="xMidYMid meet">
-
-                    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff" stroke="none">
-                      <path d="M2424 4755 c-192 -42 -324 -176 -393 -400 -51 -163 -66 -455 -32
+                  <svg
+                    version="1.0"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-8 h-8 mr-4"
+                    viewBox="0 0 512.000000 512.000000"
+                    preserveAspectRatio="xMidYMid meet"
+                  >
+                    <g
+                      transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                      fill="#ffffff"
+                      stroke="none"
+                    >
+                      <path
+                        d="M2424 4755 c-192 -42 -324 -176 -393 -400 -51 -163 -66 -455 -32
 -621 29 -141 84 -249 170 -333 l71 -69 0 -121 c0 -89 -3 -122 -12 -125 -7 -2
 -51 -12 -98 -23 -177 -43 -330 -117 -422 -205 l-49 -48 -52 14 c-29 8 -64 17
 -79 20 l-28 6 0 129 0 128 40 32 c91 73 162 205 195 361 20 93 19 334 0 465
@@ -355,27 +500,41 @@ m-3019 -210 c133 -89 297 -175 460 -242 l115 -46 3 -77 c2 -42 0 -76 -3 -76
 -18 0 -239 92 -362 151 -246 117 -466 256 -635 403 l-82 70 105 26 104 26 90
 -79 c50 -43 142 -113 205 -156z m2547 177 c191 -173 467 -339 726 -434 l77
 -29 0 -78 c0 -71 -2 -78 -17 -73 -351 133 -626 277 -858 451 -92 69 -199 164
--193 170 2 2 46 15 98 28 52 14 96 26 97 26 2 1 33 -27 70 -61z"/>
+-193 170 2 2 46 15 98 28 52 14 96 26 97 26 2 1 33 -27 70 -61z"
+                      />
                     </g>
                   </svg>
                   Teams
                 </button>
               </Link>
 
-              {user?.role === 'admin' && (<Link href="/coaches">
-                <button
-                  className={`text-l flex items-center text-left px-4 py-4  hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.coaches ? "bg-slate-800 border-l-4 border-green-500" : "bg-slate-700"
+              {user?.role === "admin" && (
+                <Link href="/coaches">
+                  <button
+                    className={`text-l flex items-center text-left px-4 py-4  hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
+                      props?.page == LayoutPages.coaches
+                        ? "bg-slate-800 border-l-4 border-green-500"
+                        : "bg-slate-700"
                     }`}
-                >
-                  <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                    className="w-8 h-8 mr-4" viewBox="0 0 512.000000 512.000000"
-                    preserveAspectRatio="xMidYMid meet">
-
-                    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff" stroke="none">
-                      <path d="M2563 5106 c-85 -21 -163 -65 -228 -131 -196 -196 -190 -509 14 -697
-198 -181 496 -169 679 27 89 94 132 201 132 325 0 315 -294 549 -597 476z"/>
-                      <path d="M2245 4020 c-146 -9 -260 -74 -361 -203 -185 -236 -283 -653 -284
+                  >
+                    <svg
+                      version="1.0"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-8 h-8 mr-4"
+                      viewBox="0 0 512.000000 512.000000"
+                      preserveAspectRatio="xMidYMid meet"
+                    >
+                      <g
+                        transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                        fill="#ffffff"
+                        stroke="none"
+                      >
+                        <path
+                          d="M2563 5106 c-85 -21 -163 -65 -228 -131 -196 -196 -190 -509 14 -697
+198 -181 496 -169 679 27 89 94 132 201 132 325 0 315 -294 549 -597 476z"
+                        />
+                        <path
+                          d="M2245 4020 c-146 -9 -260 -74 -361 -203 -185 -236 -283 -653 -284
 -1202 l-1 -170 -116 -129 c-85 -93 -114 -132 -107 -142 5 -7 106 -99 224 -205
 118 -106 254 -227 301 -271 l87 -78 129 142 c383 424 573 638 573 645 0 4 -36
 39 -80 78 -71 63 -78 71 -64 86 13 14 0 29 -132 148 -132 118 -149 130 -163
@@ -397,24 +556,37 @@ c5 -965 6 -1017 24 -1050 87 -165 298 -199 426 -70 87 86 80 -67 80 1779 0
 l-20 -24 -140 126 c-186 167 -178 158 -133 139 80 -33 167 -6 214 65 l26 39
 -7 308 c-5 217 -4 316 4 336 6 16 37 57 68 92 l57 63 58 -50 c49 -43 56 -53
 46 -67z m-545 -715 c29 -44 6 -29 -88 58 l-89 84 69 78 70 78 10 -136 c8 -98
-16 -143 28 -162z"/>
-                    </g>
-                  </svg>
-                  Coaches
-                </button>
-              </Link>)}
+16 -143 28 -162z"
+                        />
+                      </g>
+                    </svg>
+                    Coaches
+                  </button>
+                </Link>
+              )}
 
               <Link href="/players">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.players ? "bg-slate-800 border-l-4 border-green-500" : "bg-slate-700"
-                    }`}
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
+                    props?.page == LayoutPages.players
+                      ? "bg-slate-800 border-l-4 border-green-500"
+                      : "bg-slate-700"
+                  }`}
                 >
-                  <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                    className="w-9 h-9 mr-4" viewBox="0 0 512.000000 512.000000"
-                    preserveAspectRatio="xMidYMid meet">
-                    <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff" stroke="none">
-                      <path d="M2645 4665 c-73 -13 -215 -51 -257 -70 -15 -6 -18 -2 -18 18 0 14 -7
+                  <svg
+                    version="1.0"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-9 h-9 mr-4"
+                    viewBox="0 0 512.000000 512.000000"
+                    preserveAspectRatio="xMidYMid meet"
+                  >
+                    <g
+                      transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                      fill="#ffffff"
+                      stroke="none"
+                    >
+                      <path
+                        d="M2645 4665 c-73 -13 -215 -51 -257 -70 -15 -6 -18 -2 -18 18 0 14 -7
 28 -17 31 -47 18 -258 -166 -348 -304 -62 -96 -145 -269 -186 -390 -18 -52
 -40 -104 -50 -115 -10 -11 -23 -41 -29 -67 -9 -36 -17 -48 -31 -48 -22 0 -59
 -34 -59 -54 0 -8 11 -28 25 -44 14 -17 23 -36 20 -44 -3 -7 -13 -64 -24 -126
@@ -541,32 +713,53 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
 -66 44 -6 30 1 31 68 10z m1258 -584 c134 -112 144 -122 150 -162 4 -23 5 -43
 3 -45 -1 -2 -74 57 -160 132 -118 101 -157 140 -157 158 0 21 7 36 17 36 2 0
 68 -54 147 -119z m-1555 -45 l42 -43 -89 -168 -90 -167 -43 62 c-24 34 -43 67
--41 72 5 18 167 288 172 288 3 0 25 -20 49 -44z"/>
-                      <path d="M2412 3212 c-24 -8 -64 -60 -56 -74 5 -8 78 -48 89 -48 15 0 2 20
+-41 72 5 18 167 288 172 288 3 0 25 -20 49 -44z"
+                      />
+                      <path
+                        d="M2412 3212 c-24 -8 -64 -60 -56 -74 5 -8 78 -48 89 -48 15 0 2 20
 -17 26 -13 4 -31 12 -41 19 -17 12 -17 14 -2 29 9 9 27 16 40 16 19 0 24 -6
 27 -32 6 -67 102 -71 115 -6 5 27 7 28 29 13 29 -19 44 -19 44 0 0 38 -160 78
--228 57z"/>
-                      <path d="M2907 3173 c-9 -16 -28 -213 -30 -318 -2 -92 0 -110 13 -110 12 0 16
-27 22 160 4 88 11 182 16 210 6 27 8 53 6 57 -6 10 -22 10 -27 1z"/>
-                      <path d="M3023 3145 c-44 -19 -44 -39 1 -31 31 6 34 4 39 -24 13 -64 103 -66
+-228 57z"
+                      />
+                      <path
+                        d="M2907 3173 c-9 -16 -28 -213 -30 -318 -2 -92 0 -110 13 -110 12 0 16
+27 22 160 4 88 11 182 16 210 6 27 8 53 6 57 -6 10 -22 10 -27 1z"
+                      />
+                      <path
+                        d="M3023 3145 c-44 -19 -44 -39 1 -31 31 6 34 4 39 -24 13 -64 103 -66
 122 -2 11 37 24 40 50 12 22 -25 13 -50 -20 -50 -14 0 -25 -4 -25 -10 0 -13
 23 -13 55 2 25 11 34 41 14 53 -5 4 -14 17 -19 30 -5 14 -20 24 -40 29 -54 10
--143 6 -177 -9z"/>
-                      <path d="M2296 2988 c-38 -54 -2 -93 128 -138 52 -17 61 -18 86 -5 28 15 40
+-143 6 -177 -9z"
+                      />
+                      <path
+                        d="M2296 2988 c-38 -54 -2 -93 128 -138 52 -17 61 -18 86 -5 28 15 40
 33 40 64 0 14 -16 22 -64 35 -35 10 -87 28 -116 42 -28 13 -54 24 -55 24 -2 0
--11 -10 -19 -22z"/>
-                      <path d="M3235 2920 c-16 -4 -59 -8 -94 -9 l-63 -1 6 -32 c10 -54 40 -71 111
--63 105 12 115 15 115 41 0 31 -20 74 -34 73 -6 -1 -24 -5 -41 -9z"/>
-                      <path d="M2534 2515 c-4 -10 -1 -21 7 -26 30 -18 199 -51 290 -56 123 -7 189
-2 189 26 0 16 -13 17 -132 17 -127 0 -179 8 -325 50 -16 4 -25 1 -29 -11z"/>
-                      <path d="M2730 2406 c0 -8 16 -16 38 -20 60 -10 220 -7 227 4 9 15 -8 18 -142
-24 -100 5 -123 3 -123 -8z"/>
-                      <path d="M2497 2083 c-14 -14 -6 -34 17 -43 14 -5 30 -18 36 -30 15 -28 40
--26 40 3 0 37 -73 91 -93 70z"/>
-                      <path d="M2720 2041 c0 -11 9 -22 19 -26 11 -3 27 -17 36 -31 13 -20 19 -23
-30 -14 11 9 12 17 4 34 -25 49 -89 75 -89 37z"/>
-                      <path d="M2950 2028 c0 -16 75 -79 84 -71 14 14 4 43 -20 62 -30 23 -64 28
--64 9z"/>
+-11 -10 -19 -22z"
+                      />
+                      <path
+                        d="M3235 2920 c-16 -4 -59 -8 -94 -9 l-63 -1 6 -32 c10 -54 40 -71 111
+-63 105 12 115 15 115 41 0 31 -20 74 -34 73 -6 -1 -24 -5 -41 -9z"
+                      />
+                      <path
+                        d="M2534 2515 c-4 -10 -1 -21 7 -26 30 -18 199 -51 290 -56 123 -7 189
+2 189 26 0 16 -13 17 -132 17 -127 0 -179 8 -325 50 -16 4 -25 1 -29 -11z"
+                      />
+                      <path
+                        d="M2730 2406 c0 -8 16 -16 38 -20 60 -10 220 -7 227 4 9 15 -8 18 -142
+24 -100 5 -123 3 -123 -8z"
+                      />
+                      <path
+                        d="M2497 2083 c-14 -14 -6 -34 17 -43 14 -5 30 -18 36 -30 15 -28 40
+-26 40 3 0 37 -73 91 -93 70z"
+                      />
+                      <path
+                        d="M2720 2041 c0 -11 9 -22 19 -26 11 -3 27 -17 36 -31 13 -20 19 -23
+30 -14 11 9 12 17 4 34 -25 49 -89 75 -89 37z"
+                      />
+                      <path
+                        d="M2950 2028 c0 -16 75 -79 84 -71 14 14 4 43 -20 62 -30 23 -64 28
+-64 9z"
+                      />
                     </g>
                   </svg>
                   Players
@@ -575,21 +768,34 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
 
               <Link href={"/matches"}>
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.matches ? "bg-slate-800 border-l-4 border-green-500" : "bg-slate-700"
-                    }`}
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${
+                    props?.page == LayoutPages.matches
+                      ? "bg-slate-800 border-l-4 border-green-500"
+                      : "bg-slate-700"
+                  }`}
                 >
-                  <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                    className="w-8 h-8 mr-4" viewBox="0 0 256.000000 256.000000"
-                    preserveAspectRatio="xMidYMid meet">
-                    <g transform="translate(0.000000,256.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff" stroke="none">
-                      <path d="M265 2196 c-59 -18 -88 -41 -115 -88 -71 -127 17 -279 163 -280 59
+                  <svg
+                    version="1.0"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-8 h-8 mr-4"
+                    viewBox="0 0 256.000000 256.000000"
+                    preserveAspectRatio="xMidYMid meet"
+                  >
+                    <g
+                      transform="translate(0.000000,256.000000) scale(0.100000,-0.100000)"
+                      fill="#ffffff"
+                      stroke="none"
+                    >
+                      <path
+                        d="M265 2196 c-59 -18 -88 -41 -115 -88 -71 -127 17 -279 163 -280 59
 -1 99 16 138 59 39 41 50 68 50 121 1 92 -49 162 -135 187 -57 17 -50 17 -101
 1z m70 -76 c-5 -8 -11 -8 -17 -2 -6 6 -7 16 -3 22 5 8 11 8 17 2 6 -6 7 -16 3
 -22z m120 -119 c7 -12 -12 -24 -25 -16 -11 7 -4 25 10 25 5 0 11 -4 15 -9z
 m-125 -140 c0 -6 -4 -13 -10 -16 -5 -3 -10 1 -10 9 0 9 5 16 10 16 6 0 10 -4
-10 -9z"/>
-                      <path d="M1140 2082 c-8 -4 -26 -14 -40 -23 -14 -9 -87 -56 -163 -104 -91 -58
+10 -9z"
+                      />
+                      <path
+                        d="M1140 2082 c-8 -4 -26 -14 -40 -23 -14 -9 -87 -56 -163 -104 -91 -58
 -136 -92 -133 -101 7 -18 -14 -30 -24 -14 -5 8 -65 30 -135 50 l-126 37 -53
 -52 c-44 -45 -61 -55 -110 -65 -70 -14 -133 3 -182 51 -26 26 -34 28 -57 20
 -40 -16 -53 -45 -87 -205 -25 -113 -30 -154 -22 -171 10 -22 196 -137 274
@@ -620,10 +826,14 @@ m-125 -140 c0 -6 -4 -13 -10 -16 -5 -3 -10 1 -10 9 0 9 5 16 10 16 6 0 10 -4
 -8 -11 -8 -17 -2 -6 6 -7 16 -3 22 5 8 11 8 17 2 6 -6 7 -16 3 -22z m-598
 -126 c-9 -9 -28 6 -21 18 4 6 10 6 17 -1 6 -6 8 -13 4 -17z m718 -3 c7 -12
 -12 -24 -25 -16 -11 7 -4 25 10 25 5 0 11 -4 15 -9z m110 -151 c-5 -8 -11 -8
--17 -2 -6 6 -7 16 -3 22 5 8 11 8 17 2 6 -6 7 -16 3 -22z"/>
-                      <path d="M1515 1559 c-4 -6 -13 -8 -20 -5 -19 7 -45 -26 -45 -56 0 -71 98 -77
-122 -8 12 35 -40 98 -57 69z"/>
-                      <path d="M1905 873 c-16 -3 -36 -9 -42 -15 -9 -7 -17 -7 -26 0 -26 22 -222
+-17 -2 -6 6 -7 16 -3 22 5 8 11 8 17 2 6 -6 7 -16 3 -22z"
+                      />
+                      <path
+                        d="M1515 1559 c-4 -6 -13 -8 -20 -5 -19 7 -45 -26 -45 -56 0 -71 98 -77
+122 -8 12 35 -40 98 -57 69z"
+                      />
+                      <path
+                        d="M1905 873 c-16 -3 -36 -9 -42 -15 -9 -7 -17 -7 -26 0 -26 22 -222
 -26 -302 -73 -39 -22 -44 -29 -34 -41 10 -12 8 -16 -9 -21 -21 -5 -22 -11 -22
 -110 0 -103 0 -104 23 -101 18 2 23 10 25 40 l3 38 31 -16 c85 -44 263 -84
 376 -84 l52 0 0 -70 c0 -73 2 -76 48 -64 20 6 22 12 22 68 l0 62 118 12 c132
@@ -643,13 +853,13 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
 -20 33 -31 30 -56 -2 -24 -8 -33 -26 -35 -12 -2 -20 -8 -17 -13 6 -9 -41 -36
 -49 -28 -5 5 -20 155 -17 172 1 10 36 -8 79 -40z m-818 -169 c0 -17 -22 -14
 -28 4 -2 7 3 12 12 12 9 0 16 -7 16 -16z m710 -15 c0 -5 -4 -9 -10 -9 -5 0
--10 7 -10 16 0 8 5 12 10 9 6 -3 10 -10 10 -16z"/>
+-10 7 -10 16 0 8 5 12 10 9 6 -3 10 -10 10 -16z"
+                      />
                       <path d="M1708 663 c12 -2 30 -2 40 0 9 3 -1 5 -23 4 -22 0 -30 -2 -17 -4z" />
                       <path d="M1948 663 c12 -2 30 -2 40 0 9 3 -1 5 -23 4 -22 0 -30 -2 -17 -4z" />
                       <path d="M2063 663 c15 -2 37 -2 50 0 12 2 0 4 -28 4 -27 0 -38 -2 -22 -4z" />
                     </g>
                   </svg>
-
                   Matches
                 </button>
               </Link>
@@ -679,16 +889,41 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
                     onClick={() => setIsChangePassword(false)}
                   >
                     <span className="text-black opacity-7 h-6 w-6 text-xl">
-                      <svg className="w-6 h-6" fill="#000000" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16.707,8.707,13.414,12l3.293,3.293a1,1,0,1,1-1.414,1.414L12,13.414,8.707,16.707a1,1,0,1,1-1.414-1.414L10.586,12,7.293,8.707A1,1,0,1,1,8.707,7.293L12,10.586l3.293-3.293a1,1,0,1,1,1.414,1.414Z" /></svg>
+                      <svg
+                        className="w-6 h-6"
+                        fill="#000000"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M16.707,8.707,13.414,12l3.293,3.293a1,1,0,1,1-1.414,1.414L12,13.414,8.707,16.707a1,1,0,1,1-1.414-1.414L10.586,12,7.293,8.707A1,1,0,1,1,8.707,7.293L12,10.586l3.293-3.293a1,1,0,1,1,1.414,1.414Z" />
+                      </svg>
                     </span>
                   </button>
                 </div>
                 <div className="relative p-6 flex flex-col">
-                  <input type="password" placeholder="Enter Old Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+                  <input
+                    type="password"
+                    placeholder="Enter Old Password"
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                  />
 
-                  <input type="password" placeholder="Enter New Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                  <input
+                    type="password"
+                    placeholder="Enter New Password"
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
 
-                  <input type="password" placeholder="Re-Enter Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={reEnterPassword} onChange={(e) => setReEnterPassword(e.target.value)} />
+                  <input
+                    type="password"
+                    placeholder="Re-Enter Password"
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5"
+                    value={reEnterPassword}
+                    onChange={(e) => setReEnterPassword(e.target.value)}
+                  />
                 </div>
                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                   <button
@@ -710,20 +945,21 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
             </div>
           </div>
         </>
-      ) : null
-      }
+      ) : null}
       <ToastContainer />
       <a
         style={{
-          position: 'fixed',
+          position: "fixed",
           left: 10,
           bottom: 7,
-          color: "white"
+          color: "white",
         }}
         href="https://www.npmcode.com/"
-        target="_blank" rel="noreferrer"
-      >Powered By: NPMCODE LLC</a>
+        target="_blank"
+        rel="noreferrer"
+      >
+        Powered By: NPMCODE LLC
+      </a>
     </>
   );
 }
-
