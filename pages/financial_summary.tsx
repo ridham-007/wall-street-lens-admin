@@ -34,6 +34,7 @@ const LEAGUES = gql`
 
 export default function LeaguesPage() {
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
+  const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
   const [updateLeague, setUpdateLeague] = useState(null);
   const [searchKey, setSearchKey] = useState("");
   const [filteredLeagues, setFilteredLeagues] = useState<any[]>([]);
@@ -68,6 +69,7 @@ export default function LeaguesPage() {
   const router = useRouter();
   const onAddUpdateParameter = () => {
     setAddUpdateParameter(false);
+    setAddUpdateQuarter(false)
   };
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -103,6 +105,7 @@ export default function LeaguesPage() {
 
   const onAddUpdateParameterClose = () => {
     setAddUpdateParameter(false);
+    setAddUpdateQuarter(false)
   };
 
   const filteredData = (key: string) => {
@@ -201,7 +204,7 @@ export default function LeaguesPage() {
             <button
               type="button"
               className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onClick={() => setAddUpdateParameter(true)}
+              onClick={() => setAddUpdateQuarter(true)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -408,109 +411,57 @@ c-25 -24 -25 -27 -25 -200 l0 -175 80 0 80 0 0 120 0 120 520 0 520 0 0 -120
         {addUpdateParameter && (
           <AddUpdateParaMeter
             onSuccess={onAddUpdateParameter}
-            league={updateLeague}
             onClose={onAddUpdateParameterClose}
           ></AddUpdateParaMeter>
+        )}
+        {addUpdateQuarter && (
+          <AddUpdateParaQuarter
+            onSuccess={onAddUpdateParameter}
+            onClose={onAddUpdateParameterClose}
+          ></AddUpdateParaQuarter>
         )}
       </>
     </Layout>
   );
 }
 
-const ADD_UPDATE_LEAGUE = gql`
-  mutation CreateOrUpdateLeague(
-    $name: String!
-    $startDate: DateTime!
-    $endDate: DateTime!
-    $playerLimit: Int!
-    $active: Boolean!
-    $id: String
-  ) {
-    createOrUpdateLeague(
-      name: $name
-      startDate: $startDate
-      endDate: $endDate
-      playerLimit: $playerLimit
-      active: $active
-      id: $id
-    ) {
-      code
-      success
-      message
-      data {
-        _id
-        name
-        startDate
-        endDate
-        active
-        playerLimit
-      }
-    }
-  }
-`;
 
-interface AddUpdateLeagueOnSuccess {
+interface AddUpdateParameterOnSuccess {
   (id: string): void;
 }
 
-interface AddUpdateLeagueOnClose {
+interface AddUpdateParameterOnClose {
   (): void;
 }
 
-interface AddUpdateLeagueProps {
-  league?: any;
-  onSuccess?: AddUpdateLeagueOnSuccess;
-  onClose?: AddUpdateLeagueOnClose;
+interface AddUpdateParameterProps {
+  onSuccess?: AddUpdateParameterOnSuccess;
+  onClose?: AddUpdateParameterOnClose;
 }
 
-function AddUpdateParaMeter(props: AddUpdateLeagueProps) {
-  const date = format(new Date(), "yyy-MM-dd");
-  const [name, setName] = useState(props?.league?.name || "");
+function AddUpdateParaMeter(props: AddUpdateParameterProps) {
+  const [val, setVal] = useState({
+    company: "",
+    title: "",
+    unit: "",
+    isVisible: false
+  })
+  const handleOnSave = () => {
+    props.onClose && props.onClose()
+  };
 
-  const [startDate, setStartDate] = useState(
-    props?.league
-      ? format(new Date(props?.league.startDate), "yyy-MM-dd")
-      : date
-  );
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    const name = e.target.name;
 
-  const [endDate, setEndDate] = useState(
-    props?.league ? format(new Date(props?.league.endDate), "yyy-MM-dd") : date
-  );
-
-  const [playerLimit, setPlayerLimit] = useState(
-    props?.league ? props?.league?.playerLimit : 2
-  );
-
-  const [active, setActive] = useState(
-    props?.league ? props?.league?.active + "" : "true"
-  );
-
-  const [addUpdateParameter, { data, error, loading }] = useMutation(
-    ADD_UPDATE_LEAGUE,
-    {
-      variables: {
-        name,
-        startDate,
-        endDate,
-        playerLimit,
-        active: active === "true" ? true : false,
-        id: props?.league?._id,
-      },
-    }
-  );
-
-  useEffect(() => {
-    if (data?.createOrUpdateLeague?.code === 200) {
-      props?.onSuccess &&
-        props.onSuccess(data?.createOrUpdateLeague?.data?._id);
-    }
-  }, [data, error]);
-  const handleOnClose = () => {};
-  const handleOnSave = () => {};
+    setVal((prevVal) => ({
+      ...prevVal,
+      [name]: value
+    }));
+  };
   return (
     <Modal
       showModal={true}
-      handleOnClose={handleOnClose}
       handleOnSave={handleOnSave}
       title="Add Parameter"
       onClose={() => props.onClose && props.onClose()}
@@ -527,7 +478,10 @@ function AddUpdateParaMeter(props: AddUpdateLeagueProps) {
             <input
               type="text"
               id="company"
+
               name="company"
+              value={val.company}
+              onChange={handleOnChange}
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
@@ -542,25 +496,12 @@ function AddUpdateParaMeter(props: AddUpdateLeagueProps) {
               type="text"
               id="title"
               name="title"
+              value={val.title}
+              onChange={handleOnChange}
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="isVisible"
-              className="text-sm font-medium text-gray-700"
-            >
-              Is Visible To Chart
-            </label>
-            <select
-              id="isVisible"
-              name="isVisible"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-            >
-              <option value="true">True</option>
-              <option value="false">False</option>
-            </select>
-          </div>
+
           <div className="flex flex-col">
             <label htmlFor="unit" className="text-sm font-medium text-gray-700">
               Unit
@@ -568,11 +509,53 @@ function AddUpdateParaMeter(props: AddUpdateLeagueProps) {
             <input
               type="number"
               id="unit"
+              value={val.unit}
+              onChange={handleOnChange}
               name="unit"
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
+          <div className="flex flex-row items-center w-full h-full gap-2">
+            <input
+              type="checkbox"
+              id="isVisible"
+              name="isVisible"
+              checked={val.isVisible}
+              onChange={handleOnChange}
+              className="p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+            <label
+              htmlFor="isVisible"
+              className="text-sm font-medium text-gray-700"
+            >
+              Is Visible To Chart
+            </label>
+
+          </div>
         </div>
+      </form>
+    </Modal>
+  );
+}
+
+
+const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
+  const [val, setVal] = useState([])
+  const handleOnSave = () => {
+
+  };
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  };
+  return (
+    <Modal
+      showModal={true}
+      handleOnSave={handleOnSave}
+      title="Add Quarter Details"
+      onClose={() => props.onClose && props.onClose()}
+    >
+      <form className="form w-100">
+
       </form>
     </Modal>
   );
