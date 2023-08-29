@@ -12,7 +12,7 @@ export enum LayoutPages {
   "financial_summary" = "financial_summary",
   "operational_summary" = "operational_summary",
   "coaches" = "coaches",
-  "players" = "players",
+  "vihicle_capacity" = "vihicle_capacity",
   "matches" = "matches",
 }
 
@@ -292,13 +292,13 @@ export default function Layout(props: LayoutProps) {
         </div>
 
         <div className="flex flex-row overflow-auto" style={{ height: "90%" }}>
-          <div className="w-1/6 drop-shadow-xl bg-slate-700 border-r border-gray-200 pb-5">
-            <div className="flex-1 py-4 space-y-1 bg-slate-700 divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="w-1/6 drop-shadow-xl  border-r border-gray-200 pb-5">
+            <div className="flex-1 py-4 space-y-1  divide-y divide-gray-200 dark:divide-gray-700">
               <Link href="/financial_summary">
                 <button
-                  className={` flex items-center text-md text-l text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.financial_summary
-                    ? "bg-slate-800 border-l-4 border-green-500"
-                    : "bg-slate-700"
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.financial_summary
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
                     }`}
                 >
                   <svg
@@ -310,7 +310,10 @@ export default function Layout(props: LayoutProps) {
                   >
                     <g
                       transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff"
+                      fill={`${props?.page === LayoutPages.financial_summary
+                        ? "white"
+                        : "black"
+                        }`}
                       stroke="none"
                     >
                       <path
@@ -394,9 +397,9 @@ c-25 -24 -25 -27 -25 -200 l0 -175 80 0 80 0 0 120 0 120 520 0 520 0 0 -120
 
               <Link href="/operational_summary">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.operational_summary
-                    ? "bg-slate-800 border-l-4 border-green-500"
-                    : "bg-slate-700"
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.operational_summary
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
                     }`}
                 >
                   <svg
@@ -408,7 +411,10 @@ c-25 -24 -25 -27 -25 -200 l0 -175 80 0 80 0 0 120 0 120 520 0 520 0 0 -120
                   >
                     <g
                       transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff"
+                      fill={`${props?.page === LayoutPages.operational_summary
+                        ? "white"
+                        : "black"
+                        }`}
                       stroke="none"
                     >
                       <path
@@ -509,10 +515,11 @@ m-3019 -210 c133 -89 297 -175 460 -242 l115 -46 3 -77 c2 -42 0 -76 -3 -76
               {user?.role === "admin" && (
                 <Link href="/coaches">
                   <button
-                    className={`text-l flex items-center text-left px-4 py-4  hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.coaches
-                      ? "bg-slate-800 border-l-4 border-green-500"
-                      : "bg-slate-700"
+                    className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.coaches
+                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                      : "bg-slate-50 text-black"
                       }`}
+
                   >
                     <svg
                       version="1.0"
@@ -523,7 +530,10 @@ m-3019 -210 c133 -89 297 -175 460 -242 l115 -46 3 -77 c2 -42 0 -76 -3 -76
                     >
                       <g
                         transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                        fill="#ffffff"
+                        fill={`${props?.page === LayoutPages.coaches
+                          ? "white"
+                          : "black"
+                          }`}
                         stroke="none"
                       >
                         <path
@@ -562,11 +572,12 @@ l-20 -24 -140 126 c-186 167 -178 158 -133 139 80 -33 167 -6 214 65 l26 39
                 </Link>
               )}
 
-              <Link href="/players">
+              <Link href="/vihicle_capacity">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.players
-                    ? "bg-slate-800 border-l-4 border-green-500"
-                    : "bg-slate-700"
+
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.vihicle_capacity
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
                     }`}
                 >
                   <svg
@@ -578,7 +589,10 @@ l-20 -24 -140 126 c-186 167 -178 158 -133 139 80 -33 167 -6 214 65 l26 39
                   >
                     <g
                       transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff"
+                      fill={`${props?.page === LayoutPages.operational_summary
+                        ? "white"
+                        : "black"
+                        }`}
                       stroke="none"
                     >
                       <path
@@ -758,15 +772,16 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
                       />
                     </g>
                   </svg>
-                  Players
+                  Vihicle Capacity
                 </button>
               </Link>
 
               <Link href={"/matches"}>
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-600 active:bg-slate-600 dark:hover:bg-slate-600 text-white w-full font-medium ${props?.page == LayoutPages.matches
-                    ? "bg-slate-800 border-l-4 border-green-500"
-                    : "bg-slate-700"
+
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.matches
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
                     }`}
                 >
                   <svg
@@ -778,7 +793,10 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
                   >
                     <g
                       transform="translate(0.000000,256.000000) scale(0.100000,-0.100000)"
-                      fill="#ffffff"
+                      fill={`${props?.page === LayoutPages.matches
+                        ? "white"
+                        : "black"
+                        }`}
                       stroke="none"
                     >
                       <path

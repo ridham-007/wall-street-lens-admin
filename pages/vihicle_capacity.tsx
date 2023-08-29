@@ -16,6 +16,7 @@ import {
   MenuItem,
   Button,
 } from "@material-tailwind/react";
+import { Modal } from "@/components/model";
 
 const PLAYERS = gql`
   query GetPlayers(
@@ -148,6 +149,8 @@ const ADD_UPDATE_LEAGUE = gql`
 
 export default function PlayersPage() {
 
+  const [addUpdateParameter, setAddUpdateParameter] = useState(false);
+  const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
 
   const [isOpen, setIsOpen] = useState('');
   const [userRole, setUserRole] = useState('');
@@ -185,6 +188,16 @@ export default function PlayersPage() {
     setUserRole(localStorageData?.role);
     setUserData(localStorageData?._id);
   }
+
+
+  const onAddUpdateParameter = () => {
+    setAddUpdateParameter(false);
+    setAddUpdateQuarter(false)
+  };
+  const onAddUpdateParameterClose = () => {
+    setAddUpdateParameter(false);
+    setAddUpdateQuarter(false)
+  };
 
   useEffect(() => {
     getDatafromLocalStorage();
@@ -414,48 +427,9 @@ export default function PlayersPage() {
     }
   });
   return (
-    <Layout title="Players" page={LayoutPages.players}>
+    <Layout title="Players" page={LayoutPages.vihicle_capacity}>
       <>
-        <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden flex flex-row-reverse justify-between pb-4 pt-2">
-          <div className="flex flex-row-reverse pl-4">
-            {
-              userRole == "admin" && (<button type="button" className="min-w-[188px] transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
-                onClick={() => setAddPlayers(true)}
-              >
-                <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 mr-2" viewBox="0 0 512.000000 512.000000"
-                  preserveAspectRatio="xMidYMid meet">
-                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                    fill="#ffffff" stroke="none">
-                    <path d="M2478 4905 c-61 -23 -106 -63 -133 -120 l-26 -53 -1 -1311 c0 -721
--3 -1311 -6 -1310 -4 0 -110 164 -237 365 -126 201 -245 383 -264 405 -49 58
--103 83 -181 84 -55 0 -74 -5 -120 -31 -97 -54 -145 -164 -117 -269 18 -69
-940 -1522 1004 -1583 61 -57 131 -78 208 -62 101 21 117 41 373 440 128 201
-312 490 410 642 97 153 210 329 249 390 104 162 117 207 88 306 -52 175 -292
-227 -411 90 -16 -19 -135 -201 -264 -405 l-235 -370 -5 1311 c-3 763 -9 1319
--14 1331 -24 52 -71 107 -112 131 -55 32 -150 41 -206 19z"/>
-                    <path d="M516 3504 c-179 -44 -328 -194 -371 -375 -22 -96 -22 -2442 0 -2538
-44 -183 193 -332 376 -376 56 -13 312 -15 2039 -15 1727 0 1983 2 2039 15 183
-43 333 193 376 376 22 96 22 2442 0 2538 -45 191 -206 344 -400 381 -40 7
--166 10 -371 8 -309 -3 -311 -3 -346 -27 -128 -88 -113 -269 27 -332 36 -17
-71 -19 335 -19 275 0 297 -1 327 -20 67 -41 63 44 63 -1260 0 -1304 4 -1219
--63 -1260 -31 -20 -66 -20 -1985 -20 -2158 0 -1991 -5 -2032 63 -19 31 -20 59
--20 1217 0 1171 0 1185 20 1218 36 59 57 62 382 62 277 0 294 1 336 21 66 32
-97 86 97 169 0 76 -22 119 -83 161 l-35 24 -326 2 c-256 1 -339 -1 -385 -13z"/>
-                  </g>
-                </svg>
 
-                Import Players
-              </button>)
-            }
-            <button type="button" className="min-w-[188px] transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
-              onClick={() => setAddUpdatePlayer(true)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
-              Add a Player
-            </button>
-          </div>
-        </div>
         <div className="flex justify-between mb-4">
           <div className="relative w-1/3">
             <div className="flex relative m-2 w-full">
@@ -472,65 +446,62 @@ export default function PlayersPage() {
               </div>
             </div>
           </div>
-          <div className="flex self-center">
-            <div className="border border-gray-30"
-              style={{
-                borderRadius: '8px',
-                height: '42px',
-                color: 'grey',
-              }}>
-              <select
-                name="leagueId"
-                id="leagueId"
-                value={leagueId}
-                onChange={(e) => setLeagueId(e.target.value)}
-                style={{
-                  borderRadius: '8px',
-                  padding: '8px',
-                }}
+          <div className="flex flex-row-reverse pr-4 gap-4">
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => setAddUpdateParameter(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="ionicon w-7 h-7"
+                viewBox="0 0 512 512"
               >
-                <option>Select a league</option>
-                <option>UnAssigned</option>
-                {leaguesQuery?.getLeagues?.code === 200 &&
-                  leaguesQuery?.getLeagues?.data?.map((league: any) => (
-                    <option key={league?._id} value={league?._id}>
-                      {league?.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div
-              className="border border-gray-30 ml-4"
+                <path
+                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="32"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="32"
+                  d="M256 176v160M336 256H176"
+                />
+              </svg>
+              <span>Add a Parameter</span>
+            </button>
 
-              style={{
-                borderRadius: '8px',
-                height: '42px',
-                color: 'grey',
-              }}>
-              <select
-                name="teamId"
-                id="teamId"
-                value={teamId}
-                onChange={(e) => setTeamId(e.target.value)}
-                style={{
-                  borderRadius: '8px',
-                  padding: '8px',
-                }}
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => setAddUpdateQuarter(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="ionicon w-7 h-7"
+                viewBox="0 0 512 512"
               >
-                <option>Select a team</option>
-                <option>UnAssigned</option>
-                {teamsQuery?.getTeams?.code === 200 &&
-                  teamsQuery?.getTeams?.data?.map((team: any) => {
-                    if (team?.league?._id === leagueId){
-                    return (
-                    <option key={team?._id} value={team?._id}>
-                      {team?.name}
-                    </option>
-                  )
-}
-})}
-              </select>
-            </div>
+                <path
+                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="32"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="32"
+                  d="M256 176v160M336 256H176"
+                />
+              </svg>
+              <span>Add a Quarter Summary</span>
+            </button>
           </div>
         </div>
         <div style={{
@@ -918,36 +889,221 @@ export default function PlayersPage() {
 
           </table >
         </div>
-        {addUpdatePlayer && (
-          <AddUpdatePlayer
-            key={uuidv4()}
-            onSuccess={onAddUpdatePlayer}
-            player={updatePlayer}
-            onClose={onAddUpdatePlayerClose}
-            data={data?.getPlayers?.data}
-            addInAnotherLeague={addInAnotherLeague}
-            userRole={userRole}
-            userID={userID}
-          />
+        {addUpdateParameter && (
+          <AddUpdateParaMeter
+            onSuccess={onAddUpdateParameter}
+            onClose={onAddUpdateParameterClose}
+          ></AddUpdateParaMeter>
         )}
-
-        {
-          addPlayers && (
-            <AddPlayers
-              onSuccess={onAddUpdatePlayer}
-              onClose={() => setAddPlayers(false)}
-              data={data?.getPlayers?.data}
-              userID={userID}
-              userRole={userRole}
-            />
-          )
-        }
-{showLoader && (
-      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
-        <div className="loader border-4 border-gray-300 border-t-red-500 rounded-full h-10 w-10 animate-spin"></div>
-      </div>
-      )}
+        {addUpdateQuarter && (
+          <AddUpdateParaQuarter
+            onSuccess={onAddUpdateParameter}
+            onClose={onAddUpdateParameterClose}
+          ></AddUpdateParaQuarter>
+        )}
       </>
     </Layout >
+  );
+}
+
+
+interface AddUpdateParameterOnSuccess {
+  (id: string): void;
+}
+
+interface AddUpdateParameterOnClose {
+  (): void;
+}
+
+interface AddUpdateParameterProps {
+  onSuccess?: AddUpdateParameterOnSuccess;
+  onClose?: AddUpdateParameterOnClose;
+}
+
+function AddUpdateParaMeter(props: AddUpdateParameterProps) {
+  const [val, setVal] = useState({
+    company: "",
+    region: "",
+    modal: "",
+    capacity: "",
+    operationType: ""
+  })
+  const handleOnSave = () => {
+    props.onClose && props.onClose()
+    console.log(val);
+
+  };
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
+
+    const value = e.target.value;
+    const name = e.target.name;
+
+    setVal((prevVal) => ({
+      ...prevVal,
+      [name]: value
+    }));
+  };
+  return (
+    <Modal
+      showModal={true}
+      handleOnSave={handleOnSave}
+      title="Add Parameter"
+      onClose={() => props.onClose && props.onClose()}
+    >
+      <form className="form w-100">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <label htmlFor="company" className="text-sm font-medium text-gray-700">
+              Company
+            </label>
+            <input
+              type="text"
+              id="company"
+              value={val.company}
+              onChange={handleOnChange}
+              name="company"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 min-w-[280px] focus:border-blue-500 outline-none"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label
+              htmlFor="region"
+              className="text-sm font-medium text-gray-700"
+            >
+              Region
+            </label>
+            <input
+              type="text"
+              id="region"
+
+              name="region"
+              value={val.region}
+              onChange={handleOnChange}
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 min-w-[280px] focus:border-blue-500 outline-none"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label
+              htmlFor="modal"
+              className="text-sm font-medium text-gray-700"
+            >
+              Modal
+            </label>
+            <input
+              type="text"
+              id="modal"
+              name="modal"
+              value={val.modal}
+              onChange={handleOnChange}
+              className="mt-1 p-2 border rounded-md min-w-[280px] focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="capacity" className="text-sm font-medium text-gray-700">
+              Capacity
+            </label>
+            <input
+              type="text"
+              id="unit"
+              value={val.capacity}
+              onChange={handleOnChange}
+              name="capacity"
+              className="mt-1 p-2 border rounded-md min-w-[280px] focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="operationType" className="text-sm font-medium text-gray-700">
+              Operation Type
+            </label>
+            <select
+              id="operationType"
+              name="operationType"
+              className="mt-1 p-2 border rounded-md min-w-[280px] focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.operationType}
+              onChange={handleOnChange}
+            >
+              <option value="" disabled>Select an option</option>
+              <option value="production">Production</option>
+              <option value="productionTooling">Production
+                Tooling</option>
+              <option value="pilotProduction">Pilot production</option>
+              <option value="inDevelopment">In development</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+
+const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
+  const [val, setVal] = useState({
+    title: "",
+    company: "",
+    summary: ""
+  })
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
+    const { name, value } = e.target;
+    setVal((prevVal) => ({
+      ...prevVal,
+      [name]: value
+    }));
+  };
+  const handleOnSave = () => {
+    props.onClose && props.onClose()
+    console.log(val);
+  };
+  return (
+    <Modal
+      showModal={true}
+      handleOnSave={handleOnSave}
+      title="Add Quarter Summary"
+      onClose={() => props.onClose && props.onClose()}
+    >
+      <form className="form w-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <label htmlFor="title" className="text-sm font-medium text-gray-700">
+              Title
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.title}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="company" className="text-sm font-medium text-gray-700">
+              Company
+            </label>
+            <input
+              type="text"
+              id="company"
+              name="company"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.company}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+        <div className="mt-4">
+          <label htmlFor="summary" className="text-sm font-medium text-gray-700">
+            Summary
+          </label>
+          <textarea
+            id="summary"
+            name="summary"
+            className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
+            value={val.summary}
+            onChange={handleInputChange}
+          />
+        </div>
+      </form>
+    </Modal >
   );
 }

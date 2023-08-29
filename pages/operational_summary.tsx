@@ -835,7 +835,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     unit: 0,
     subIndustry: "",
     industry: "",
-    operationType: ""
   })
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -927,25 +926,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               onChange={handleInputChange}
             />
           </div>
-          <div className="flex flex-col">
-            <label htmlFor="operationType" className="text-sm font-medium text-gray-700">
-              Operation Type
-            </label>
-            <select
-              id="operationType"
-              name="operationType"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.operationType}
-              onChange={handleInputChange}
-            >
-              <option value="" disabled>Select an option</option>
-              <option value="production">Production</option>
-              <option value="productionTooling">Production
-                Tooling</option>
-              <option value="pilotProduction">Pilot production</option>
-              <option value="inDevelopment">In development</option>
-            </select>
-          </div>
+
         </div>
       </form>
 
