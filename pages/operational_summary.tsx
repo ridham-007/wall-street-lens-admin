@@ -252,7 +252,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               <option value="m">million</option>
             </select>
           </div>
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <label htmlFor="subIndustry" className="text-sm font-medium text-gray-700">
               Sub-Industry
             </label>
@@ -277,7 +277,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               value={val.industry}
               onChange={handleInputChange}
             />
-          </div>
+          </div> */}
 
         </div>
       </form>

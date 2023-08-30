@@ -1,14 +1,18 @@
 import { LoginService } from "@/utils/login";
 import Head from "next/head";
-import { ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Below change is temporary, will be updated with token once user module implemented
   const onLogin = () => {
-    
+    if (email === 'admin@test.com' && password === 'test') {
+      LoginService.saveUser({ email, password });
+      window.location.href = "/financial_summary";
+    }
+
   };
 
   useEffect(() => {

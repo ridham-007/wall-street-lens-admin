@@ -10,7 +10,7 @@ export default function Capacity() {
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
   const [title, setTitle] = useState<string[]>([])
-  const [activeTab, setActiveTab] = useState('Parameter');
+  const [activeTab, setActiveTab] = useState('Summary');
   const [isOpenAction, setIsOpenAction] = useState('');
 
   const onAddUpdateParameter = () => {
@@ -60,7 +60,34 @@ export default function Capacity() {
               </div>
             </div>
           </div>
-          <div className="flex flex-row-reverse pr-4 gap-4">
+          <div className="flex pr-4 gap-4">
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => setAddUpdateQuarter(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="ionicon w-7 h-7"
+                viewBox="0 0 512 512"
+              >
+                <path
+                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="32"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="32"
+                  d="M256 176v160M336 256H176"
+                />
+              </svg>
+              <span>Add a Quarter Summary</span>
+            </button>
             <button
               type="button"
               className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -89,50 +116,23 @@ export default function Capacity() {
               <span>Add a Parameter</span>
             </button>
 
-            <button
-              type="button"
-              className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onClick={() => setAddUpdateQuarter(true)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="ionicon w-7 h-7"
-                viewBox="0 0 512 512"
-              >
-                <path
-                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="32"
-                />
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="32"
-                  d="M256 176v160M336 256H176"
-                />
-              </svg>
-              <span>Add a Quarter Summary</span>
-            </button>
           </div>
         </div>
         <div className="flex mb-4">
           <TabButton
-            label="Parameter"
+            label="Summary"
             activeTab={activeTab}
-            onClick={() => handleTabClick('Parameter')}
+            onClick={() => handleTabClick('Summary')}
           />
           <TabButton
-            label="Quarter"
+            label="Details"
             activeTab={activeTab}
-            onClick={() => handleTabClick('Quarter')}
+            onClick={() => handleTabClick('Details')}
           />
         </div>
         <div>
-          {activeTab === 'Parameter' && <ParameterTable />}
-          {activeTab === 'Quarter' && <QuarterTable />}
+          {activeTab === 'Summary' && <ParameterTable />}
+          {activeTab === 'Details' && <QuarterTable />}
         </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter
@@ -205,6 +205,38 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     >
       <form className="form w-100">
         <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <label htmlFor="year" className="text-sm font-medium text-gray-700">
+              Year
+            </label>
+            <input
+              type="number"
+              id="year"
+              name="year"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+            // value={year}
+            // min={minYear}
+            // max={currentYear}
+            // onChange={handleYearChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+              Quarter
+            </label>
+            <select
+              id="quarter"
+              name="selectedQuarter"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.selectedQuarter}
+              onChange={handleOnChange}
+            >
+              <option value={1}>Q1</option>
+              <option value={2}>Q2</option>
+              <option value={3}>Q3</option>
+              <option value={4}>Q4</option>
+            </select>
+          </div>
           <div className="flex flex-col">
             <label htmlFor="summary" className="text-sm font-medium text-gray-700">
               Quarter summary
@@ -298,24 +330,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               <option value="inDevelopment">In development</option>
             </select>
           </div>
-          <div className="flex flex-col">
-            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-              Quarter
-            </label>
-            <select
-              id="quarter"
-              name="selectedQuarter"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.selectedQuarter}
-              onChange={handleOnChange}
-            >
-              <option value={1}>Q1</option>
-              <option value={2}>Q2</option>
-              <option value={3}>Q3</option>
-              <option value={4}>Q4</option>
-            </select>
-          </div>
-
         </div>
       </form>
     </Modal>
