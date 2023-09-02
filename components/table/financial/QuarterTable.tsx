@@ -1,8 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 
-const QuarterTable = () => {
-    const [isOpenAction, setIsOpenAction] = useState(false);
+export interface TableProps {
+    data: any;
+}
+
+const QuarterTable = (props: TableProps) => {
+    const [isOpenAction, setIsOpenAction] = useState('');
     const ref = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
         const checkIfClickedOutside = (e: { target: any; }) => {
@@ -19,13 +23,14 @@ const QuarterTable = () => {
             document.removeEventListener("mousedown", checkIfClickedOutside)
         }
     }, [isOpenAction])
-    const toggleMenu = () => {
+    const toggleMenu = (id: SetStateAction<string>) => {
         if (isOpenAction) {
-            setIsOpenAction(false);
+            setIsOpenAction('');
         } else {
-            setIsOpenAction(true);
+            setIsOpenAction(id);
         }
     };
+    const tableData = props?.data?.financialReportsByCompanyName?.financialQuarters;
     return <>
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
@@ -36,28 +41,27 @@ const QuarterTable = () => {
                         <>
                             <TH>Quarter</TH>
                             <TH>Year</TH>
-                            <TH>Updated At</TH>
                             <TH >Actions</TH>
                         </>
                     </THR>
                 </thead>
 
                 <tbody className="w-full">
-                    <TDR >
+                    {tableData?.map((current: { quarter: string | JSX.Element | undefined; year: string | JSX.Element | undefined; }) => {
+                        return <TDR key={Math.random().toString()}>
                         <>
-                            <TD></TD>
-                            <TD></TD>
-                            <TD></TD>
+                                <TD>{current?.quarter}</TD>
+                            <TD>{current?.year}</TD>
                             <TD style="text-center">
                                 <>
                                     <button
                                         className=" inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        onClick={() => toggleMenu()}
+                                            onClick={() => toggleMenu(`${current?.quarter}-${current?.year}`)}
                                     >
                                         <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
 
                                     </button>
-                                    {(isOpenAction && (
+                                        {((isOpenAction === `${current?.quarter}-${current?.year}`) && (
                                         <div ref={ref} className="z-auto absolute right-[150px] mt-2   rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                                 <a
@@ -73,6 +77,7 @@ const QuarterTable = () => {
                             </TD>
                         </>
                     </TDR>
+                    })}
                 </tbody>
             </table>
         </div >

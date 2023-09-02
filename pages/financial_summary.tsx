@@ -1,12 +1,15 @@
-import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, SetStateAction, useEffect, useRef, useState } from "react";
+import { ChangeEvent, JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { useMutation, useLazyQuery } from "@apollo/client";
-import { ADD_FINANCIAL_SUMMARY_PARAMETER, ADD_QUARTERS_DETAILS, GET_FINANCIAL_SUMMARY_PARAMETERS } from "@/utils/query";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import { ADD_FINANCIAL_SUMMARY_PARAMETER, ADD_QUARTERS_DETAILS, FINANCIAL_REPORT_BY_COMPANY_NAME, GET_FINANCIAL_SUMMARY_PARAMETERS } from "@/utils/query";
 import Loader from "@/components/loader";
 import { TabButton } from "@/components/TabButton";
 import ParameterTable from "@/components/table/financial/ParameterTable";
-import QuarterTable from "@/components/table/financial/QuarterTable";
+import YearDropdown from "@/components/year_dropdown/year_dropdown";
 
 const selectedCompany = [{
   id: 1,
@@ -20,17 +23,17 @@ export default function FinancialPage() {
   const [perametersData, setPerametersData] = useState<any[]>([]);
   const [searchKey, setSearchKey] = useState("");
   const [isOpenAction, setIsOpenAction] = useState("");
-  const [activeTab, setActiveTab] = useState('Parameter');
+  const [activeTab, setActiveTab] = useState('Descriptions');
 
-  const [addParameter, { data: parameterData }] = useMutation(ADD_FINANCIAL_SUMMARY_PARAMETER);
-  const [addQuarters, { data: quartersData }] = useMutation(ADD_QUARTERS_DETAILS);
+  const [addParameter] = useMutation(ADD_FINANCIAL_SUMMARY_PARAMETER);
+  const [addQuarters] = useMutation(ADD_QUARTERS_DETAILS);
 
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
   };
 
-  const [getParametersData, { data, error, loading, refetch }] = useLazyQuery(
-    GET_FINANCIAL_SUMMARY_PARAMETERS,
+  const [getQuarterDetails, { data: quarterData, refetch: refetchQuarter }] = useLazyQuery(
+    FINANCIAL_REPORT_BY_COMPANY_NAME,
     {
       variables: {
         companyName: selectedCompany[0]?.name,
@@ -39,47 +42,42 @@ export default function FinancialPage() {
   );
 
   useEffect(() => {
-    if (data && data.getFinancialSummaryByCompany){
-      const updatedData = data.getFinancialSummaryByCompany?.map((current: { id: any; linkTo: any; unit: any; }) => {
-        return {
-          id: current?.id,
-          title: current?.linkTo,
-          value: '',
-          unit: current?.unit
-        }
-      });
-      setPerametersData(updatedData)
-    }
-  }, [data])
-
-
-  useEffect(() => {
-    getParametersData();
-  }, [getParametersData, parameterData]);
+    getQuarterDetails();
+  }, [])
 
   const closePopups = () => {
     setAddUpdateParameter(false);
     setAddUpdateQuarter(false);
   }
 
+  console.log({ quarterData })
+
   const onAddUpdateParameter = async (data: any) => {
     setShowLoader(true);
     await addParameter({
       variables: {
-        summaryInfo: {
-          company: data.company,
-          linkTo: data.title,
-          unit: data.unit,
-          isVisibleToChart: data.isVisible
-        }
+        financialQuarter:{
+          financialSummary: {
+            company: data.company,
+            title: data.title,
+            graphType: data.graph,
+            yoy: Number(data.YoY),
+          },
+          quarters: data.quarterData.map((current: any) => {
+            return {
+              ...current,
+              value: Number(current?.value), 
+              year: Number(data.year)
+            }})
+      }
       },
     })
     setShowLoader(false);
-    refetch();
     closePopups()
   };
 
   const onAddUpdateQuarter = async(perameters: any) => {
+    setShowLoader(true);
     const {
       year,
       selectedQuarter,
@@ -103,7 +101,9 @@ export default function FinancialPage() {
         },
       }
     })
-
+    setShowLoader(false);
+    closePopups();
+    refetchQuarter();
   }
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -190,53 +190,19 @@ export default function FinancialPage() {
                   d="M256 176v160M336 256H176"
                 />
               </svg>
-              <span>Add a Parameter</span>
-            </button>
-
-            <button
-              type="button"
-              className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onClick={() => setAddUpdateQuarter(true)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="ionicon w-7 h-7"
-                viewBox="0 0 512 512"
-              >
-                <path
-                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="32"
-                />
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="32"
-                  d="M256 176v160M336 256H176"
-                />
-              </svg>
-              <span>Add a Quarter Details</span>
+              <span>Add a Description</span>
             </button>
           </div>
         </div>
         <div className="flex mb-4">
           <TabButton
-            label="Parameter"
+            label="Descriptions"
             activeTab={activeTab}
-            onClick={() => handleTabClick('Parameter')}
-          />
-          <TabButton
-            label="Quarter"
-            activeTab={activeTab}
-            onClick={() => handleTabClick('Quarter')}
+            onClick={() => handleTabClick('Descriptions')}
           />
         </div>
         <div>
-          {activeTab === 'Parameter' && <ParameterTable />}
-          {activeTab === 'Quarter' && <QuarterTable />}
+          {activeTab === 'Descriptions' && <ParameterTable data={quarterData} />}
         </div>
 
         {addUpdateParameter && (
@@ -265,14 +231,39 @@ interface AddUpdateParameterProps {
   financialInitData?: any;
 }
 
+const dummyQuarters = [
+  {
+    quarter: 1,
+    value: "",
+  },
+  {
+    quarter: 2,
+    value: "",
+},
+  {
+    quarter: 3,
+    value: "",
+},
+  {
+    quarter: 4,
+    value: "",
+}
+];
+
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [val, setVal] = useState({
     company: props?.selectedCompany[0].name,
     title: "",
-    unit: "",
-    isVisible: false
+    graph: "",
+    quarterData: dummyQuarters,
+    YoY: "",
+    year: "",
   })
   const handleOnSave = () => {
+    if (!val.title){
+      toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      return;
+    }
     props.onSuccess && props.onSuccess(val)
     props.onClose && props.onClose()
   };
@@ -286,85 +277,133 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
       [name]: value
     }));
   };
+
+  const handleQuarterUpdate = (event: ChangeEvent<HTMLInputElement>, id: number) => {
+    const updatedQuarter = val.quarterData?.map(current => {
+      if (current?.quarter === id){
+        return {
+          ...current,
+          value: event?.target?.value
+        }
+      }
+      return current;
+    })
+    setVal((prevVal) => ({
+      ...prevVal,
+      ['quarterData']: updatedQuarter
+    }));
+  }
+
   return (
     <Modal
       showModal={true}
       handleOnSave={handleOnSave}
-      title="Add Parameter"
+      title="Financial Summary Descriptions"
       onClose={() => props.onClose && props.onClose()}
     >
-      <form className="form w-100">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <label
-              htmlFor="company"
-              className="text-sm font-medium text-gray-700"
-            >
-              Company
-            </label>
-            <input
-              type="text"
-              id="company"
-              name="company"
-              value={props?.selectedCompany[0].name}
-              disabled={true} // need to update when we will have more companies
-              onChange={handleOnChange}
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="title"
-              className="text-sm font-medium text-gray-700"
-            >
-              Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={val.title}
-              onChange={handleOnChange}
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
+      <>
+        <form className="form w-100">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+                Company
+              </label>
+              <select
+                id="quarter"
+                name="company"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={val.company}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                <option value="TESLA">TESLA</option>
+                <option value="TATA">TATA</option>
+              </select>
+            </div>
+            
+            <YearDropdown onChange={handleOnChange} year={val.year}/>
+
+            <div className="flex flex-col">
+              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+                Graph Type
+              </label>
+              <select
+                id="graphType"
+                name="graph"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={val.graph}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                <option value="Bar">Bar Chart</option>
+                <option value="Linear">Linear Graph</option>
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label
+                htmlFor="title"
+                className="text-sm font-medium text-gray-700"
+              >
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={val.title}
+                onChange={handleOnChange}
+                required
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label
+                htmlFor="YoY"
+                className="text-sm font-medium text-gray-700"
+              >
+                YoY
+              </label>
+              <input
+                type="number"
+                id="YoY"
+                name="YoY"
+                value={val.YoY}
+                onChange={handleOnChange}
+                required
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              />
+            </div>
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="unit" className="text-sm font-medium text-gray-700">
-              Unit
-            </label>
-            <select
-              id="unit"
-              name="unit"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.unit}
-              onChange={handleOnChange}
-            >
-              <option value="number">Number</option>
-              <option value="%">%</option>
-              <option value="KWH">KWH</option>
-              <option value="m">million</option>
-            </select>
-          </div>
-          <div className="flex flex-row items-center w-full h-full gap-2">
-            <input
-              type="checkbox"
-              id="isVisible"
-              name="isVisible"
-              checked={val.isVisible}
-              onChange={handleOnChange}
-              className="p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
-            <label
-              htmlFor="isVisible"
-              className="text-sm font-medium text-gray-700"
-            >
-              Is Visible To Chart
-            </label>
-
-          </div>
-        </div>
-      </form>
+            <div className="w-full">
+              <h1 className="text-xl font-semibold mb-2 mt-4">Quarter Values</h1>
+              <div className="flex gap-5 flex-wrap ">
+              {
+                val.quarterData?.map(current => {
+                  return <div key={current?.quarter} className="flex flex-col">
+                    <label
+                      htmlFor={`quarter${current?.quarter}`}
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Quarter {current?.quarter}
+                    </label>
+                    <input
+                      type="number"
+                      id={`quarter${current?.quarter}`}
+                      name={`quarter${current?.quarter}`}
+                      value={current.value}
+                      onChange={(event) => handleQuarterUpdate(event, current?.quarter)}
+                      required
+                      className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                  </div>
+                })
+              }
+              </div> 
+            </div>
+        </form>
+        <ToastContainer />  
+      </>
     </Modal>
   );
 }
@@ -388,6 +427,11 @@ const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
     }
   };
   const handleOnSave = () => {
+    const errorPresent = val?.find((current: { value: any; }) => !current?.value);
+    if (errorPresent){
+      toast('Please fill the required fields.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      return;
+    }
     props.onSuccess && props.onSuccess({ val, year, selectedQuarter })
   };
 
@@ -396,6 +440,7 @@ const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
       prevVal.map((val: { id: any; }) => val.id === id ? { ...val, value: Number(e.target.value) } : { ...val })
     ))
   };
+
   return (
     <Modal
       showModal={true}

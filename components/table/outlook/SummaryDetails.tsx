@@ -1,11 +1,11 @@
-import { Key, useEffect, useRef, useState } from "react";
+import { Key, SetStateAction, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 
 export interface TableProps {
     data: any;
 }
 
-const ParameterTable = (props: TableProps) => {
+const SummaryDetails = (props: TableProps) => {
     const [isOpenAction, setIsOpenAction] = useState('');
     const ref = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
@@ -21,8 +21,9 @@ const ParameterTable = (props: TableProps) => {
             document.removeEventListener("mousedown", checkIfClickedOutside)
         }
     }, [isOpenAction])
-    const toggleMenu = (id: string | number | ((prevState: string) => string) | null | undefined) => {
-        if (isOpenAction) {
+
+    const toggleMenu = (id: Key | null | undefined) => {
+        if (isOpenAction?.length) {
             setIsOpenAction('');
         } else {
             if(id){
@@ -30,9 +31,9 @@ const ParameterTable = (props: TableProps) => {
             }
         }
     };
-    console.log({props})
-    const tableData = props?.data?.getOperationalReportsByCompany?.operationalQuarters;
-    console.log({ tableData })
+
+    const tableData = props?.data?.getOutLookSummaryByCompany;
+
     return <>
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
@@ -42,27 +43,25 @@ const ParameterTable = (props: TableProps) => {
                     <THR>
                         <>
                             <TH>Company</TH>
-                            <TH>title</TH>
-                            <TH>graphType</TH>
-                            <TH>operationType</TH>
+                            <TH>Quarter</TH>
+                            <TH>Year</TH>
                             <TH >Action</TH>
                         </>
                     </THR>
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { operationalSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; operationType: string | JSX.Element | undefined; }; id: string | number | ((prevState: string) => string) | null | undefined; }) => {
-                        return <TDR key={current?.operationalSummary?.id}>
+                    {tableData?.map((current: { id: Key | null | undefined; company: string | JSX.Element | undefined; quarter: string | JSX.Element | undefined; year: string | JSX.Element | undefined; }) => {
+                        return <TDR key={current?.id}>
                         <>
-                                <TD>{current?.operationalSummary?.company}</TD>
-                                <TD>{current?.operationalSummary?.title}</TD>
-                                <TD>{current?.operationalSummary?.graphType}</TD>
-                                <TD>{current?.operationalSummary?.operationType}</TD>
+                            <TD>{current?.company}</TD>
+                            <TD>{current?.quarter}</TD>
+                            <TD>{current?.year}</TD>
                             <TD style="text-center">
                                 <>
                                     <button
                                         className=" inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                            onClick={() => toggleMenu(current?.id)}
+                                        onClick={() => toggleMenu(current?.id)}
                                     >
                                         <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
 
@@ -83,10 +82,11 @@ const ParameterTable = (props: TableProps) => {
                             </TD>
                         </>
                     </TDR>
-})}
+                    })}
                 </tbody>
             </table>
         </div >
     </>
 }
-export default ParameterTable;
+
+export default SummaryDetails;

@@ -1,19 +1,95 @@
-import { useEffect, useRef, useState } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { TabButton } from "@/components/TabButton";
 import ParameterTable from "@/components/table/vihicle/ParameterTable";
 import QuarterTable from "@/components/table/vihicle/QuarterTable";
+import { useLazyQuery, useMutation } from "@apollo/client";
+import { CREATE_CAPACITY_OPERATIONAL_SUMMARY, CREATE_CAPASITY_SUMMARY, GET_CAPACITY_SUMMARY_PARAMETERS, GET_VEHICLE_CAPACITY_SUMMARY } from "@/utils/query";
+import Loader from "@/components/loader";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import Tablist from "@/components/tablist/tablist";
+import YearDropdown from "@/components/year_dropdown/year_dropdown";
+import CollapsibleForm from "@/components/collapsibleform/collapsibleform";
+
+const selectedCompany = [{
+  id: 1,
+  name: 'TESLA',
+}]
 
 export default function Capacity() {
 
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
+  const [addParameter] = useMutation(CREATE_CAPACITY_OPERATIONAL_SUMMARY);
+  const [addProducts] = useMutation(CREATE_CAPASITY_SUMMARY);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
-  const [title, setTitle] = useState<string[]>([])
-  const [activeTab, setActiveTab] = useState('Summary');
+  const [activeTab, setActiveTab] = useState('Descriptions');
   const [isOpenAction, setIsOpenAction] = useState('');
+  const [showLoader, setShowLoader] = useState(false);
 
-  const onAddUpdateParameter = () => {
+  const [getParametersData, { data, error, loading, refetch }] = useLazyQuery(
+    GET_CAPACITY_SUMMARY_PARAMETERS,
+    {
+      variables: {
+        companyName: selectedCompany[0]?.name,
+      },
+    }
+  );
+
+  const [getQuarterDetails, { data: quarterData, refetch: refetchQuarters }] = useLazyQuery(
+    GET_VEHICLE_CAPACITY_SUMMARY,
+    {
+      variables: {
+        companyName: selectedCompany[0]?.name,
+      },
+    }
+  );
+
+  useEffect(() => {
+    getParametersData();
+    getQuarterDetails();
+  }, [])
+
+  const onAddUpdateParameter = async (data: any) => {
+    setShowLoader(true);
+    await addParameter({
+      variables: {
+        summaryInfo: {
+          company: data.company,
+          title: data.title,
+          summary: data.summary,
+          year: Number(data.year),
+          quarter: Number(data.selectedQuarter),
+        }
+      },
+    })
+    setShowLoader(false);
+    refetch();
+    closePopups()
+  };
+
+
+  const onAddUpdateProduct = async (data: any) => {
+    setShowLoader(true);
+    await addProducts({
+      variables: {
+        capacityInfo: {
+          company: data.company,
+          region: data.region,
+          product: data.modal,
+          status: data.operationType,
+          capacity: data.capacity,
+          capacitySummaryId: data.summary,
+        }
+      },
+    })
+    setShowLoader(false);
+    closePopups()
+  };
+
+  const closePopups = () => {
     setAddUpdateParameter(false);
     setAddUpdateQuarter(false)
   };
@@ -44,6 +120,8 @@ export default function Capacity() {
   return (
     <Layout title="Capasity" page={LayoutPages.vihicle_capacity}>
       <>
+        {showLoader && (<Loader />)}
+
         <div className="flex justify-between mb-4">
           <div className="relative w-1/3">
             <div className="flex relative m-2 w-full">
@@ -86,9 +164,9 @@ export default function Capacity() {
                   d="M256 176v160M336 256H176"
                 />
               </svg>
-              <span>Add a Quarter Summary</span>
+              <span>Add a Description</span>
             </button>
-            <button
+            {/* <button
               type="button"
               className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={() => setAddUpdateParameter(true)}
@@ -113,75 +191,68 @@ export default function Capacity() {
                   d="M256 176v160M336 256H176"
                 />
               </svg>
-              <span>Add a Parameter</span>
-            </button>
+              <span>Add a Capacity Details</span>
+            </button> */}
 
           </div>
         </div>
         <div className="flex mb-4">
           <TabButton
-            label="Summary"
+            label="Descriptions"
             activeTab={activeTab}
-            onClick={() => handleTabClick('Summary')}
+            onClick={() => handleTabClick('Descriptions')}
           />
-          <TabButton
+          {/* <TabButton
             label="Details"
             activeTab={activeTab}
             onClick={() => handleTabClick('Details')}
-          />
+          /> */}
         </div>
         <div>
-          {activeTab === 'Summary' && <ParameterTable />}
+          {activeTab === 'Descriptions' && <ParameterTable data={data}/>}
           {activeTab === 'Details' && <QuarterTable />}
         </div>
-        {addUpdateParameter && (
+        {/* {addUpdateParameter && (
           <AddUpdateParaMeter
-            onSuccess={onAddUpdateParameter}
+            onSuccess={onAddUpdateProduct}
             onClose={onAddUpdateParameterClose}
-            title={title}
-            setTitle={setTitle}
+            data={data}
           ></AddUpdateParaMeter>
-        )}
+        )} */}
         {addUpdateQuarter && (
           <AddUpdateParaQuarter
             onSuccess={onAddUpdateParameter}
             onClose={onAddUpdateParameterClose}
-            title={title}
-            setTitle={setTitle}
           ></AddUpdateParaQuarter>
         )}
+        <ToastContainer/>
       </>
     </Layout >
   );
 }
 
 
-interface AddUpdateParameterOnSuccess {
-  (id: string): void;
-}
-
-interface AddUpdateParameterOnClose {
-  (): void;
-}
-
 interface AddUpdateParameterProps {
-  onSuccess?: AddUpdateParameterOnSuccess;
-  onClose?: AddUpdateParameterOnClose;
-  setTitle?: React.Dispatch<React.SetStateAction<string[]>>;
-  title?: string[]
+  onSuccess?: any;
+  onClose?: any;
+  data?: any;
 }
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [val, setVal] = useState({
-    company: "",
+    company: selectedCompany[0]?.name,
     region: "",
     modal: "",
     capacity: "",
     operationType: "",
-    selectedQuarter: 'Q1',
     summary: ""
   })
   const handleOnSave = () => {
+    if (!val.region || !val.modal || !val.capacity || !val.operationType || !val.summary) {
+      toast('Please fill the required data.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      return;
+    }
+    props.onSuccess && props.onSuccess(val);
     props.onClose && props.onClose()
   };
 
@@ -200,43 +271,11 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     <Modal
       showModal={true}
       handleOnSave={handleOnSave}
-      title="Add Parameter"
+      title="Add Descriptions"
       onClose={() => props.onClose && props.onClose()}
     >
       <form className="form w-100">
         <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <label htmlFor="year" className="text-sm font-medium text-gray-700">
-              Year
-            </label>
-            <input
-              type="number"
-              id="year"
-              name="year"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-            // value={year}
-            // min={minYear}
-            // max={currentYear}
-            // onChange={handleYearChange}
-            />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-              Quarter
-            </label>
-            <select
-              id="quarter"
-              name="selectedQuarter"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.selectedQuarter}
-              onChange={handleOnChange}
-            >
-              <option value={1}>Q1</option>
-              <option value={2}>Q2</option>
-              <option value={3}>Q3</option>
-              <option value={4}>Q4</option>
-            </select>
-          </div>
           <div className="flex flex-col">
             <label htmlFor="summary" className="text-sm font-medium text-gray-700">
               Quarter summary
@@ -248,23 +287,11 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               value={val.summary}
               onChange={handleOnChange}
             >
-              {props.title?.map((item: string, index: number) => {
-                return <option value={item} key={index}>{item}</option>
+              <option value="" key={Math.random().toString()}>Select an option</option>
+              {props?.data?.getCapacityQuarterSummaryByCompany?.map((item: { id: string; title: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }) => {
+                return <option value={item?.id} key={item?.id}>{item?.title}</option>
               })}
             </select>
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="company" className="text-sm font-medium text-gray-700">
-              Company
-            </label>
-            <input
-              type="text"
-              id="company"
-              value={val.company}
-              onChange={handleOnChange}
-              name="company"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 min-w-[280px] focus:border-blue-500 outline-none"
-            />
           </div>
           <div className="flex flex-col">
             <label
@@ -279,7 +306,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               name="region"
               value={val.region}
               onChange={handleOnChange}
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 min-w-[280px] focus:border-blue-500 outline-none"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 min-w-[322px] focus:border-blue-500 outline-none"
             />
           </div>
           <div className="flex flex-col">
@@ -295,7 +322,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               name="modal"
               value={val.modal}
               onChange={handleOnChange}
-              className="mt-1 p-2 border rounded-md min-w-[280px] focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="mt-1 p-2 border rounded-md min-w-[322px] focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
           <div className="flex flex-col">
@@ -308,26 +335,26 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               value={val.capacity}
               onChange={handleOnChange}
               name="capacity"
-              className="mt-1 p-2 border rounded-md min-w-[280px] focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="mt-1 p-2 border rounded-md min-w-[322px] focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
           <div className="flex flex-col">
             <label htmlFor="operationType" className="text-sm font-medium text-gray-700">
-              Operation Type
+              Status
             </label>
             <select
               id="operationType"
               name="operationType"
-              className="mt-1 p-2 border rounded-md min-w-[280px] focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="mt-1 p-2 border rounded-md min-w-[322px] focus:ring-blue-500 focus:border-blue-500 outline-none"
               value={val.operationType}
               onChange={handleOnChange}
             >
               <option value="" disabled>Select an option</option>
-              <option value="production">Production</option>
-              <option value="productionTooling">Production
+              <option value="Production">Production</option>
+              <option value="ProductionTooling">Production
                 Tooling</option>
-              <option value="pilotProduction">Pilot production</option>
-              <option value="inDevelopment">In development</option>
+              <option value="PilotProduction">Pilot production</option>
+              <option value="InDevelopment">In development</option>
             </select>
           </div>
         </div>
@@ -338,10 +365,14 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
 
 const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
+  const currentYear = new Date().getFullYear();
+  const minYear = 1880;
   const [val, setVal] = useState({
     title: "",
-    company: "",
-    summary: ""
+    company: selectedCompany[0]?.name,
+    summary: "",
+    selectedQuarter: 1,
+    year: currentYear
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
@@ -351,20 +382,78 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
       [name]: value
     }));
   };
+
   const handleOnSave = () => {
+    return;
+    if (!val.title || !val.summary) {
+      toast('Title or Summary is missing', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      return;
+    }
+    props.onSuccess && props.onSuccess(val);
     props.onClose && props.onClose()
-    props.setTitle && props.setTitle(prevVal => [...prevVal, val.title])
   };
+
   return (
     <Modal
       showModal={true}
       handleOnSave={handleOnSave}
-      title="Add Quarter Summary"
+      title="Vehical Capacity Descriptions"
       onClose={() => props.onClose && props.onClose()}
     >
       <form className="form w-100">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col">
+            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+              Company
+            </label>
+            <select
+              id="quarter"
+              name="company"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+            // value={selectedQuarter}
+            // onChange={handleQuarterChange}
+            >
+              <option value="">Select a option</option>
+              <option value="TESLA">TESLA</option>
+              <option value="TATA">TATA</option>
+              {/* <option value={3}>Q3</option> */}
+              {/* <option value={4}>Q4</option> */}
+            </select>
+          </div>
+          {/* <div className="flex flex-col">
+            <label htmlFor="year" className="text-sm font-medium text-gray-700">
+              Year
+            </label>
+            <input
+              type="number"
+              id="year"
+              name="year"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.year}
+              min={minYear}
+              max={currentYear}
+              onChange={handleInputChange}
+            />
+          </div> */}
+          <YearDropdown onChange={() => { } } year={""}/>
+          {/* <div className="flex flex-col">
+            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+              Quarter
+            </label>
+            <select
+              id="quarter"
+              name="selectedQuarter"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={val.selectedQuarter}
+              onChange={handleInputChange}
+            >
+              <option value={1}>Q1</option>
+              <option value={2}>Q2</option>
+              <option value={3}>Q3</option>
+              <option value={4}>Q4</option>
+            </select>
+          </div> */}
+          {/* <div className="flex flex-col">
             <label htmlFor="title" className="text-sm font-medium text-gray-700">
               Title
             </label>
@@ -388,19 +477,44 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
               value={val.company}
               onChange={handleInputChange}
+              disabled
             />
-          </div>
+          </div> */}
         </div>
-        <div className="mt-4">
-          <label htmlFor="summary" className="text-sm font-medium text-gray-700">
-            Summary
-          </label>
-          <textarea
-            id="summary"
-            name="summary"
-            className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
-            value={val.summary}
-            onChange={handleInputChange}
+        <div className="w-full max-w-[700px] mt-4">
+          <Tablist 
+            content={<>
+            <div className="w-full flex flex-wrap gap-5 mt-5">
+              <div className="w-full flex flex-col">
+                <label htmlFor="title" className="text-sm font-medium text-gray-700">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  className="w-full mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={val.title}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+            </div>
+              <div className="mt-5">
+                <label htmlFor="summary" className="text-sm font-medium text-gray-700">
+                  Summary
+                </label>
+                <textarea
+                  id="summary"
+                  name="summary"
+                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
+                  value={val.summary}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <CollapsibleForm />
+              </>
+          }
           />
         </div>
       </form>
