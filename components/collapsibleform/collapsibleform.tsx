@@ -4,23 +4,45 @@ type Entry = {
     region: string;
     modal: string;
     capacity: string;
-    production: string;
+    status: string;
 };
 
-const CollapsibleForm = () => {
-    const [entries, setEntries] = useState<Entry[]>([
-        { region: '', modal: '', capacity: '', production: '' },
-    ]);
-    const [expanded, setExpanded] = useState<number | null>(null);
+export interface formProps {
+    quarters: any,
+    selectedTab: any,
+    updateQuarters: any;
+}
 
+const CollapsibleForm = (props: formProps) => {
+    const initialEntries = [...props?.quarters?.find((current: { quarter: any; }) => current?.quarter === props?.selectedTab)?.rows];
+    const [expanded, setExpanded] = useState<number | null>(null);
     const addEntry = () => {
-        setEntries([...entries, { region: '', modal: '', capacity: '', production: '' }]);
+        const updatedRows = [...initialEntries, { region: '', modal: '', capacity: '', status: '' }];
+        const updatedQuarters = props?.quarters?.map((current: { quarter: any; })  => {
+            if(current?.quarter === props.selectedTab){
+                return {
+                    ...current,
+                    rows: updatedRows,
+                }
+            }
+            return current;
+        })
+        props.updateQuarters(updatedQuarters)
     };
 
     const deleteEntry = (index: number) => {
-        const updatedEntries = [...entries];
+        const updatedEntries = [...initialEntries];
         updatedEntries.splice(index, 1);
-        setEntries(updatedEntries);
+        const updatedQuarters = props?.quarters?.map((current: { quarter: any; }) => {
+            if (current?.quarter === props.selectedTab) {
+                return {
+                    ...current,
+                    rows: updatedEntries,
+                }
+            }
+            return current;
+        })
+        props.updateQuarters(updatedQuarters);
         if (expanded === index) {
             setExpanded(null);
         }
@@ -31,22 +53,42 @@ const CollapsibleForm = () => {
     };
 
     const handleInputChange = (index: number, key: keyof Entry, value: string) => {
-        const updatedEntries = [...entries];
+        const updatedEntries = [...initialEntries];
         updatedEntries[index][key] = value;
-        setEntries(updatedEntries);
+        const updatedQuarters = props?.quarters?.map((current: { quarter: any; }) => {
+            if (current?.quarter === props.selectedTab) {
+                return {
+                    ...current,
+                    rows: updatedEntries,
+                }
+            }
+            return current;
+        })
+        props.updateQuarters(updatedQuarters);
     };
 
     return (
-        <div className='w-full p-2 bg-gray-100'>
-            {entries.map((entry, index) => (
-                <div key={index} className="w-full border p-2 rounded mb-2 bg-gray-200">
+        <div className='w-full  '>
+            {initialEntries.map((entry, index) => (
+                <div key={index} className="w-full shadow-md border p-2 rounded-lg mb-2">
                     <div className="flex justify-between items-center">
-                        <button type="button" onClick={() => toggleCollapse(index)} className="bg-gray-300 p-1 rounded">
-                            {expanded === index ? '▲' : '▼'}
+                        <button type="button" onClick={() => toggleCollapse(index)} className=" p-1 rounded">
+                            {expanded === index ? '▼' : '▶'}
                         </button>
                         <h2 className="text-lg mr-auto font-bold">{entry.region}</h2>
                         <button type="button" onClick={() => deleteEntry(index)} className="bg-red-500 ml-auto text-white p-1 rounded ml-2">
-                            Delete
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-6 h-6"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M3 6h18M9 6v12a3 3 0 0 0 3 3h0a3 3 0 0 0 3-3V6M5 6l1 13a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-13M10 11v6M14 11v6" />
+                            </svg>
                         </button>
                     </div>
                     <div className={`mt-2 w-full ${expanded === index ? '' : 'hidden'}`}>
@@ -82,16 +124,19 @@ const CollapsibleForm = () => {
                         <input
                             type="text"
                             placeholder="Status"
-                            value={entry.production}
-                            onChange={(e) => handleInputChange(index, 'production', e.target.value)}
+                            value={entry.status}
+                            onChange={(e) => handleInputChange(index, 'status', e.target.value)}
                             className="w-full mt-2 border rounded p-2"
                         />
                 </div>
                     </div>
                 </div>
             ))}
-            <button type="button" onClick={addEntry} className="mb-2 bg-gray-500 text-white p-2 rounded">
-                Add Entry
+            <button type="button"
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={addEntry}
+            >
+                +
             </button>
         </div>
     );

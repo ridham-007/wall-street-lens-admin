@@ -40,7 +40,8 @@ const ParameterTable = (props: TableProps) => {
                     <THR>
                         <>
                             <TH>Company</TH>
-                            <TH>title</TH>
+                            <TH>Title</TH>
+                            <TH>Priority</TH>
                             <TH>Graph Type</TH>
                             <TH >Action</TH>
                         </>
@@ -48,11 +49,12 @@ const ParameterTable = (props: TableProps) => {
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { financialSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; }; id: string | number | ((prevState: string) => string) | null | undefined; }) => {
+                    {tableData?.map((current: { financialSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; priority: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; }, id: string | number | ((prevState: string) => string) | null | undefined; }) => {
                         return <TDR key={current?.financialSummary?.id}>
                             <>
                                 <TD>{current?.financialSummary?.company}</TD>
                                 <TD>{current?.financialSummary?.title}</TD>
+                                <TD>{current?.financialSummary?.priority || ''}</TD>
                                 <TD>{current?.financialSummary?.graphType}</TD>
                                 <TD style="text-center">
                                     <>

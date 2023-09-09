@@ -76,6 +76,7 @@ query getFinancialReportsByCompany(
         title
         graphType
         yoy
+        priority
       }
       quarters {
         id
@@ -102,6 +103,7 @@ query getOperationalReportsByCompany(
         graphType
         yoy
         operationType
+        priority
       }
       quarters {
         year
@@ -122,15 +124,13 @@ mutation addUpdateOperationalQuarters($operationalQuarter:AddUpdateOperationalQu
   }
 }`;
 
-const CREATE_CAPACITY_OPERATIONAL_SUMMARY = gql`mutation createCapacityQuarterSummary(
-  $summaryInfo:CreateCapacityQuarterSummary!
+const CREATE_CAPACITY_OPERATIONAL_SUMMARY = gql`mutation addUpdateCapacityInfo(
+  $summaryInfo:AddUpdateCapacityInfo!
   ){
-  createCapacityQuarterSummary(
+  addUpdateCapacityInfo(
     summaryInfo: $summaryInfo
   ) {
-    title
-    company
-    summary
+    success
   }
 }`;
 
@@ -148,15 +148,13 @@ const CREATE_OUTLOOKL_SUMMARY = gql`mutation createOutLookSummary(
 }`;
 
 
-const CREATE_CAPASITY_SUMMARY = gql`mutation addCapacitySummaryDetails(
-  $capacityInfo:AddCapacitySummary!
+const CREATE_OUTLOOK_SUMMARY = gql`mutation addUpdateOutLookInfo(
+  $outLookInfo:AddUpdateOutLookInfo!
   ){
-  addCapacitySummaryDetails(
-    capacityInfo: $capacityInfo
+  addUpdateOutLookInfo(
+    outLookInfo: $outLookInfo
   ) {
-    id
-    company
-    product
+    success
   }
 }`;
 
@@ -168,36 +166,29 @@ const GET_OUT_LOOK_SUMMARY = gql`query getOutLookSummaryByCompany(
 ) {
   id
   company
-  summary
   quarter
   year
+  volume
+  cash
+  profit
+  product
+  growthRate
+  production
 }
 }`;
 
-const GET_VEHICLE_CAPACITY_SUMMARY = gql`query getCapacityReportsByCompanyName(
+const GET_VEHICLE_CAPACITY_SUMMARY = gql`query getCapacityQuarterSummaryByCompany(
   $companyName: String!
   ) {
-    getCapacityReportsByCompanyName(
+    getCapacityQuarterSummaryByCompany(
     companyName: $companyName
   ) {
-    capacityQuarters {
-      quarterSummary {
-        id
-        title
-        company
-        summary
-        quarter
-        year
-      }
-      capacityInfo {
-        id
-        company
-        region
-        product
-        status
-        capacity
-      }
-    }
+      id
+      title
+      description
+      year
+      quarter
+      company
   }
 }`;
 
@@ -213,6 +204,6 @@ export {
     CREATE_OUTLOOKL_SUMMARY,
     GET_OUT_LOOK_SUMMARY,
     OPERATIONAL_REPORT_BY_COMPANY_NAME,
-    CREATE_CAPASITY_SUMMARY,
     GET_VEHICLE_CAPACITY_SUMMARY,
+    CREATE_OUTLOOK_SUMMARY
 }

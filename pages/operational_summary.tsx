@@ -85,6 +85,7 @@ export default function OperationPage() {
               operationType: data.operation,
               graphType: data.graph,
               yoy: Number(data.YoY),
+              priority: Number(data.priority)
           },
           quarters: data?.quarterData?.map((current: any) => {
             return { 
@@ -253,6 +254,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     graph: "",
     quarterData: dummyQuarters,
     YoY: "",
+    priority:"",
     year: "",
     operation: "",
   })
@@ -312,7 +314,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             >
               <option value="">Select a option</option>
               <option value="TESLA">TESLA</option>
-              <option value="TATA">TATA</option>
+              <option value="APPLE">APPLE</option>
             </select>
           </div>
 
@@ -382,6 +384,24 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               id="YoY"
               name="YoY"
               value={val.YoY}
+              onChange={handleInputChange}
+              required
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label
+              htmlFor="priority"
+              className="text-sm font-medium text-gray-700"
+            >
+              Priority
+            </label>
+            <input
+              type="number"
+              id="priority"
+              name="priority"
+              value={val.priority}
               onChange={handleInputChange}
               required
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"

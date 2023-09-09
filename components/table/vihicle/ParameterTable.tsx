@@ -6,6 +6,7 @@ export interface TableProps {
 }
 
 const ParameterTable = (props: TableProps) => {
+    const [isOpen, setIsOpen] = useState<string | any>('');
     const [isOpenAction, setIsOpenAction] = useState('');
     const ref = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
@@ -32,6 +33,32 @@ const ParameterTable = (props: TableProps) => {
     };
 
     const tableData = props.data?.getCapacityQuarterSummaryByCompany;
+
+    const groupedData = tableData?.reduce((result: { [x: string]: { [x: string]: any[]; }; }, item: { year: any; quarter: any; }) => {
+        const year = item.year;
+        const quarter = item.quarter;
+
+        if (!result[year]) {
+            result[year] = {};
+        }
+
+        if (!result[year][quarter]) {
+            result[year][quarter] = [];
+        }
+
+        result[year][quarter].push(item);
+
+        return result;
+    }, {});
+
+    const finalData = groupedData ? Object.keys(groupedData).map(year => ({
+        year: parseInt(year),
+        quarters: Object.keys(groupedData[year]).map(quarter => ({
+            quarter: parseInt(quarter),
+            data: groupedData[year][quarter]
+        }))
+    })): [];
+
     return <>
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
@@ -40,35 +67,47 @@ const ParameterTable = (props: TableProps) => {
                 <thead className="w-full sticky top-0 z-20">
                     <THR>
                         <>
+                            <TH></TH>
                             <TH>Title</TH>
                             <TH>Company</TH>
                             <TH>Quarter</TH>
                             <TH>Year</TH>
-                            <TH>Summary</TH>
+                            <TH>Description</TH>
                             <TH >Actions</TH>
                         </>
                     </THR>
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { id: Key | ((prevState: string) => string) | null | undefined; title: string | JSX.Element | undefined; company: string | JSX.Element | undefined; quarter: string | JSX.Element | undefined; year: string | JSX.Element | undefined; summary: string | JSX.Element | undefined; }) => {
-                        return<TDR key={Math.random().toString()}>
+                    {finalData?.map((current) => {
+                        const currentQuarters = current?.quarters;
+                        return<><TDR key={Math.random().toString()}>
                         <>
-                            <TD>{current?.title}</TD>
-                            <TD>{current?.company}</TD>
-                            <TD>{current?.quarter}</TD>
-                            <TD>{current?.year}</TD>
-                            <TD>{current?.summary}</TD>
+                            <TD>
+                                <>
+                                    <button
+                                        className="text-black text-[24px] px-4 py-2 rounded"
+                                            onClick={() => setIsOpen(isOpen?.length > 0 ? '' : current?.quarters[0]?.data[0]?.id)}
+                                    >
+                                            {isOpen === currentQuarters[0]?.data[0]?.id ? '▼' : '▶'}
+                                    </button>
+                                </>
+                            </TD>
+                                <TD>{currentQuarters[0]?.data[0]?.title}</TD>
+                                <TD>{currentQuarters[0]?.data[0]?.company}</TD>
+                                <TD>{currentQuarters[0]?.data[0]?.quarter}</TD>
+                                <TD>{currentQuarters[0]?.data[0]?.year}</TD>
+                                <TD>{currentQuarters[0]?.data[0]?.description}</TD>
                             <TD style="text-center">
                                 <>
                                     <button
                                         className=" inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        onClick={() => toggleMenu(current?.id)}
+                                            onClick={() => toggleMenu(current?.quarters[0]?.data[0]?.id)}
                                     >
                                         <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
 
                                     </button>
-                                        {((isOpenAction ===current?.id) && (
+                                        {((isOpenAction === current?.quarters[0]?.data[0]?.id) && (
                                         <div ref={ref} className="z-auto absolute right-[150px] mt-2   rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                                 <a
@@ -84,6 +123,48 @@ const ParameterTable = (props: TableProps) => {
                             </TD>
                         </>
                     </TDR>
+                        {
+                            isOpen === currentQuarters[0]?.data[0]?.id && (
+                                    currentQuarters?.map((cur, index) => {
+                                        if(index === 0) return <></>
+                                        return <TDR key={cur?.data[0]?.id} >
+                                            <>
+                                            <TD></TD>
+                                            <TD>{cur?.data[0]?.title}</TD>
+                                            <TD>{cur?.data[0]?.company}</TD>
+                                            <TD>{cur?.data[0]?.quarter}</TD>
+                                            <TD>{cur?.data[0]?.year}</TD>
+                                            <TD>{cur?.data[0]?.description}</TD>
+                                                <TD style="text-center">
+                                                    <>
+                                                        <button
+                                                            className=" inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                            onClick={() => toggleMenu(cur?.data[0]?.id)}
+                                                        >
+                                                            <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+
+                                                        </button>
+                                                        {((isOpenAction === cur?.data[0]?.id) && (
+                                                            <div ref={ref} className="z-auto absolute right-[150px] mt-2   rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                                                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                                                    <a
+                                                                        // onClick={() => {}}
+                                                                        className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                                                    <a
+                                                                        // onClick={() => { }}
+                                                                        className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </>
+                                                </TD>
+                                            </>
+                                        </TDR>
+                                    })
+                                
+                            )
+                        }
+                        </>
                     })}
                 </tbody>
             </table>

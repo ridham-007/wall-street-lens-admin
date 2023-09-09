@@ -30,9 +30,8 @@ const ParameterTable = (props: TableProps) => {
             }
         }
     };
-    console.log({props})
+
     const tableData = props?.data?.getOperationalReportsByCompany?.operationalQuarters;
-    console.log({ tableData })
     return <>
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
@@ -42,20 +41,22 @@ const ParameterTable = (props: TableProps) => {
                     <THR>
                         <>
                             <TH>Company</TH>
-                            <TH>title</TH>
-                            <TH>graphType</TH>
-                            <TH>operationType</TH>
+                            <TH>Title</TH>
+                            <TH>Priority</TH>
+                            <TH>GraphType</TH>
+                            <TH>OperationType</TH>
                             <TH >Action</TH>
                         </>
                     </THR>
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { operationalSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; operationType: string | JSX.Element | undefined; }; id: string | number | ((prevState: string) => string) | null | undefined; }) => {
+                    {tableData?.map((current: { operationalSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; priority: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; operationType: string | JSX.Element | undefined; }, id: string | number | ((prevState: string) => string) | null | undefined; }) => {
                         return <TDR key={current?.operationalSummary?.id}>
                         <>
                                 <TD>{current?.operationalSummary?.company}</TD>
                                 <TD>{current?.operationalSummary?.title}</TD>
+                                <TD>{current?.operationalSummary?.priority || ''}</TD>
                                 <TD>{current?.operationalSummary?.graphType}</TD>
                                 <TD>{current?.operationalSummary?.operationType}</TD>
                             <TD style="text-center">
