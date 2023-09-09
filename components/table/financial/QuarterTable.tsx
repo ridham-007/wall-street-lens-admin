@@ -41,7 +41,7 @@ const QuarterTable = (props: TableProps) => {
                         <>
                             <TH>Quarter</TH>
                             <TH>Year</TH>
-                            <TH >Actions</TH>
+                            <TH>Actions</TH>
                         </>
                     </THR>
                 </thead>
