@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import dynamic from 'next/dynamic';
-import { CREATE_OUTLOOKL_SUMMARY, GET_OUT_LOOK_SUMMARY } from "@/utils/query";
+import { CREATE_OUTLOOK_SUMMARY, GET_OUT_LOOK_SUMMARY } from "@/utils/query";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import SummaryDetails from "@/components/table/outlook/SummaryDetails";
 import Loader from "@/components/loader";
@@ -11,8 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Tablist from "@/components/tablist/tablist";
 import YearDropdown from "@/components/year_dropdown/year_dropdown";
-
-const DynamicEditor = dynamic(() => import('../components/ckeditor/ckeditor'), { ssr: false });
+import GrawthRate from '../components/collapsibleform/growthrate';
 
 const selectedCompany = [{
   id: 1,
@@ -20,7 +19,7 @@ const selectedCompany = [{
 }]
 
 export default function Outlook() {
-  const [addParameter, { data: parameterData }] = useMutation(CREATE_OUTLOOKL_SUMMARY);
+  const [addParameter, { data: parameterData }] = useMutation(CREATE_OUTLOOK_SUMMARY);
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [addUpdateQuarter, setAddUpdateQuarter] = useState(false)
   const [title, setTitle] = useState<string[]>([])
@@ -45,11 +44,22 @@ export default function Outlook() {
     setShowLoader(true);
     await addParameter({
       variables: {
-        summaryInfo: {
+        outLookInfo: {
           company: data.company,
-          summary: data.summary,
-          quarter: Number(data.selectedQuarter),
           year: Number(data.year),
+          quarters: data.quarters?.map((current: { quarter: any; volume: any; cash: any; profit: any; product: any; growthRate: any; production: any; }) => {
+            return {
+              quarter: current?.quarter,
+              outLook: {
+                volume: current?.volume,
+                cash: current?.cash,
+                profit: current?.profit,
+                product: current?.product,
+                growthRate: current?.growthRate,
+                production: current?.production,
+              }
+            }
+          }),
         }
       },
     })
@@ -159,49 +169,120 @@ interface AddUpdateParameterProps {
   title?: string[]
 }
 
+const dummyQuarters = [
+  {
+    quarter: 1,
+    volume: '',
+    cash: '',
+    profit: '',
+    product: '',
+    growthRate: ['',''],
+    production: ['',''],
+  },
+  {
+    quarter: 2,
+    volume: '',
+    cash: '',
+    profit: '',
+    product:'',
+    growthRate: ['',''],
+    production: ['',''],
+  },
+  {
+    quarter: 3,
+    volume: '',
+    cash: '',
+    profit: '',
+    product: '',
+    growthRate: ['', ''],
+    production: ['',''],
+  },
+  {
+    quarter: 4,
+    volume: '',
+    cash: '',
+    profit: '',
+    product: '',
+    growthRate: ['', ''],
+    production: ['', ''],
+  }
+]
+
 const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
   const currentYear = new Date().getFullYear();
-  const minYear = 1880;
+  const [selectedTab, setSelectedTab] = useState(1);
+
   const [val, setVal] = useState({
     company: selectedCompany[0]?.name,
-    summary: "",
     year: currentYear,
-    selectedQuarter: 1,
+    quarters: dummyQuarters,
   });
-
-  const handleCkeditorChange = (value: any) => {
-    setVal((prevVal) => ({
-      ...prevVal,
-      ['summary']: value
-    }));
-  }
-
-  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseInt(e.target.value);
-    if (!isNaN(newValue)) {
-      setVal((prevVal) => ({
-        ...prevVal,
-        ['year']: Math.max(minYear, Math.min(currentYear, newValue))
-      }));
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const { name, value } = e.target;
+    const updatedQuarters = val.quarters?.map(current => {
+      if (current?.quarter === selectedTab) {
+        return {
+          ...current,
+          [name]: value
+        }
+      }
+      return current;
+    })
     setVal((prevVal) => ({
       ...prevVal,
-      [name]: value
+      ['quarters']: updatedQuarters
     }));
   };
+
+  const onTabChange = (tab: SetStateAction<number>) => {
+    setSelectedTab(tab);
+  }
+  
   const handleOnSave = () => {
-    return;
-    if (!val.summary) {
+    if (!val) {
       toast('Summary is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
       return;
     }
     props?.onSuccess && props?.onSuccess(val)
     props.onClose && props.onClose();
   };
+
+  const handleOnChange = (e: { target: { name: any; value: any; }; }) => {
+    const { name, value } = e.target;
+    setVal((prevVal) => ({
+      ...prevVal,
+      [name]: value
+    }));
+  }
+
+  const handleGrowthaOrProductionChange = (
+    field: 'growthRate' | 'production',
+    index: number,
+    value: string
+  ) => {
+    const updatedQuarters = val.quarters?.map(current => {
+      if (current?.quarter === selectedTab) {
+        let newVal = [];
+        if (field === 'growthRate'){
+          newVal = current?.growthRate?.map((cur, ind )=> ind === index ? value : cur );
+        } else {
+          newVal = current?.production?.map((cur, ind) => ind === index ? value : cur);
+        }
+        return {
+          ...current,
+          [field]: newVal
+        }
+      }
+      return current;
+    })
+    setVal((prevVal) => ({
+      ...prevVal,
+      ['quarters']: updatedQuarters,
+    }));
+  };
+
+  const selectedQuarter = val?.quarters?.find(cur => cur?.quarter === selectedTab);
   return (
     <Modal
       showModal={true}
@@ -211,53 +292,6 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
     >
       <form className="form w-100">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          {/* <div className="flex flex-col">
-            <label htmlFor="year" className="text-sm font-medium text-gray-700">
-              Year
-            </label>
-            <input
-              type="number"
-              id="year"
-              name="year"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.year}
-              min={minYear}
-              max={currentYear}
-              onChange={handleYearChange}
-            />
-          </div> */}
-          {/* <div className="flex flex-col">
-            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-              Quarter
-            </label>
-            <select
-              id="quarter"
-              name="selectedQuarter"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.selectedQuarter}
-              onChange={handleInputChange}
-            >
-              <option value={1}>Q1</option>
-              <option value={2}>Q2</option>
-              <option value={3}>Q3</option>
-              <option value={4}>Q4</option>
-            </select>
-          </div> */}
-          {/* <div className="flex flex-col">
-            <label htmlFor="company" className="text-sm font-medium text-gray-700">
-              Company
-            </label>
-            <input
-              type="text"
-              id="company"
-              name="company"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.company}
-              onChange={handleInputChange}
-              disabled
-            />
-          </div> */}
-
           <div className="flex flex-col">
             <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
               Company
@@ -266,48 +300,124 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
               id="quarter"
               name="company"
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-            // value={selectedQuarter}
-            // onChange={handleQuarterChange}
+              value={val.company}
+              onChange={handleOnChange}
             >
               <option value="">Select a option</option>
               <option value="TESLA">TESLA</option>
-              <option value="TATA">TATA</option>
-              {/* <option value={3}>Q3</option> */}
-              {/* <option value={4}>Q4</option> */}
+              <option value="APPLE">APPLE</option>
             </select>
           </div>
-          {/* <div className="flex flex-col">
-            <label htmlFor="year" className="text-sm font-medium text-gray-700">
-              Year
-            </label>
-            <input
-              type="number"
-              id="year"
-              name="year"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={val.year}
-              min={minYear}
-              max={currentYear}
-              onChange={handleInputChange}
-            />
-          </div> */}
-          <YearDropdown />
+          <YearDropdown onChange={handleOnChange} year={val.year.toString()}/>
 
         </div>
 
-        <Tablist content={<div className="mt-4">
-          <div className="mb-2">
-          <label htmlFor="summary" className="text-sm font-medium text-gray-700">
-            Summary
-          </label>
+        <Tablist 
+          onTabChange={onTabChange}
+          selectedTab={selectedTab}
+        content={<div className="mt-4">
+          <div className="w-full flex flex-wrap gap-5 mt-5">
+            <div className="w-full flex flex-col">
+              <label htmlFor="volume" className="text-sm font-medium text-gray-700">
+                Volume
+              </label>
+              <textarea
+
+                id="volume"
+                name="volume"
+                className="w-full mt-1 p-2 h-[50px] border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={selectedQuarter?.volume}
+                onChange={handleInputChange}
+              />
+            </div>
+
           </div>
-          <DynamicEditor
-            editorLoaded={true}
-            onChange={() => {}}
-            name="ckeditor"
-            value={val.summary}
-          />
-        </div>}/>
+
+          <div className="w-full flex flex-wrap gap-5 mt-5">
+            <div className="w-full flex flex-col">
+              <label htmlFor="cash" className="text-sm font-medium text-gray-700">
+                Cash
+              </label>
+              <textarea
+                id="cash"
+                name="cash"
+                className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={selectedQuarter?.cash}
+                onChange={handleInputChange}
+              />
+            </div>
+
+          </div>
+
+          <div className="w-full flex flex-wrap gap-5 mt-5">
+            <div className="w-full flex flex-col">
+              <label htmlFor="profit" className="text-sm font-medium text-gray-700">
+                Profit
+              </label>
+              <textarea
+                id="profit"
+                name="profit"
+                className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={selectedQuarter?.profit}
+                onChange={handleInputChange}
+              />
+            </div>
+
+          </div>
+
+          <div className="w-full flex flex-wrap gap-5 mt-5">
+            <div className="w-full flex flex-col">
+              <label htmlFor="product" className="text-sm font-medium text-gray-700">
+                Product
+              </label>
+              <textarea
+                id="product"
+                name="product"
+                className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={selectedQuarter?.product}
+                onChange={handleInputChange}
+              />
+            </div>
+
+          </div>
+
+          {/* <GrawthRate quarters={val.quarters} updateQuarters={updateQuarters} selectedTab={selectedTab}/> */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mt-5">Growth Rate </label>
+              <div className="flex gap-5">
+              {selectedQuarter?.growthRate.map((value, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  value={value}
+                  placeholder={`Value ${index + 1}`}
+                  onChange={(e) => handleGrowthaOrProductionChange('growthRate', index, e.target.value)}
+                  className="border rounded p-2 mt-2"
+                />
+              ))}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Production </label>
+              <div className="flex gap-5">
+
+              {selectedQuarter?.production.map((value, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  value={value}
+                  placeholder={`Value ${index + 1}`}
+                  onChange={(e) => handleGrowthaOrProductionChange('production', index, e.target.value)}
+                  className="border rounded p-2 mt-2"
+                />
+              ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      
+      }/>
       </form>
     </Modal >
   );

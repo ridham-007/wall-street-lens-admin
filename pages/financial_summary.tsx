@@ -50,8 +50,6 @@ export default function FinancialPage() {
     setAddUpdateQuarter(false);
   }
 
-  console.log({ quarterData })
-
   const onAddUpdateParameter = async (data: any) => {
     setShowLoader(true);
     await addParameter({
@@ -62,6 +60,7 @@ export default function FinancialPage() {
             title: data.title,
             graphType: data.graph,
             yoy: Number(data.YoY),
+            priority: Number(data.priority)
           },
           quarters: data.quarterData.map((current: any) => {
             return {
@@ -73,7 +72,8 @@ export default function FinancialPage() {
       },
     })
     setShowLoader(false);
-    closePopups()
+    refetchQuarter();
+    closePopups();
   };
 
   const onAddUpdateQuarter = async(perameters: any) => {
@@ -256,6 +256,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     title: "",
     graph: "",
     quarterData: dummyQuarters,
+    priority: 0,
     YoY: "",
     year: "",
   })
@@ -317,7 +318,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               >
                 <option value="">Select a option</option>
                 <option value="TESLA">TESLA</option>
-                <option value="TATA">TATA</option>
+                <option value="APPLE">APPLE</option>
               </select>
             </div>
             
@@ -368,6 +369,23 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 id="YoY"
                 name="YoY"
                 value={val.YoY}
+                onChange={handleOnChange}
+                required
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label
+                htmlFor="priority"
+                className="text-sm font-medium text-gray-700"
+              >
+                Priority
+              </label>
+              <input
+                type="number"
+                id="priority"
+                name="priority"
+                value={val.priority}
                 onChange={handleOnChange}
                 required
                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"

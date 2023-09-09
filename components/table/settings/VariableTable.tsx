@@ -5,7 +5,7 @@ export interface TableProps {
     data: any;
 }
 
-const ParameterTable = (props: TableProps) => {
+const VariableTable = (props: TableProps) => {
     const [isOpenAction, setIsOpenAction] = useState('');
     const ref = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
@@ -40,11 +40,13 @@ const ParameterTable = (props: TableProps) => {
                 <thead className="w-full sticky top-0 z-20">
                     <THR>
                         <>
-                            <TH>Company</TH>
-                            <TH>Title</TH>
+                            <TH>Name</TH>
+                            <TH>Type</TH>
+                            <TH>Terms name</TH>
                             <TH>Priority</TH>
-                            <TH>GraphType</TH>
-                            <TH>OperationType</TH>
+                            <TH>Category</TH>
+                            <TH>YoY</TH>
+                            <TH>Last Update</TH>
                             <TH >Action</TH>
                         </>
                     </THR>
@@ -90,4 +92,4 @@ const ParameterTable = (props: TableProps) => {
         </div >
     </>
 }
-export default ParameterTable;
+export default VariableTable;

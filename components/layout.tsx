@@ -13,7 +13,7 @@ export enum LayoutPages {
   "operational_summary" = "operational_summary",
   "vihicle_capacity" = "vihicle_capacity",
   "outlook" = "outlook",
-  "settings" = "settings"
+  "settings"="settings"
 }
 
 export interface LayoutProps {

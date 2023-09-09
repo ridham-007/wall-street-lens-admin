@@ -5,7 +5,7 @@ export interface TableProps {
     data: any;
 }
 
-const ParameterTable = (props: TableProps) => {
+const TermsTable = (props: TableProps) => {
     const [isOpenAction, setIsOpenAction] = useState('');
     const ref = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
@@ -25,7 +25,7 @@ const ParameterTable = (props: TableProps) => {
         if (isOpenAction) {
             setIsOpenAction('');
         } else {
-            if(id){
+            if (id) {
                 setIsOpenAction(id?.toString());
             }
         }
@@ -40,11 +40,10 @@ const ParameterTable = (props: TableProps) => {
                 <thead className="w-full sticky top-0 z-20">
                     <THR>
                         <>
+                            <TH>Name</TH>
                             <TH>Company</TH>
-                            <TH>Title</TH>
-                            <TH>Priority</TH>
-                            <TH>GraphType</TH>
-                            <TH>OperationType</TH>
+                            <TH>Type</TH>
+                            <TH>Last Update</TH>
                             <TH >Action</TH>
                         </>
                     </THR>
@@ -53,41 +52,41 @@ const ParameterTable = (props: TableProps) => {
                 <tbody className="w-full">
                     {tableData?.map((current: { operationalSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; priority: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; operationType: string | JSX.Element | undefined; }, id: string | number | ((prevState: string) => string) | null | undefined; }) => {
                         return <TDR key={current?.operationalSummary?.id}>
-                        <>
+                            <>
                                 <TD>{current?.operationalSummary?.company}</TD>
                                 <TD>{current?.operationalSummary?.title}</TD>
                                 <TD>{current?.operationalSummary?.priority || ''}</TD>
                                 <TD>{current?.operationalSummary?.graphType}</TD>
                                 <TD>{current?.operationalSummary?.operationType}</TD>
-                            <TD style="text-center">
-                                <>
-                                    <button
-                                        className=" inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                <TD style="text-center">
+                                    <>
+                                        <button
+                                            className=" inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                             onClick={() => toggleMenu(current?.id)}
-                                    >
-                                        <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                        >
+                                            <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
 
-                                    </button>
-                                    {((isOpenAction === current?.id) && (
-                                        <div ref={ref} className="z-auto absolute right-[85px] mt-2   rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                                <a
-                                                    // onClick={() => {}}
-                                                    className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                                <a
-                                                    // onClick={() => { }}
-                                                    className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                                        </button>
+                                        {((isOpenAction === current?.id) && (
+                                            <div ref={ref} className="z-auto absolute right-[85px] mt-2   rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                                    <a
+                                                        // onClick={() => {}}
+                                                        className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                                    <a
+                                                        // onClick={() => { }}
+                                                        className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </>
-                            </TD>
-                        </>
-                    </TDR>
-})}
+                                        ))}
+                                    </>
+                                </TD>
+                            </>
+                        </TDR>
+                    })}
                 </tbody>
             </table>
         </div >
     </>
 }
-export default ParameterTable;
+export default TermsTable;
