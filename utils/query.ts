@@ -1,4 +1,4 @@
-import { gql} from "@apollo/client";
+import { gql } from "@apollo/client";
 
 
 const ADD_FINANCIAL_SUMMARY_PARAMETER = gql`
@@ -192,19 +192,89 @@ const GET_VEHICLE_CAPACITY_SUMMARY = gql`query getCapacityQuarterSummaryByCompan
   }
 }`;
 
+const GET_TERMS_BY_COMPANY = gql`query getKpiTermsByCompanyId(
+  $companyId: String!
+  ) {
+    getKpiTermsByCompanyId(
+    companyId: $companyId
+  ) {
+      id
+      name
+      quarterWiseTable
+      summaryOnly
+      updatedAt
+      company
+  }
+}`;
+
+const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
+  $termId: String!
+  ) {
+    getViewForTerm(
+    termId: $termId
+  ) {
+      headers
+      rows{
+        title
+        cells{
+          id
+          value
+          quarter
+          year
+        }
+      }
+      description
+      title
+  }
+}`;
+
+const GET_VARIBALES_KPI_TERM = gql`query getVariablesByKpiTerm(
+  $termId: String!
+  ) {
+    getVariablesByKpiTerm(
+    termId: $termId
+  ) {
+      id
+      title
+      category
+      priority
+      yoy
+      updatedAt
+      kpiTerm {
+        id
+        name
+        company
+        quarterWiseTable
+        summaryOnly
+        updatedAt
+      }
+  }
+}`;
+
+const PROCCESS_BULK_UPLOAD = gql`mutation processBulkUploadTypeOne(
+  $bulkUpload:BulkUploadTypeOne!
+  ){
+  processBulkUploadTypeOne(
+    bulkUpload: $bulkUpload
+  ) 
+}`;
+
 export {
-    ADD_FINANCIAL_SUMMARY_PARAMETER,
-    GET_FINANCIAL_SUMMARY_PARAMETERS,
-    ADD_QUARTERS_DETAILS,
-    FINANCIAL_REPORT_BY_COMPANY_NAME,
-    CREATE_OPERATIONAL_SUMMARY,
-    GET_OPERATIONAL_SUMMARY_PARAMETERS,
-    CREATE_CAPACITY_OPERATIONAL_SUMMARY,
-    GET_CAPACITY_SUMMARY_PARAMETERS,
-    CREATE_OUTLOOKL_SUMMARY,
-    GET_OUT_LOOK_SUMMARY,
-    OPERATIONAL_REPORT_BY_COMPANY_NAME,
-    GET_VEHICLE_CAPACITY_SUMMARY,
-    CREATE_OUTLOOK_SUMMARY,
-    
+  ADD_FINANCIAL_SUMMARY_PARAMETER,
+  GET_FINANCIAL_SUMMARY_PARAMETERS,
+  ADD_QUARTERS_DETAILS,
+  FINANCIAL_REPORT_BY_COMPANY_NAME,
+  CREATE_OPERATIONAL_SUMMARY,
+  GET_OPERATIONAL_SUMMARY_PARAMETERS,
+  CREATE_CAPACITY_OPERATIONAL_SUMMARY,
+  GET_CAPACITY_SUMMARY_PARAMETERS,
+  CREATE_OUTLOOKL_SUMMARY,
+  GET_OUT_LOOK_SUMMARY,
+  OPERATIONAL_REPORT_BY_COMPANY_NAME,
+  GET_VEHICLE_CAPACITY_SUMMARY,
+  CREATE_OUTLOOK_SUMMARY,
+  PROCCESS_BULK_UPLOAD,
+  GET_TERMS_BY_COMPANY,
+  GET_VIEW_FOR_TERM,
+  GET_VARIBALES_KPI_TERM,
 }

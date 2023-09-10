@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import Loader from "@/components/loader";
 import VariableTable from "@/components/table/settings/VariableTable";
@@ -9,6 +9,8 @@ import * as XLSX from 'xlsx';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { useLazyQuery, useMutation } from "@apollo/client";
+import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, GET_VIEW_FOR_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 
 
 
@@ -37,6 +39,54 @@ const dummySettingsForTerms = [
 export default function FinancialPage() {
     const [showLoader, setShowLoader] = useState(false);
     const [showImport, setShowImport] = useState(false)
+    const [bulkUpload] = useMutation(PROCCESS_BULK_UPLOAD);
+
+    const [getTermsDetails, { data: termsData, refetch: refetchQuarter }] = useLazyQuery(
+        GET_TERMS_BY_COMPANY,
+        {
+            variables: {
+                companyId: 'Tesla',
+            },
+        }
+    );
+
+    const [getVariables, { data: termsVaribles }] = useLazyQuery(
+        GET_VARIBALES_KPI_TERM,
+        {
+            variables: {
+                termId: '3e52ddcb-381c-4868-bf74-07e424e9ee98',
+            },
+        }
+    );
+
+    const [getTermVaribles, { data: termVaribles }] = useLazyQuery(
+        GET_VIEW_FOR_TERM,
+        {
+            variables: {
+                termId: '3e52ddcb-381c-4868-bf74-07e424e9ee98',
+            },
+        }
+    );
+
+    useEffect(() => {
+        getTermsDetails()
+        getTermVaribles()
+        getVariables()
+    }, [])
+
+
+    const onAddUpdateParameter = async (data: any) => {
+        console.log(data)
+        setShowLoader(true);
+        await bulkUpload({
+            variables: {
+                bulkUpload: {
+                    ...data,
+                }
+            },
+        })
+        setShowLoader(false);
+    };
 
     const [val, setVal] = useState({
         settingsData: dummySettings,
@@ -91,10 +141,10 @@ export default function FinancialPage() {
                         onClick={() => handleTabClick('Tabs')}
                     />
                 </div>
-                {activeTab === 'Variables' ? <VariableTable data={val.settingsData} /> : <TermsTable data={dummySettingsForTerms} />}
+                {activeTab === 'Variables' ? <VariableTable data={val.settingsData} /> : <TermsTable data={termsData} />}
                 {showImport && (
                     <ImportData
-                        onSuccess={() => {}}
+                        onSuccess={onAddUpdateParameter}
                         onClose={() => {}}
                     ></ImportData>
                 )}
@@ -113,8 +163,13 @@ interface ImportDataProps {
 function ImportData(props: ImportDataProps) {
     const [val, setVal] = useState({
         company: '',
-        data:{},
+        name:'',
+        quarterWiseTable: '',
+        summaryOnly: '',
+        variables: []
     })
+
+    const regex = new RegExp('Q[1-4]{1}-[0-9]{4}$');
     const handleOnSave = () => {
         if (!val.company) {
             toast('Company is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
@@ -134,26 +189,119 @@ function ImportData(props: ImportDataProps) {
         }));
     };
 
-    const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+    const convertDataToArrayOfObjects = (data: string | any[], table: Boolean) => {
+        const attributes = data[0];
+        const result = [];
+
+        for (let i = 1; i < data?.length; i++) {
+            const obj = {};
+            const quarters = [];
+            for (let j = 0; j < attributes?.length; j++) {
+                if (!table){
+                    if (regex.test(attributes[j])){
+                        quarters.push({
+                            quarter: attributes[j].charAt(1),
+                            year: attributes[j].slice(-4),
+                            value: data[i][j],
+                        })
+                    } else {
+                        obj[attributes[j]] = data[i][j];
+                    }
+                } else {
+                    obj[attributes[j]?.replace(/\s/g, '')] = data[i][j];
+                }
+            }
+            if (!table) {
+                obj['quarters'] = quarters;
+            }
+            result.push(obj);
+        }
+
+        return result;
+    }
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target?.files?.[0];
 
         if (file) {
             const reader = new FileReader();
 
-            reader.onload = (e) => {
-                const data = new Uint8Array(e.target?.result as ArrayBuffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheetName = workbook.SheetNames[0]; // Assuming you want the first sheet
-                const sheet = workbook.Sheets[sheetName];
-                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Include the first 4 rows
+            reader.onload = async (e) => {
+                const arrayBuffer = e.target?.result as ArrayBuffer;
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const parsedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                // Use jsonData for further processing
-                console.log(jsonData);
+                let tableData: { tableName: string, header: string[], rows: any[][] }[] = [];
+                let currentTable: any[][] | null = null;
+                let header: string[] | null = null;
+                let tableName = '';
+
+                for (const row of parsedData) {
+                    if (row[0] && row[0].toString().startsWith('Table')) {
+                        if (currentTable) {
+                            tableData.push({ tableName, header: header!, rows: currentTable });
+                        }
+                        currentTable = [];
+                        header = row.slice(1);
+                        tableName = row[0].toString();
+                    } else if (currentTable) {
+                        console.log({ row })
+                        const sanitizedRow = row.map((cell: null | undefined) => 
+                        {
+                            return cell !== null && cell !== undefined ? cell : ' '
+                        }
+                        );
+                        currentTable.push(sanitizedRow);
+                    }
+                }
+
+                if (currentTable) {
+                    tableData.push({ tableName, header: header!, rows: currentTable });
+                }
+
+                const filteredTableData = tableData.map(({ tableName, header, rows }) => ({
+                    tableName,
+                    header,
+                    rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
+                }));
+                let arrayOfObjects: {}[] = [];
+                let basicDetails: {}[] = [];
+
+                if (filteredTableData?.length > 1) {
+                    arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
+                    basicDetails = convertDataToArrayOfObjects(filteredTableData[0].rows, true);
+                }
+                setVal({
+                    company: basicDetails[0]?.Company,
+                    name: basicDetails[0]?.TermsName,
+                    quarterWiseTable: basicDetails[0]?.QuaterSpecificTable === 'Enable',
+                    summaryOnly: basicDetails[0]?.SummaryOnly === 'Enable',
+                    variables: arrayOfObjects?.map(current => {
+                        return {
+                            title: current?.Variables?.toString() || '',
+                            category: current?.Category?.toString() || '',
+                            priority: current?.Priority?.toString() || '0',
+                            yoy: current?.YoY?.toString() || '0',
+                            quarters: current?.quarters?.map((cur: { quarter: any; year: any; value: any; }) => {
+                                return {
+                                    quarter: Number(cur?.quarter),
+                                    year: Number(cur?.year),
+                                    value: cur?.value?.toString() || '',
+                                }
+                            })
+                        }
+                    })
+                })
+
             };
 
             reader.readAsArrayBuffer(file);
         }
     };
+
+    console.log({ val })
 
     return (
         <Modal
@@ -188,7 +336,7 @@ function ImportData(props: ImportDataProps) {
                             <input
                                 type="file"
                                 accept=".xlsx, .xls"
-                                onChange={handleImport}
+                                onChange={handleFileUpload}
                                 className=" text-white font-bold py-2 px-4 rounded-full"
                             />
                         </div>

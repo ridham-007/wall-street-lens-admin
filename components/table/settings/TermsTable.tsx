@@ -31,7 +31,7 @@ const TermsTable = (props: TableProps) => {
         }
     };
 
-    const tableData = props?.data?.getOperationalReportsByCompany?.operationalQuarters;
+    const tableData = props?.data?.getKpiTermsByCompanyId;
     return <>
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
@@ -42,22 +42,23 @@ const TermsTable = (props: TableProps) => {
                         <>
                             <TH>Name</TH>
                             <TH>Company</TH>
-                            <TH>Type</TH>
-                            <TH>Last Update</TH>
+                            <TH>Quarter Wise Table</TH>
+                            <TH>Summary Only</TH>
+                            {/* <TH>Last Update</TH> */}
                             <TH >Action</TH>
                         </>
                     </THR>
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { operationalSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; priority: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; operationType: string | JSX.Element | undefined; }, id: string | number | ((prevState: string) => string) | null | undefined; }) => {
+                    {tableData?.map((current) => {
                         return <TDR key={current?.operationalSummary?.id}>
                             <>
-                                <TD>{current?.operationalSummary?.company}</TD>
-                                <TD>{current?.operationalSummary?.title}</TD>
-                                <TD>{current?.operationalSummary?.priority || ''}</TD>
-                                <TD>{current?.operationalSummary?.graphType}</TD>
-                                <TD>{current?.operationalSummary?.operationType}</TD>
+                                <TD>{current?.name}</TD>
+                                <TD>{current?.company}</TD>
+                                <TD>{current?.quarterWiseTable? 'Enabled':'Disabled'}</TD>
+                                <TD>{current?.summaryOnly ? 'Enabled' : 'Disabled'}</TD>
+                                {/* <TD>{current?.}</TD> */}
                                 <TD style="text-center">
                                     <>
                                         <button

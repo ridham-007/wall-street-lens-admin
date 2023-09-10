@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import Loader from "@/components/loader";
 import Variable from "@/components/table/variables/Variable";
@@ -6,9 +6,25 @@ import { Modal } from "@/components/model";
 import * as XLSX from 'xlsx';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { GET_VARIBALES_KPI_TERM, GET_VIEW_FOR_TERM } from "@/utils/query";
+import { useLazyQuery } from "@apollo/client";
 
 
-export default function variable_details() {
+export default function VariableDetails() {
+
+    const [getTermVaribles, { data: termVaribles }] = useLazyQuery(
+        GET_VIEW_FOR_TERM,
+        {
+            variables: {
+                termId: '3e52ddcb-381c-4868-bf74-07e424e9ee98',
+            },
+        }
+    );
+
+    useEffect(() => {
+        getTermVaribles()
+    }, [])
+
     const [showLoader, setShowLoader] = useState(false);
     const [showImport, setShowImport] = useState(false)
 
@@ -50,7 +66,6 @@ export default function variable_details() {
                         <span>Details</span>
                     </button>
                 </div>
-
                 {showImport && (
                     <ImportData
                         onSuccess={() => { }}
@@ -59,7 +74,7 @@ export default function variable_details() {
                 )}
 
             </>
-            <Variable />
+            <Variable data={termVaribles}/>
         </Layout >
     );
 }
