@@ -259,6 +259,16 @@ const PROCCESS_BULK_UPLOAD = gql`mutation processBulkUploadTypeOne(
   ) 
 }`;
 
+const UPDATE_MAPPED_VALUE = gql`mutation addUpdateMappedValue(
+  $mappingInfo:AddUpdateMappedValue!
+  ){
+  addUpdateMappedValue(
+    mappingInfo: $mappingInfo
+  ){
+    id
+  }
+}`;
+
 export {
   ADD_FINANCIAL_SUMMARY_PARAMETER,
   GET_FINANCIAL_SUMMARY_PARAMETERS,
@@ -277,4 +287,5 @@ export {
   GET_TERMS_BY_COMPANY,
   GET_VIEW_FOR_TERM,
   GET_VARIBALES_KPI_TERM,
+  UPDATE_MAPPED_VALUE,
 }
