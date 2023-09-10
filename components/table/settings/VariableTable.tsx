@@ -31,7 +31,7 @@ const VariableTable = (props: TableProps) => {
         }
     };
 
-    const tableData = props?.data?.getOperationalReportsByCompany?.operationalQuarters;
+    const tableData = props?.data?.getVariablesByKpiTerm;
     return <>
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
@@ -41,26 +41,24 @@ const VariableTable = (props: TableProps) => {
                     <THR>
                         <>
                             <TH>Name</TH>
-                            <TH>Type</TH>
                             <TH>Terms name</TH>
                             <TH>Priority</TH>
                             <TH>Category</TH>
                             <TH>YoY</TH>
-                            <TH>Last Update</TH>
                             <TH >Action</TH>
                         </>
                     </THR>
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { operationalSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; priority: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; operationType: string | JSX.Element | undefined; }, id: string | number | ((prevState: string) => string) | null | undefined; }) => {
-                        return <TDR key={current?.operationalSummary?.id}>
+                    {tableData?.map((current) => {
+                        return <TDR key={current?.id}>
                         <>
-                                <TD>{current?.operationalSummary?.company}</TD>
-                                <TD>{current?.operationalSummary?.title}</TD>
-                                <TD>{current?.operationalSummary?.priority || ''}</TD>
-                                <TD>{current?.operationalSummary?.graphType}</TD>
-                                <TD>{current?.operationalSummary?.operationType}</TD>
+                                <TD>{current?.title}</TD>
+                                <TD>{current?.kpiTerm?.name}</TD>
+                                <TD>{current?.priority || ''}</TD>
+                                <TD>{current?.category}</TD>
+                                <TD>{current?.yoy}</TD>
                             <TD style="text-center">
                                 <>
                                     <button

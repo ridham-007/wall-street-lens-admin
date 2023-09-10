@@ -76,7 +76,6 @@ export default function FinancialPage() {
 
 
     const onAddUpdateParameter = async (data: any) => {
-        console.log(data)
         setShowLoader(true);
         await bulkUpload({
             variables: {
@@ -95,7 +94,6 @@ export default function FinancialPage() {
     const handleTabClick = (tabName: string) => {
         setActiveTab(tabName);
     };
-
     return (
         <Layout title="Financial Summary" page={LayoutPages.settings}>
             <>
@@ -141,7 +139,7 @@ export default function FinancialPage() {
                         onClick={() => handleTabClick('Tabs')}
                     />
                 </div>
-                {activeTab === 'Variables' ? <VariableTable data={val.settingsData} /> : <TermsTable data={termsData} />}
+                {activeTab === 'Variables' ? <VariableTable data={termsVaribles} /> : <TermsTable data={termsData} />}
                 {showImport && (
                     <ImportData
                         onSuccess={onAddUpdateParameter}
