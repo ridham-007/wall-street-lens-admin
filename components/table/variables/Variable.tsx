@@ -5,7 +5,7 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
 
 export interface TableProps {
-  data: any;
+  termId: string;
 }
 
 export interface Row {
@@ -20,11 +20,11 @@ export interface Cell {
   quarter: number;
 }
 
-export default function Variable() {
+export default function Variable({ termId }: TableProps) {
   const [getTermView, { data: termView, refetch: refetchTermView }] =
     useLazyQuery(GET_VIEW_FOR_TERM, {
       variables: {
-        termId: "e3d3e0c2-e1f3-45c1-9432-a60f468b66c1",
+        termId: termId,
       },
     });
 
