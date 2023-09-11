@@ -84,7 +84,7 @@ export default function FinancialPage() {
         {addUpdateParameter && (
           <AddUpdateParaMeter
             onSuccess={() => { }}
-            onClose={{}}
+            onClose={() => { setAddUpdateParameter(false) }}
             selectedCompany={selectedCompany}
             company={company}
           ></AddUpdateParaMeter>
@@ -125,7 +125,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     term: "",
   })
 
-  const [termId, setTermId] = useState("");
   const [isToggled, setIsToggled] = useState(false);
   const onToggle = () => setIsToggled(!isToggled);
 
