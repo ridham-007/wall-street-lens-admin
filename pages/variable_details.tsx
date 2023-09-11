@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import Variable from "@/components/table/variables/Variable";
 import "react-toastify/dist/ReactToastify.css";
-import { GET_TERMS_BY_COMPANY, GET_VIEW_FOR_TERM } from "@/utils/query";
+import { GET_TERMS_BY_COMPANY } from "@/utils/query";
 import { useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 

@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, GET_VIEW_FOR_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
+import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 import { useRouter } from "next/router";
 
 export default function FinancialPage() {
@@ -25,7 +25,7 @@ export default function FinancialPage() {
         setCompany(router.query.company)
     }, [router.query])
 
-    const [getTermsDetails, { data: termsData, refetch: refetchTerms }] = useLazyQuery(
+    const [getTermsDetails, { data: termsData }] = useLazyQuery(
         GET_TERMS_BY_COMPANY,
         {
             variables: {
