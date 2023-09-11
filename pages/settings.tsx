@@ -129,7 +129,7 @@ export default function FinancialPage() {
                 {showImport && (
                     <ImportData
                         onSuccess={onAddUpdateParameter}
-                        onClose={() => { }}
+                        onClose={() => { setShowImport(false)}}
                     ></ImportData>
                 )}
 

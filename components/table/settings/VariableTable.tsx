@@ -22,8 +22,8 @@ interface KpiTerm {
 }
 
 const VariableTable = (props: TableProps) => {
-    console.log({ props })
     const[show, setShow] = useState(false);
+    const [uniqueId, setUniqueId] = useState('');
     const [currentData, setCurrentData] = useState({});
     const [deletePopup, setDeletePopup] = useState(false);
     const [deleteId, setDeleteId] = useState('');
@@ -164,7 +164,7 @@ const VariableTable = (props: TableProps) => {
                                 <TD>{current?.priority || ''}</TD>
                                 <TD>{current?.category}</TD>
                                 <TD>{current?.yoy}</TD>
-                            <TD style="text-center">
+                            <TD style="text-center" key={uniqueId}>
                                 <>
                                     <button
                                         className=" inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -177,7 +177,7 @@ const VariableTable = (props: TableProps) => {
                                         <div ref={ref} className="z-auto absolute right-[85px] mt-2   rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                                 <a
-                                                    onClick={() => {setShow(true); setCurrentData(current)}}
+                                                    onClick={() => {setShow(true); setUniqueId(Math.random.toString()); setCurrentData(current)}}
                                                     className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
                                                 <a
                                                         onClick={() => { setDeletePopup(true); setDeleteId(current?.id) }}

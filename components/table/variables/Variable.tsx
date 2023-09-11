@@ -28,6 +28,10 @@ export default function Variable({ termId }: TableProps) {
       },
     });
 
+    useEffect(() => {
+      getTermView();
+    }, [termId])
+
   const [show, setShow] = useState(false);
   const [cellData, setCellData] = useState({});
   const [updateValue] = useMutation(UPDATE_MAPPED_VALUE);
