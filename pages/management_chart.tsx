@@ -25,6 +25,12 @@ export default function FinancialPage() {
   const [perametersData, setPerametersData] = useState<any[]>([]);
   const [searchKey, setSearchKey] = useState("");
   const [isOpenAction, setIsOpenAction] = useState("");
+  const [company, setCompany] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    setCompany(router.query.company)
+  }, [router.query])
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -88,6 +94,7 @@ export default function FinancialPage() {
             onSuccess={()=> {}}
             onClose={{}}
             selectedCompany={selectedCompany}
+            company={company}
           ></AddUpdateParaMeter>
         )}
         
@@ -142,10 +149,8 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   }, [router.query])
 
   useEffect(() => {
-    if (company) {
       getTermsDetails();
-    }
-  }, []);
+  }, [company]);
 
   const handleOnSave = () => {
     if (!val.title){
