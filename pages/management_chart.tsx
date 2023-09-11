@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import ParameterTable from "@/components/table/chart/ParameterTable";
+import Multiselect from 'multiselect-react-dropdown';
 
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
@@ -114,6 +115,11 @@ interface KpiTerm {
   __typename: string;
 }
 
+interface VariablesArray {
+  category: string;
+  title: string;
+}
+
 
 
 
@@ -177,6 +183,39 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     }));
   };
 
+  const [selectedVariablesArr, setselectedVariablesArr] = useState<any[]>([]);
+
+  let updatedOptions: { cat: string; key: string }[] = [];
+
+  if (termsVaribles?.getVariablesByKpiTerm) {
+    const originalData = termsVaribles.getVariablesByKpiTerm;
+    const groupedOptions: Record<string, { cat: string; key: string }[]> = {};
+
+    // Iterate over the original data and group options by the "title" field
+    originalData.forEach((item: VariablesArray) => {
+      const { category, title } = item;
+
+      if (title) {
+        if (!groupedOptions[title]) {
+          groupedOptions[title] = [];
+        }
+
+        groupedOptions[title].push({ cat: title, key: title });
+      }
+    });
+
+    // Flatten the grouped options into a single array
+    updatedOptions = Object.values(groupedOptions).reduce(
+      (accumulator, categoryOptions) => [...accumulator, ...categoryOptions],
+      []
+    );
+  }
+
+  // Handler function to update selectedVariablesArr
+  const handleSelect = (selectedList: any[]) => {
+    setselectedVariablesArr(selectedList);
+  };
+  console.log(selectedVariablesArr);
   return (
     <Modal
       showModal={true}
@@ -245,30 +284,21 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               </select>
             </div>
             <div className="flex flex-col">
-
-              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-                Varibles Array
+              <label htmlFor="variables_array" className="text-sm  text-gray-700">
+                Variables Array
               </label>
-
-              <select
-                id="graphType"
-                name="veriables"
-                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={val.veriables}
-                onChange={handleOnChange}
-              >
-                <option value="">Select a option</option>
-                {
-                  (termsVaribles?.getVariablesByKpiTerm ?? []).map((cur: KpiTerm) => {
-                    return (
-                      <option key={cur.id} value={cur?.id}>
-                        {cur?.title}
-                      </option>
-                    );
-                  }
-                  )
-                }
-              </select>
+              <Multiselect
+                id="variables_array"
+                displayValue="key"
+                placeholder="Select options"
+                onKeyPressFn={function noRefCheck() { }}
+                onRemove={function noRefCheck() { }}
+                onSearch={function noRefCheck() { }}
+                onSelect={handleSelect}
+                options={updatedOptions}
+                selectedValues={selectedVariablesArr}
+                showCheckbox
+              />
             </div>
 
             <div className="flex flex-row">
@@ -287,6 +317,3 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     </Modal>
   );
 }
-
-
-
