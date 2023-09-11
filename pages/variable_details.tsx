@@ -19,17 +19,13 @@ interface KpiTerm {
 export default function VariableDetails() {
   const [termId, setTermId] = useState("");
   const [company, setCompany] = useState('');
-  const [getTermsDetails, { data: termsData, refetch: refetchQuarter }] =
+  const [getTermsDetails, { data: termsData }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
       variables: {
         companyId: company,
       },
     });
-
   const router = useRouter();
-
-  
-
   useEffect(() => {
     setCompany(router.query.company)
   }, [router.query])
