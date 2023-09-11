@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import ParameterTable from "@/components/table/chart/ParameterTable";
 import Multiselect from 'multiselect-react-dropdown';
+import { ADD_UPDATE_TERM_CHART_MUTATION } from "@/utils/query";
 
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
@@ -164,9 +165,37 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     getVariables();
   }, [val.term])
 
+  const [addUpdateTermChart] = useMutation(ADD_UPDATE_TERM_CHART_MUTATION);
+
+  const handleAddUpdateTermChart = async () => {
+    try {
+      const result = await addUpdateTermChart({
+        variables: {
+          chartInfo: {
+            id: 'String',
+            title: val.title,
+            // type: String
+            visible: true
+          },
+          keysInfo: {
+            termId: val.term,
+          variableIds: selectedVariablesArr,
+          },
+        },
+      });
+
+      // Handle the result (e.g., update your UI)
+      console.log('Mutation result:', result);
+    } catch (error) {
+      // Handle errors
+      console.error('Mutation error:', error);
+    }
+  };
+
+
   const handleOnSave = () => {
-    if (!val.title) {
-      toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+    if (val.title) {
+      handleAddUpdateTermChart();
       return;
     }
     props.onSuccess && props.onSuccess(val)
@@ -215,7 +244,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const handleSelect = (selectedList: any[]) => {
     setselectedVariablesArr(selectedList);
   };
-  console.log(selectedVariablesArr);
+
   return (
     <Modal
       showModal={true}

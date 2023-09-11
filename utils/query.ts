@@ -311,6 +311,17 @@ const DELETE_KPI_BY_ID = gql`mutation deleteKpiTermByTermId(
   }
 }`;
 
+const ADD_UPDATE_TERM_CHART_MUTATION = gql`
+  mutation AddUpdateTermChart($chartInfo: addUpdateTermChart!, $keysInfo: TermChartDependencyKey) {
+    addUpdateTermChart(chartInfo: $chartInfo, keysInfo: $keysInfo) {
+      kpiTerm
+      id
+      title
+      termVariables
+    }
+  }
+`;
+
 export {
   ADD_FINANCIAL_SUMMARY_PARAMETER,
   GET_FINANCIAL_SUMMARY_PARAMETERS,
@@ -334,4 +345,5 @@ export {
   ADD_UPDATE_KPI_TERM,
   DELETE_KPI_BY_ID,
   DELETE_VERIABLE_BY_ID,
+  ADD_UPDATE_TERM_CHART_MUTATION,
 }
