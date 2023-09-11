@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 
 export default function FinancialPage() {
     const [showLoader, setShowLoader] = useState(false);
+    const [refetch, setRefetch] = useState(false);
     const [company, setCompany] = useState('');
     const [term, setTerm] = useState('');
     const [showImport, setShowImport] = useState(false)
@@ -25,7 +26,7 @@ export default function FinancialPage() {
         setCompany(router.query.company)
     }, [router.query])
 
-    const [getTermsDetails, { data: termsData }] = useLazyQuery(
+    const [getTermsDetails, { data: termsData, refetch: refetchTerms }] = useLazyQuery(
         GET_TERMS_BY_COMPANY,
         {
             variables: {
@@ -49,6 +50,14 @@ export default function FinancialPage() {
             getVariables();
         }
     }, [])
+
+    useEffect(() => {
+        if (!!company && refetch) {
+            refetchTerms();
+            refetchVeriables();
+        }
+        setRefetch(false);
+    }, [refetch])
 
     useEffect(() => {
         getTermsDetails();
@@ -125,7 +134,7 @@ export default function FinancialPage() {
                         onClick={() => handleTabClick('Tabs')}
                     />
                 </div>
-                {activeTab === 'Variables' ? <VariableTable term={term} data={termsVaribles} setTerm={setTerm} termsData={termsData}/> : <TermsTable data={termsData} />}
+                {activeTab === 'Variables' ? <VariableTable term={term} data={termsVaribles} setTerm={setTerm} setRefetch={setRefetch} termsData={termsData} /> : <TermsTable data={termsData} company={company} setRefetch={setRefetch} />}
                 {showImport && (
                     <ImportData
                         onSuccess={onAddUpdateParameter}

@@ -9,6 +9,7 @@ export interface TableProps {
     setTerm: any;
     termsData: any;
     term: any;
+    setRefetch: any;
 }
 
 interface KpiTerm {
@@ -45,6 +46,7 @@ const VariableTable = (props: TableProps) => {
                 termId: perameters?.term,
             }
         })
+        props.setRefetch(true);
     }
 
     const onDeleteVeriable = async (id: any) => {
@@ -53,6 +55,7 @@ const VariableTable = (props: TableProps) => {
                 variableId: id,
             }
         })
+        props.setRefetch(true);
     }
 
     const [isOpenAction, setIsOpenAction] = useState('');
@@ -217,6 +220,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
         priority: props?.data?.priority,
         YoY: props?.data?.yoy,
     })
+
     const handleOnSave = () => {
         if (!val.name || !val.term) {
             // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
@@ -256,7 +260,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                             <input
                                 type="text"
                                 id="Name"
-                                name="Name"
+                                name="name"
                                 value={val.name}
                                 onChange={handleOnChange}
                                 required
@@ -273,7 +277,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                             <input
                                 type="text"
                                 id="Category"
-                                name="Category"
+                                name="category"
                                 value={val.category}
                                 onChange={handleOnChange}
                                 required

@@ -6,6 +6,8 @@ import { ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID } from "@/utils/query";
 
 export interface TableProps {
     data: any;
+    company: any;
+    setRefetch: any;
 }
 
 const TermsTable = (props: TableProps) => {
@@ -17,7 +19,6 @@ const TermsTable = (props: TableProps) => {
     const [addOrUpdateKPIterm] = useMutation(ADD_UPDATE_KPI_TERM);
     const [deleteKPI] = useMutation(DELETE_KPI_BY_ID);
 
-
     const onAddUpdateKpiTerm = async (perameters: any) => {
 
         await addOrUpdateKPIterm({
@@ -25,12 +26,13 @@ const TermsTable = (props: TableProps) => {
                 kpiInfo: {
                     id: perameters?.id,
                     name: perameters?.name,
-                    company: perameters?.category,
-                    quarterWiseTable: perameters?.priority,
-                    summaryOnly: perameters?.YoY,
+                    company: props?.company,
+                    quarterWiseTable: perameters?.quarterWise,
+                    summaryOnly: perameters?.summaryOnly,
                 },
             }
         })
+        props.setRefetch(true);
     }
 
     const onDeleteKPI = async (id: any) => {
@@ -39,6 +41,7 @@ const TermsTable = (props: TableProps) => {
                 termId: id,
             }
         })
+        props.setRefetch(true);
     }
     const ref = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
