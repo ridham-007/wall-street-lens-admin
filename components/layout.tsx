@@ -1,12 +1,13 @@
 import Head from "next/head";
 import { gql, useMutation } from "@apollo/client";
-import { useContext, useEffect, useState, useRef, use } from "react";
+import { useContext, useEffect, useState, useRef, use, SetStateAction } from "react";
 import { UserContext } from "@/config/auth";
 import Link from "next/link";
 import { LoginService } from "@/utils/login";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { useRouter } from "next/router";
 
 export enum LayoutPages {
   "financial_summary" = "financial_summary",
@@ -54,6 +55,8 @@ export default function Layout(props: LayoutProps) {
   const [newPassword, setNewPassword] = useState("");
   const [reEnterPassword, setReEnterPassword] = useState("");
   const ref = useRef<HTMLInputElement | null>(null);
+  const [company, setCompany] = useState('TESLA');
+  const router = useRouter();
 
   const [updatePassword, { data, error, loading }] = useMutation(
     CHANGE_PASSWORD,
@@ -143,6 +146,14 @@ export default function Layout(props: LayoutProps) {
       updatePassword();
     }
   };
+  
+  useEffect(() => {
+    router.push(`${router.pathname}?company=${company}`);
+  }, [company])
+
+  const handleOnChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+    setCompany(event.target.value)
+  }
 
   return (
     <>
@@ -170,7 +181,19 @@ export default function Layout(props: LayoutProps) {
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Wall Street Lens
           </h1>
-
+          <div className="flex gap-[20px] items-center mr-auto ml-[20px]">
+            <select
+              id="quarter"
+              name="company"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={company}
+              onChange={handleOnChange}
+            >
+              <option value="">Select a option</option>
+              <option value="TESLA">TESLA</option>
+              <option value="HSBC">HSBC</option>
+            </select>
+          </div>
           <div className="flex align-right items-center">
             <button onClick={handleOpen}>
               <svg
@@ -371,7 +394,7 @@ export default function Layout(props: LayoutProps) {
                 </button>
               </Link>
 
-              <Link href={"/outlook"}>
+              <Link href={`/outlook?company=${company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
                     props?.page === LayoutPages.outlook
@@ -396,7 +419,7 @@ export default function Layout(props: LayoutProps) {
                   Outlook
                 </button>
               </Link>
-              <Link href={"/settings"}>
+              <Link href={`/settings?company=${company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
                     props?.page === LayoutPages.settings

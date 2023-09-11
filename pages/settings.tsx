@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import Loader from "@/components/loader";
 import VariableTable from "@/components/table/settings/VariableTable";
@@ -11,68 +11,57 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, GET_VIEW_FOR_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
-
-
-
-const dummySettings = [
-    {
-      Terms_name: 'Financial Summary',
-      Title: "Revenue Segments",
-      Category: "Total automotive revenues",
-      Priority: "High",
-      YoY: "2023",
-      UpdatedAt : "01/02/23",
-      id: 1,
-    },
-];
-
-const dummySettingsForTerms = [
-    {
-        Name: "Revenue Segments",
-        Type: "row",
-        Company: "",
-        UpdatedAt: "01/02/23",
-        id: 1,
-    },
-];
+import { useRouter } from "next/router";
 
 export default function FinancialPage() {
     const [showLoader, setShowLoader] = useState(false);
+    const [company, setCompany] = useState('');
+    const [term, setTerm] = useState('');
     const [showImport, setShowImport] = useState(false)
     const [bulkUpload] = useMutation(PROCCESS_BULK_UPLOAD);
+    const router = useRouter();
 
-    const [getTermsDetails, { data: termsData, refetch: refetchQuarter }] = useLazyQuery(
+    useEffect(() => {
+        setCompany(router.query.company)
+    }, [router.query])
+
+    const [getTermsDetails, { data: termsData, refetch: refetchTerms }] = useLazyQuery(
         GET_TERMS_BY_COMPANY,
         {
             variables: {
-                companyId: 'Tesla',
+                companyId: company,
             },
         }
     );
 
-    const [getVariables, { data: termsVaribles }] = useLazyQuery(
+    const [getVariables, { data: termsVaribles, refetch: refetchVeriables }] = useLazyQuery(
         GET_VARIBALES_KPI_TERM,
         {
             variables: {
-                termId: '3e52ddcb-381c-4868-bf74-07e424e9ee98',
-            },
-        }
-    );
-
-    const [getTermVaribles, { data: termVaribles }] = useLazyQuery(
-        GET_VIEW_FOR_TERM,
-        {
-            variables: {
-                termId: '3e52ddcb-381c-4868-bf74-07e424e9ee98',
+                termId: term || '',
             },
         }
     );
 
     useEffect(() => {
-        getTermsDetails()
-        getTermVaribles()
-        getVariables()
+        if (!!company) {
+            getTermsDetails();
+            getVariables();
+        }
     }, [])
+
+    useEffect(() => {
+        getTermsDetails();
+    }, [company])
+
+    useEffect(() => {
+        if (termsData?.getKpiTermsByCompanyId?.length) {
+            setTerm(termsData?.getKpiTermsByCompanyId[0]?.id)
+        } else {
+            setTerm('');
+        }
+        getVariables();
+    }, [termsData])
 
 
     const onAddUpdateParameter = async (data: any) => {
@@ -87,9 +76,6 @@ export default function FinancialPage() {
         setShowLoader(false);
     };
 
-    const [val, setVal] = useState({
-        settingsData: dummySettings,
-      })
     const [activeTab, setActiveTab] = useState('Variables');
     const handleTabClick = (tabName: string) => {
         setActiveTab(tabName);
@@ -139,14 +125,14 @@ export default function FinancialPage() {
                         onClick={() => handleTabClick('Tabs')}
                     />
                 </div>
-                {activeTab === 'Variables' ? <VariableTable data={termsVaribles} /> : <TermsTable data={termsData} />}
+                {activeTab === 'Variables' ? <VariableTable term={term} data={termsVaribles} setTerm={setTerm} termsData={termsData}/> : <TermsTable data={termsData} />}
                 {showImport && (
                     <ImportData
                         onSuccess={onAddUpdateParameter}
-                        onClose={() => {}}
+                        onClose={() => { }}
                     ></ImportData>
                 )}
-            
+
             </>
         </Layout >
     );
@@ -161,7 +147,7 @@ interface ImportDataProps {
 function ImportData(props: ImportDataProps) {
     const [val, setVal] = useState({
         company: '',
-        name:'',
+        name: '',
         quarterWiseTable: '',
         summaryOnly: '',
         variables: []
@@ -195,8 +181,8 @@ function ImportData(props: ImportDataProps) {
             const obj = {};
             const quarters = [];
             for (let j = 0; j < attributes?.length; j++) {
-                if (!table){
-                    if (regex.test(attributes[j])){
+                if (!table) {
+                    if (regex.test(attributes[j])) {
                         quarters.push({
                             quarter: attributes[j].charAt(1),
                             year: attributes[j].slice(-4),
@@ -245,9 +231,7 @@ function ImportData(props: ImportDataProps) {
                         header = row.slice(1);
                         tableName = row[0].toString();
                     } else if (currentTable) {
-                        console.log({ row })
-                        const sanitizedRow = row.map((cell: null | undefined) => 
-                        {
+                        const sanitizedRow = row.map((cell: null | undefined) => {
                             return cell !== null && cell !== undefined ? cell : ' '
                         }
                         );
@@ -299,8 +283,6 @@ function ImportData(props: ImportDataProps) {
         }
     };
 
-    console.log({ val })
-
     return (
         <Modal
             showModal={true}
@@ -321,6 +303,7 @@ function ImportData(props: ImportDataProps) {
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                                 value={val.company}
                                 onChange={handleOnChange}
+                                disabled
                             >
                                 <option value="">Select a option</option>
                                 <option value="TESLA">TESLA</option>

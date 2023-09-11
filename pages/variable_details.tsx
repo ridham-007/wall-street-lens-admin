@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
-import Loader from "@/components/loader";
 import Variable from "@/components/table/variables/Variable";
 import "react-toastify/dist/ReactToastify.css";
 import { GET_TERMS_BY_COMPANY, GET_VIEW_FOR_TERM } from "@/utils/query";
@@ -21,7 +20,7 @@ export default function VariableDetails() {
   const [getTermsDetails, { data: termsData, refetch: refetchQuarter }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
       variables: {
-        companyId: "Suzuki",
+        companyId: "TESLA",
       },
     });
 

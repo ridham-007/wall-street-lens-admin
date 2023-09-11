@@ -269,6 +269,48 @@ const UPDATE_MAPPED_VALUE = gql`mutation addUpdateMappedValue(
   }
 }`;
 
+const ADD_UPDATE_TERM_VERIABLE = gql`mutation addUpdateTermVariable(
+  $variableInfo:AddUpdateTermVariable!
+  $termId: String
+  ){
+  addUpdateTermVariable(
+    variableInfo: $variableInfo
+    termId: $termId
+  ){
+    id
+  }
+}`;
+
+const ADD_UPDATE_KPI_TERM = gql`mutation addUpdateKpiTerm(
+  $kpiInfo:AddUpdateKpiTerm!
+  ){
+  addUpdateKpiTerm(
+    kpiInfo: $kpiInfo
+  ){
+    id
+  }
+}`;
+
+const DELETE_VERIABLE_BY_ID = gql`mutation deleteVariableByVariableId(
+  $variableId: String!
+  ){
+  deleteVariableByVariableId(
+    variableId: $variableId
+  ){
+    success
+  }
+}`;
+
+const DELETE_KPI_BY_ID = gql`mutation deleteKpiTermByTermId(
+  $termId: String!
+  ){
+  deleteKpiTermByTermId(
+    termId: $termId
+  ){
+    success
+  }
+}`;
+
 export {
   ADD_FINANCIAL_SUMMARY_PARAMETER,
   GET_FINANCIAL_SUMMARY_PARAMETERS,
@@ -288,4 +330,8 @@ export {
   GET_VIEW_FOR_TERM,
   GET_VARIBALES_KPI_TERM,
   UPDATE_MAPPED_VALUE,
+  ADD_UPDATE_TERM_VERIABLE,
+  ADD_UPDATE_KPI_TERM,
+  DELETE_KPI_BY_ID,
+  DELETE_VERIABLE_BY_ID,
 }
