@@ -12,6 +12,7 @@ import ParameterTable from "@/components/table/chart/ParameterTable";
 import YearDropdown from "@/components/year_dropdown/year_dropdown";
 
 import { GET_TERMS_BY_COMPANY, GET_VIEW_FOR_TERM } from "@/utils/query";
+import { useRouter } from "next/router";
 const selectedCompany = [{
   id: 1,
   name: 'TESLA',
@@ -24,81 +25,6 @@ export default function FinancialPage() {
   const [perametersData, setPerametersData] = useState<any[]>([]);
   const [searchKey, setSearchKey] = useState("");
   const [isOpenAction, setIsOpenAction] = useState("");
-  const [activeTab, setActiveTab] = useState('Descriptions');
-  
-  const [addParameter] = useMutation(ADD_FINANCIAL_SUMMARY_PARAMETER);
-  const [addQuarters] = useMutation(ADD_QUARTERS_DETAILS);
-
-  const handleTabClick = (tabName: string) => {
-    setActiveTab(tabName);
-  };
-
-  const [getQuarterDetails, { data: quarterData, refetch: refetchQuarter }] = useLazyQuery(
-    FINANCIAL_REPORT_BY_COMPANY_NAME,
-    {
-      variables: {
-        companyName: selectedCompany[0]?.name,
-      },
-    }
-  );
-
-  useEffect(() => {
-    getQuarterDetails();
-  }, [])
-
-  const closePopups = () => {
-    setAddUpdateParameter(false);
-    setAddUpdateQuarter(false);
-  }
-
-  const onAddUpdateParameter = async (data: any) => {
-    setShowLoader(true);
-    await addParameter({
-      variables: {
-        financialQuarter:{
-          financialSummary: {
-            
-            title: data.title,
-            
-          },
-          
-      }
-      },
-    })
-    setShowLoader(false);
-    refetchQuarter();
-    closePopups();
-  };
-
-  const onAddUpdateQuarter = async(perameters: any) => {
-    setShowLoader(true);
-    const {
-      year,
-      selectedQuarter,
-      val,
-    } = perameters;
-
-    const mutationData: { quarter: any; year: any; value: any; financialSummaryId: any; }[] = [];
-    val.forEach((current: { value: any; id: any; }) => {
-      mutationData.push({
-        quarter: selectedQuarter,
-        year,
-        value: current?.value,
-        financialSummaryId: current?.id, 
-      })
-    })
-
-    await addQuarters({
-      variables:{
-        addQuarters: {
-          quarters: mutationData
-        },
-      }
-    })
-    setShowLoader(false);
-    closePopups();
-    refetchQuarter();
-  }
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -120,15 +46,7 @@ export default function FinancialPage() {
       // Cleanup the event listener
       document.removeEventListener("mousedown", checkIfClickedOutside);
     };
-  }, [isOpenAction]);
-
-
-  const onKeyPress = (event: any) => {
-    if (event.key === "Enter") {
-      setSearchKey(event.target.value);
-    }
-  };
-  
+  }, [isOpenAction]);  
 
   return (
     <Layout title="Management Chart" page={LayoutPages.management_chart}>
@@ -163,12 +81,12 @@ export default function FinancialPage() {
             </button>
           </div>
           <div>
-            {activeTab === 'Descriptions' && <ParameterTable data={quarterData} />}
+            {<ParameterTable data={{}} />}
           </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter
-            onSuccess={onAddUpdateParameter}
-            onClose={closePopups}
+            onSuccess={()=> {}}
+            onClose={{}}
             selectedCompany={selectedCompany}
           ></AddUpdateParaMeter>
         )}
@@ -183,6 +101,7 @@ interface AddUpdateParameterProps {
   onClose?: any;
   selectedCompany?: any;
   financialInitData?: any;
+  company: any;
 }
 
 interface KpiTerm {
@@ -199,28 +118,35 @@ interface KpiTerm {
 
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
+  const [company, setCompany] = useState('');
   const [val, setVal] = useState({
-    
     title: "",
-    graph: "",
-  
-  
+    graph: "",  
   })
 
   const [termId, setTermId] = useState("");
   const [isToggled, setIsToggled] = useState(false);
   const onToggle = () => setIsToggled(!isToggled);
 
-  const [getTermsDetails, { data: termsData, refetch: refetchQuarter }] =
+  const [getTermsDetails, { data: termsData }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
       variables: {
-        companyId: "Suzuki",
+        companyId: props.company,
       },
     });
 
+  const router = useRouter();
+
   useEffect(() => {
-    getTermsDetails();
+    setCompany(router.query.company)
+  }, [router.query])
+
+  useEffect(() => {
+    if (company) {
+      getTermsDetails();
+    }
   }, []);
+
   const handleOnSave = () => {
     if (!val.title){
       toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
@@ -239,9 +165,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
       [name]: value
     }));
   };
-  
-  
-
   
   return (
     <Modal
@@ -302,11 +225,13 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
              <option value="">Select a option</option>
                  {(termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
                     return (
-             <option key={cur.id} value={cur?.id}>
-                  {cur?.name}
-             </option>
-                );
-               })}
+                          <option key={cur.id} value={cur?.id}>
+                                {cur?.name}
+                          </option>
+                        );
+                       }
+                      )
+                    }
              </select>
             </div>
             <div className="flex flex-col">
