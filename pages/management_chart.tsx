@@ -8,9 +8,10 @@ import { ToastContainer } from 'react-toastify';
 import { ADD_FINANCIAL_SUMMARY_PARAMETER, ADD_QUARTERS_DETAILS, FINANCIAL_REPORT_BY_COMPANY_NAME, GET_FINANCIAL_SUMMARY_PARAMETERS } from "@/utils/query";
 import Loader from "@/components/loader";
 import { TabButton } from "@/components/TabButton";
-import ParameterTable from "@/components/table/financial/ParameterTable";
+import ParameterTable from "@/components/table/chart/ParameterTable";
 import YearDropdown from "@/components/year_dropdown/year_dropdown";
 
+import { GET_TERMS_BY_COMPANY, GET_VIEW_FOR_TERM } from "@/utils/query";
 const selectedCompany = [{
   id: 1,
   name: 'TESLA',
@@ -24,7 +25,7 @@ export default function FinancialPage() {
   const [searchKey, setSearchKey] = useState("");
   const [isOpenAction, setIsOpenAction] = useState("");
   const [activeTab, setActiveTab] = useState('Descriptions');
-
+  
   const [addParameter] = useMutation(ADD_FINANCIAL_SUMMARY_PARAMETER);
   const [addQuarters] = useMutation(ADD_QUARTERS_DETAILS);
 
@@ -113,6 +114,7 @@ export default function FinancialPage() {
     };
 
     document.addEventListener("mousedown", checkIfClickedOutside);
+    
 
     return () => {
       // Cleanup the event listener
@@ -126,11 +128,12 @@ export default function FinancialPage() {
       setSearchKey(event.target.value);
     }
   };
+  
 
   return (
     <Layout title="Management Chart" page={LayoutPages.management_chart}>
       <>
-          <div className="flex justify-end pr-4 gap-4">
+          <div className="flex justify-end pr-4 gap-4 mb-4">
             <button
               type="button"
               className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -159,9 +162,9 @@ export default function FinancialPage() {
               <span>Add a Description</span>
             </button>
           </div>
-       
-        
-
+          <div>
+            {activeTab === 'Descriptions' && <ParameterTable data={quarterData} />}
+          </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter
             onSuccess={onAddUpdateParameter}
@@ -169,7 +172,7 @@ export default function FinancialPage() {
             selectedCompany={selectedCompany}
           ></AddUpdateParaMeter>
         )}
-       
+        
       </>
     </Layout >
   );
@@ -182,16 +185,42 @@ interface AddUpdateParameterProps {
   financialInitData?: any;
 }
 
+interface KpiTerm {
+  id: string;
+  name: string;
+  quarterWiseTable: boolean;
+  summaryOnly: boolean;
+  updatedAt: Date;
+  company: string;
+  __typename: string;
+}
+
+
 
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [val, setVal] = useState({
     
     title: "",
-   
+    graph: "",
   
   
   })
+
+  const [termId, setTermId] = useState("");
+  const [isToggled, setIsToggled] = useState(false);
+  const onToggle = () => setIsToggled(!isToggled);
+
+  const [getTermsDetails, { data: termsData, refetch: refetchQuarter }] =
+    useLazyQuery(GET_TERMS_BY_COMPANY, {
+      variables: {
+        companyId: "Suzuki",
+      },
+    });
+
+  useEffect(() => {
+    getTermsDetails();
+  }, []);
   const handleOnSave = () => {
     if (!val.title){
       toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
@@ -210,9 +239,10 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
       [name]: value
     }));
   };
+  
+  
 
-
-
+  
   return (
     <Modal
       showModal={true}
@@ -222,12 +252,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     >
       <>
         <form className="form w-100">
-          <div className="grid grid-cols-2 gap-4">
-            
-            
-            
-
-            
+        <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col">
               <label
                 htmlFor="title"
@@ -245,16 +270,80 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>
-            
-            
-          </div>
-
-            
+            <div className="flex flex-col">
+              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+                Graph Type
+              </label>
+              <select
+                id="graphType"
+                name="graph"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={val.graph}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                <option value="Bar">Bar Chart</option>
+                <option value="Linear">Linear Graph</option>
+              </select>
+            </div>
+            <div className="flex flex-row items-center gap-[20px] mb-[20px]">
+             <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
+               KPIs Term:
+             </label>
+             <select
+               id="quarter"
+               name="company"
+               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+               value={termId}
+               onChange={(event) => {
+               setTermId(event.target?.value);
+               }}
+             >
+             <option value="">Select a option</option>
+                 {(termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
+                    return (
+             <option key={cur.id} value={cur?.id}>
+                  {cur?.name}
+             </option>
+                );
+               })}
+             </select>
+            </div>
+            <div className="flex flex-col">
+          
+              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+                   Varibles Array
+              </label>
+             
+              <select
+                id="graphType"
+                name="graph"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={val.graph}
+                onChange={handleOnChange}
+               >
+                <option value="">Select a option</option>
+                <option value="Bar">Bar Chart</option>  
+                <option value="Linear">Linear Graph</option>  
+              </select>
+            </div>
+           
+            <div className="flex flex-row">
+              <label htmlFor="quarter" className="text-sm font-medium  text-gray-700">
+                 Visibility              
+              </label>
+              <label className="toggle-switch">
+                     <input type="checkbox" checked={isToggled} onChange={onToggle} />
+                 <span className="switch" />
+              </label>
+            </div>   
+        </div>
         </form>
         <ToastContainer />  
       </>
     </Modal>
   );
 }
+
 
 
