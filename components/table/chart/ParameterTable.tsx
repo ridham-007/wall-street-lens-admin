@@ -30,7 +30,7 @@ const ParameterTable = (props: TableProps) => {
             }
         }
     };
-    const tableData = props.data?.getFinancialReportsByCompany?.financialQuarters;
+    const tableData = props.data?.getChartsByKpiTerm;
     return <>
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
@@ -39,23 +39,23 @@ const ParameterTable = (props: TableProps) => {
                 <thead className="w-full sticky top-0 z-20">
                     <THR>
                         <>
-                            <TH>Company</TH>
-                            <TH>Title</TH>
-                            <TH>Priority</TH>
-                            <TH>Graph Type</TH>
+                            <TH>NAME</TH>
+                            <TH>TYPE</TH>
+                            <TH>VISIBLE</TH>
+                            <TH>TERM</TH>
                             <TH >Action</TH>
                         </>
                     </THR>
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { financialSummary: { id: Key | null | undefined; company: string | JSX.Element | undefined; title: string | JSX.Element | undefined; priority: string | JSX.Element | undefined; graphType: string | JSX.Element | undefined; }, id: string | number | ((prevState: string) => string) | null | undefined; }) => {
-                        return <TDR key={current?.financialSummary?.id}>
+                    {tableData?.map((current: { id: ((prevState: string) => string) | Key | null | undefined; title: string | JSX.Element | undefined; type: string | JSX.Element | undefined; visible: any; }) => {
+                        return <TDR key={current?.id}>
                             <>
-                                <TD>{current?.financialSummary?.company}</TD>
-                                <TD>{current?.financialSummary?.title}</TD>
-                                <TD>{current?.financialSummary?.priority || ''}</TD>
-                                <TD>{current?.financialSummary?.graphType}</TD>
+                                <TD>{current?.title}</TD>
+                                <TD>{current?.type}</TD>
+                                <TD>{current?.visible ? 'Visible' :'Hidden'}</TD>
+                                <TD>Financial Summary</TD>
                                 <TD style="text-center">
                                     <>
                                         <button

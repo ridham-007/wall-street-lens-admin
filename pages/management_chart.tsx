@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { useMutation, useLazyQuery } from "@apollo/client";
@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import ParameterTable from "@/components/table/chart/ParameterTable";
 import Multiselect from 'multiselect-react-dropdown';
-import { ADD_UPDATE_TERM_CHART_MUTATION } from "@/utils/query";
+import { ADD_UPDATE_TERM_CHART_MUTATION, GET_CHART_BY_KPI_TERM } from "@/utils/query";
 
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
@@ -18,6 +18,7 @@ const selectedCompany = [{
 
 export default function FinancialPage() {
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
+  const [term, setTerm] = useState('');
   const [isOpenAction, setIsOpenAction] = useState("");
   const [company, setCompany] = useState('');
   const router = useRouter();
@@ -25,6 +26,38 @@ export default function FinancialPage() {
   useEffect(() => {
     setCompany(router.query.company)
   }, [router.query])
+
+  const [getTermsDetails, { data: termsData }] =
+    useLazyQuery(GET_TERMS_BY_COMPANY, {
+      variables: {
+        companyId: company,
+      },
+    });
+
+  const [getChartDetails, { data: chartData }] =
+    useLazyQuery(GET_CHART_BY_KPI_TERM, {
+      variables: {
+        termId: term,
+      },
+  });
+
+
+  useEffect(() => {
+    getChartDetails();
+  }, [term])
+
+  useEffect(() => {
+    if (termsData?.getKpiTermsByCompanyId.length){
+      setTerm(termsData?.getKpiTermsByCompanyId[0]?.id)
+    } else {
+      setTerm('');
+    }
+    
+  }, [termsData])
+
+  useEffect(() => {
+    getTermsDetails();
+  }, [company]);
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -51,7 +84,31 @@ export default function FinancialPage() {
   return (
     <Layout title="Management Chart" page={LayoutPages.management_chart}>
       <>
-        <div className="flex justify-end pr-4 gap-4 mb-4">
+        <div className="flex justify-between pr-4 gap-4 mb-4">
+          <div className="flex items-center">
+            <label htmlFor="quarter" className="text-sm  text-gray-700 mr-[20px]">
+              KPIs Term:
+            </label>
+            <select
+              id="quarter"
+              name="term"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={term}
+              onChange={(event) => { setTerm(event?.target?.value)}}
+            >
+              <option value="">Select a option</option>
+              {
+                (termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
+                  return (
+                    <option key={cur.id} value={cur?.id}>
+                      {cur?.name}
+                    </option>
+                  );
+                }
+                )
+              }
+            </select>
+          </div>
           <button
             type="button"
             className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -77,11 +134,11 @@ export default function FinancialPage() {
                 d="M256 176v160M336 256H176"
               />
             </svg>
-            <span>Add a Description</span>
+            <span>Add a Chart</span>
           </button>
         </div>
         <div>
-          {<ParameterTable data={{}} />}
+          {<ParameterTable data={chartData} />}
         </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter
@@ -125,15 +182,12 @@ interface VariablesArray {
 
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
-  const [company, setCompany] = useState('');
   const [val, setVal] = useState({
     title: "",
     graph: "",
     term: "",
-  })
-
-  const [isToggled, setIsToggled] = useState(false);
-  const onToggle = () => setIsToggled(!isToggled);
+    visible: false,
+  });
 
   const [getTermsDetails, { data: termsData }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
@@ -142,15 +196,9 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
       },
     });
 
-  const router = useRouter();
-
-  useEffect(() => {
-    setCompany(router.query.company)
-  }, [router.query])
-
   useEffect(() => {
     getTermsDetails();
-  }, [company]);
+  }, [props.company]);
 
   const [getVariables, { data: termsVaribles }] = useLazyQuery(
     GET_VARIBALES_KPI_TERM,
@@ -168,24 +216,28 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [addUpdateTermChart] = useMutation(ADD_UPDATE_TERM_CHART_MUTATION);
 
   const handleAddUpdateTermChart = async () => {
+    if(!val.title || !val.term){
+      toast("Title or term missing", {
+        hideProgressBar: false,
+        autoClose: 7000,
+        type: "error",
+      });
+      return
+    }
     try {
-      const result = await addUpdateTermChart({
+     await addUpdateTermChart({
         variables: {
           chartInfo: {
-            id: 'String',
             title: val.title,
-            // type: String
-            visible: true
+            type: val.graph,
+            visible: val.visible
           },
           keysInfo: {
             termId: val.term,
-          variableIds: selectedVariablesArr,
+            variableIds: selectedVariablesArr?.map(current => current?.id),
           },
         },
       });
-
-      // Handle the result (e.g., update your UI)
-      console.log('Mutation result:', result);
     } catch (error) {
       // Handle errors
       console.error('Mutation error:', error);
@@ -194,10 +246,15 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
 
   const handleOnSave = () => {
-    if (val.title) {
-      handleAddUpdateTermChart();
-      return;
+    if (!val.title || !val.term) {
+      toast("Title or term missing", {
+        hideProgressBar: false,
+        autoClose: 7000,
+        type: "error",
+      });
+      return
     }
+    handleAddUpdateTermChart();
     props.onSuccess && props.onSuccess(val)
     props.onClose && props.onClose()
   };
@@ -222,14 +279,14 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
     // Iterate over the original data and group options by the "title" field
     originalData.forEach((item: VariablesArray) => {
-      const { category, title } = item;
+      const { category, title , id} = item;
 
       if (title) {
         if (!groupedOptions[title]) {
           groupedOptions[title] = [];
         }
 
-        groupedOptions[title].push({ cat: title, key: title });
+        groupedOptions[title].push({ cat: title, key: title, id });
       }
     });
 
@@ -245,11 +302,15 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     setselectedVariablesArr(selectedList);
   };
 
+  const OnRemoveChip = (selectedList: any[]) => {
+    setselectedVariablesArr(selectedList);
+  }
+
   return (
     <Modal
       showModal={true}
       handleOnSave={handleOnSave}
-      title="Management Chart Descriptions"
+      title="Add a chart"
       onClose={() => props.onClose && props.onClose()}
     >
       <>
@@ -321,7 +382,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 displayValue="key"
                 placeholder="Select options"
                 onKeyPressFn={function noRefCheck() { }}
-                onRemove={function noRefCheck() { }}
+                onRemove={OnRemoveChip}
                 onSearch={function noRefCheck() { }}
                 onSelect={handleSelect}
                 options={updatedOptions}
@@ -335,7 +396,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 Visibility
               </label>
               <label className="toggle-switch">
-                <input type="checkbox" checked={isToggled} onChange={onToggle} />
+                <input type="checkbox" checked={val.visible} name='visible' onChange={handleOnChange} />
                 <span className="switch" />
               </label>
             </div>
