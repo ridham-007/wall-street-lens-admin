@@ -225,6 +225,10 @@ const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
           value
           quarter
           year
+          metadata
+          termId
+          variableId
+          quarterId
         }
       }
       description
@@ -264,10 +268,16 @@ const PROCCESS_BULK_UPLOAD = gql`mutation processBulkUploadTypeOne(
 }`;
 
 const UPDATE_MAPPED_VALUE = gql`mutation addUpdateMappedValue(
-  $mappingInfo:AddUpdateMappedValue!
+    $mappingInfo: AddUpdateMappedValue!
+    $termId: String
+    $variableId: String
+    $quarterId: String
   ){
   addUpdateMappedValue(
     mappingInfo: $mappingInfo
+    termId: $termId
+    variableId: $variableId
+    quarterId: $quarterId
   ){
     id
   }

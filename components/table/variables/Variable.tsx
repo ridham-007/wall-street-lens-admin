@@ -7,6 +7,8 @@ import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
 export interface TableProps {
   termId: string;
   selectedTerm: string;
+  year: string;
+  quarter: string;
 }
 
 export interface Row {
@@ -19,18 +21,19 @@ export interface Cell {
   value: string;
   year: number;
   quarter: number;
+  metadata: string;
 }
 
-export default function Variable({ termId, selectedTerm }: TableProps) {
-
+export default function Variable({ termId, selectedTerm, year, quarter }: TableProps) {
+  console.log({year, quarter})
   const [getTermView, { data: termView, refetch: refetchTermView }] =
     useLazyQuery(GET_VIEW_FOR_TERM, {
       variables: {
         termId: termId,
         ...(
           selectedTerm?.quarterWiseTable && {
-            quarter: 1,
-            year: 2023,
+            quarter: Number(quarter),
+            year: Number(year),
       })
       },
     });
@@ -39,19 +42,35 @@ export default function Variable({ termId, selectedTerm }: TableProps) {
       getTermView();
     }, [termId])
 
+    useEffect(() => {
+      refetchTermView();
+    }, [year, quarter])
+
   const [show, setShow] = useState(false);
   const [cellData, setCellData] = useState({});
   const [updateValue] = useMutation(UPDATE_MAPPED_VALUE);
   const { headers = [], rows = [] }: { headers: string[]; rows: Row[] } =
     termView?.getViewForTerm || {};
-
-  const onSave = async (id: string, value: string) => {
+  const onSave = async (
+    id: string, 
+    value: string, 
+    metadata:string,
+    quarterId: string,
+    termId: string,
+    variableId: string,
+    ) => {
     await updateValue({
       variables: {
         mappingInfo: {
-          id: id,
+          ...(!!id && { id }),
           value: value,
+          metaData: metadata,
         },
+        ...(!id && {
+          quarterId: quarterId,
+          termId: termId,
+          variableId: variableId,
+        }),
       },
     });
     setShow(false);
@@ -99,6 +118,10 @@ export default function Variable({ termId, selectedTerm }: TableProps) {
                             title: current.title,
                             year: cur.year,
                             quarter: cur.quarter,
+                            metadata: cur.metadata,
+                            quarterId: cur.quarterId,
+                            termId: cur.termId,
+                            variableId: cur.variableId
                           });
                         }}
                         key={cur.id}
@@ -134,7 +157,14 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [val, setVal] = useState(props.cellData?.value);
   const handleOnSave = async () => {
     if (!!props.onSave) {
-      props.onSave(props.cellData.id, val);
+      props.onSave(
+          props.cellData.id,
+          val,
+          props.cellData.metadata,
+          props?.cellData?.quarterId,
+          props?.cellData?.termId,
+          props?.cellData?.variableId,
+        );
     }
   };
 

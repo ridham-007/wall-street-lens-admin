@@ -68,7 +68,6 @@ const TermsTable = (props: TableProps) => {
     };
 
     const tableData = props?.data?.getKpiTermsByCompanyId;
-    console.log({ currentData })
     return <>
         <div
             className="w-full flex justify-start mb-[20px]"
@@ -169,7 +168,6 @@ interface AddUpdateTermProps {
 }
 
 function AddUpdateTerms(props: AddUpdateTermProps) {
-    console.log({props})
     const [val, setVal] = useState({
         id: props?.data?.id,
         name: props?.data?.name,

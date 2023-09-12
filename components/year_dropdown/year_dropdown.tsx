@@ -7,12 +7,12 @@ export interface DropdownProps {
 
 const YearDropdown = (props: DropdownProps) => {
     // Create an array of years, e.g., from 1900 to the current year
-    const years = Array.from({ length: new Date().getFullYear() - 1899 }, (_, index) => 1900 + index);
-
+    let years = Array.from({ length: new Date().getFullYear() - 1899 }, (_, index) => 1900 + index);
+    years = years.reverse();
     return (
         <div className="flex flex-col relative" max-h-40 overflow-y-auto>
-            <label htmlFor="year" className="text-sm font-medium text-gray-700">
-                Select a Year
+            <label htmlFor="year" className="text-sm font-bold text-gray-700">
+                Select a Year:
             </label>
             <select
             name='year'

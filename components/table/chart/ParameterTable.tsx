@@ -169,7 +169,6 @@ interface VariablesArray {
 }
 
 function UpdateChart(props: AddUpdateParameterProps) {
-    console.log({ props })
     const [val, setVal] = useState({
         id: props?.currentData?.id,
         title: props?.currentData?.title,
