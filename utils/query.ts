@@ -311,6 +311,17 @@ const DELETE_KPI_BY_ID = gql`mutation deleteKpiTermByTermId(
   }
 }`;
 
+
+const DELETE_CHART_BY_ID = gql`mutation deleteTermChartById(
+  $chartId: String!
+  ){
+  deleteTermChartById(
+    chartId: $chartId
+  ){
+    success
+  }
+}`;
+
 const ADD_UPDATE_TERM_CHART_MUTATION = gql`
   mutation AddUpdateTermChart($chartInfo: addUpdateTermChart!, $keysInfo: TermChartDependencyKey) {
     addUpdateTermChart(chartInfo: $chartInfo, keysInfo: $keysInfo) {
@@ -358,4 +369,5 @@ export {
   DELETE_VERIABLE_BY_ID,
   ADD_UPDATE_TERM_CHART_MUTATION,
   GET_CHART_BY_KPI_TERM,
+  DELETE_CHART_BY_ID,
 }

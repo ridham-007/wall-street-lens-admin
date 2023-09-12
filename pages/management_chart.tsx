@@ -18,6 +18,7 @@ const selectedCompany = [{
 
 export default function FinancialPage() {
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
+  const [refetch, setRefetch] = useState(false);
   const [term, setTerm] = useState('');
   const [isOpenAction, setIsOpenAction] = useState("");
   const [company, setCompany] = useState('');
@@ -27,19 +28,27 @@ export default function FinancialPage() {
     setCompany(router.query.company)
   }, [router.query])
 
-  const [getTermsDetails, { data: termsData }] =
+  const [getTermsDetails, { data: termsData, refetch: refetchTerms }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
       variables: {
         companyId: company,
       },
-    });
+  });
 
-  const [getChartDetails, { data: chartData }] =
+  const [getChartDetails, { data: chartData, refetch: refetchCharts }] =
     useLazyQuery(GET_CHART_BY_KPI_TERM, {
       variables: {
         termId: term,
       },
   });
+
+  useEffect(() => {
+    if (!!company && refetch) {
+      refetchTerms();
+      refetchCharts();
+    }
+    setRefetch(false);
+  }, [refetch])
 
 
   useEffect(() => {
@@ -138,7 +147,7 @@ export default function FinancialPage() {
           </button>
         </div>
         <div>
-          {<ParameterTable data={chartData} />}
+          {<ParameterTable data={chartData} refetch={setRefetch}/>}
         </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter
@@ -146,6 +155,7 @@ export default function FinancialPage() {
             onClose={() => { setAddUpdateParameter(false) }}
             selectedCompany={selectedCompany}
             company={company}
+            refetch={setRefetch}
           ></AddUpdateParaMeter>
         )}
 
@@ -160,6 +170,7 @@ interface AddUpdateParameterProps {
   selectedCompany?: any;
   financialInitData?: any;
   company: any;
+  refetch: any;
 }
 
 interface KpiTerm {
@@ -238,6 +249,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
           },
         },
       });
+      props.refetch(true)
     } catch (error) {
       // Handle errors
       console.error('Mutation error:', error);

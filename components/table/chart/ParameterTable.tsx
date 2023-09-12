@@ -1,12 +1,19 @@
 import { Key, SetStateAction, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
+import { Modal } from "@/components/model";
+import { DELETE_CHART_BY_ID } from "@/utils/query";
+import { useMutation } from "@apollo/client";
 
 export interface TableProps {
     data: any;
+    refetch: any;
 }
 
 const ParameterTable = (props: TableProps) => {
+    const [showDelete, setShowDelete] = useState(false);
+    const [deleteId, setDeleteId] = useState('');
     const [isOpenAction, setIsOpenAction] = useState('');
+    const [deleteChart] = useMutation(DELETE_CHART_BY_ID);
     const ref = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
         const checkIfClickedOutside = (e: { target: any; }) => {
@@ -30,6 +37,15 @@ const ParameterTable = (props: TableProps) => {
             }
         }
     };
+
+    const onDeleteChart = async (id: any) => {
+        await deleteChart({
+            variables: {
+                chartId: id,
+            }
+        })
+        props.refetch(true);
+    }
     const tableData = props.data?.getChartsByKpiTerm;
     return <>
         <div style={{
@@ -72,7 +88,7 @@ const ParameterTable = (props: TableProps) => {
                                                         // onClick={() => {}}
                                                         className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
                                                     <a
-                                                        // onClick={() => { }}
+                                                        onClick={() => { setShowDelete(true); setDeleteId(current?.id)}}
                                                         className="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
                                                 </div>
                                             </div>
@@ -86,6 +102,38 @@ const ParameterTable = (props: TableProps) => {
                 </tbody>
             </table>
         </div >
+        {showDelete && <DeleteChart id={deleteId} onClose={() => { setDeleteId(''); setShowDelete(false) }} onSuccess={onDeleteChart}/>}
     </>
 }
+
+interface DeleteChartProps {
+    onSuccess?: any;
+    onClose?: any;
+    id?: any;
+}
+
+function DeleteChart(props: DeleteChartProps) {
+    const handleOnSave = () => {
+        if (!props?.id) {
+            // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+            return;
+        }
+        props.onSuccess && props.onSuccess(props?.id)
+        props.onClose && props.onClose()
+    };
+
+    return (
+        <Modal
+            showModal={true}
+            handleOnSave={handleOnSave}
+            title="Delete a Term"
+            onClose={() => props.onClose && props.onClose()}
+        >
+            <>
+                <div>Are you sure you want to delete?</div>
+            </>
+        </Modal>
+    );
+}
+
 export default ParameterTable;
