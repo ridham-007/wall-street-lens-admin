@@ -131,7 +131,7 @@ function DeleteChart(props: DeleteChartProps) {
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Delete a Term"
+            title="Delete a Chart"
             onClose={() => props.onClose && props.onClose()}
         >
             <>
