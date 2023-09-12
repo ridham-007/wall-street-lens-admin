@@ -187,6 +187,7 @@ interface KpiTerm {
 interface VariablesArray {
   category: string;
   title: string;
+  id: string;
 }
 
 
@@ -287,7 +288,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
   if (termsVaribles?.getVariablesByKpiTerm) {
     const originalData = termsVaribles.getVariablesByKpiTerm;
-    const groupedOptions: Record<string, { cat: string; key: string }[]> = {};
+    const groupedOptions: Record<string, { cat: string; key: string, id: string }[]> = {};
 
     // Iterate over the original data and group options by the "title" field
     originalData.forEach((item: VariablesArray) => {
