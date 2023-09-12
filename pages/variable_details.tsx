@@ -47,7 +47,7 @@ export default function VariableDetails() {
   useEffect(() => {
     getTermsDetails();
   }, [company])
-
+  const selectedTerm = termsData?.getKpiTermsByCompanyId?.find((cur: { id: string; }) => cur.id === termId);
   return (
     <Layout title="Financial Summary" page={LayoutPages.variable_details}>
       <>
@@ -74,7 +74,7 @@ export default function VariableDetails() {
             })}
           </select>
         </div>
-        {!!termId && <Variable termId={termId} />}
+        {!!termId && <Variable termId={termId} selectedTerm={selectedTerm}/>}
       </>
     </Layout>
   );

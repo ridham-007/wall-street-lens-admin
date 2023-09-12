@@ -129,9 +129,9 @@ export default function FinancialPage() {
                         onClick={() => handleTabClick('Variables')}
                     />
                     <TabButton
-                        label="Tabs"
+                        label="Terms"
                         activeTab={activeTab}
-                        onClick={() => handleTabClick('Tabs')}
+                        onClick={() => handleTabClick('Terms')}
                     />
                 </div>
                 {activeTab === 'Variables' ? <VariableTable term={term} data={termsVaribles} setTerm={setTerm} setRefetch={setRefetch} termsData={termsData} /> : <TermsTable data={termsData} company={company} setRefetch={setRefetch} />}
@@ -213,6 +213,37 @@ function ImportData(props: ImportDataProps) {
         return result;
     }
 
+    const getArrayofObject = (basicDetails: {}[], rows: any[][]) => {  
+        const {
+            Quarter,
+            Year,
+        } = basicDetails[0] || {};
+        const keys = rows[0];
+        keys.push('VisibleToChart');
+        const arrays = keys?.map((current, index) => {
+            let quarters = [];
+            for (let i = 1; i < rows.length; i++) {
+                const values = rows[i];
+
+                quarters.push({
+                    quarter: Quarter,
+                    year: Year,
+                    value: current ==="VisibleToChart" ? 'false' : values[index].toString(),
+                    groupKey: i.toString(),
+                })
+            }
+            return {
+                title: current,
+                quarters: quarters,
+                category:'',
+                yoy:'',
+                priority: '',
+            }
+        })
+
+        return arrays;
+    }
+
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target?.files?.[0];
 
@@ -225,7 +256,6 @@ function ImportData(props: ImportDataProps) {
                 const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
                 const parsedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
                 let tableData: { tableName: string, header: string[], rows: any[][] }[] = [];
                 let currentTable: any[][] | null = null;
                 let header: string[] | null = null;
@@ -257,19 +287,27 @@ function ImportData(props: ImportDataProps) {
                     header,
                     rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
                 }));
+
                 let arrayOfObjects: {}[] = [];
                 let basicDetails: {}[] = [];
 
                 if (filteredTableData?.length > 1) {
-                    arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
                     basicDetails = convertDataToArrayOfObjects(filteredTableData[0].rows, true);
+                    if (basicDetails[0]?.QuaterSpecificTable === 'Enable'){
+                        arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows)
+                    }else {
+                        arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
+                    }
                 }
+                const quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
                 setVal({
                     company: basicDetails[0]?.Company,
                     name: basicDetails[0]?.TermsName,
-                    quarterWiseTable: basicDetails[0]?.QuaterSpecificTable === 'Enable',
+                    quarterWiseTable: quarterWiseTable,
                     summaryOnly: basicDetails[0]?.SummaryOnly === 'Enable',
-                    variables: arrayOfObjects?.map(current => {
+                    title: basicDetails[0]?.Title,
+                    description: basicDetails[0]?.Description,
+                    variables: quarterWiseTable ? arrayOfObjects : arrayOfObjects?.map(current => {
                         return {
                             title: current?.Variables?.toString() || '',
                             category: current?.Category?.toString() || '',
@@ -291,7 +329,6 @@ function ImportData(props: ImportDataProps) {
             reader.readAsArrayBuffer(file);
         }
     };
-
     return (
         <Modal
             showModal={true}

@@ -209,9 +209,13 @@ const GET_TERMS_BY_COMPANY = gql`query getKpiTermsByCompanyId(
 
 const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
   $termId: String!
+  $quarter: Float
+  $year: Float
   ) {
     getViewForTerm(
     termId: $termId
+    quarter: $quarter
+    year: $year
   ) {
       headers
       rows{
@@ -323,8 +327,12 @@ const DELETE_CHART_BY_ID = gql`mutation deleteTermChartById(
 }`;
 
 const ADD_UPDATE_TERM_CHART_MUTATION = gql`
-  mutation AddUpdateTermChart($chartInfo: addUpdateTermChart!, $keysInfo: TermChartDependencyKey) {
-    addUpdateTermChart(chartInfo: $chartInfo, keysInfo: $keysInfo) {
+  mutation AddUpdateTermChart(
+    $chartInfo: addUpdateTermChart!, 
+    ) {
+    addUpdateTermChart(
+      chartInfo: $chartInfo, 
+      ) {
       id
       title
     }
@@ -341,6 +349,18 @@ const GET_CHART_BY_KPI_TERM = gql`query getChartsByKpiTerm(
       title
       type
       visible
+      termVariables {
+        id
+        title
+      }
+      kpiTerm {
+        id
+        name
+        company
+        quarterWiseTable
+        summaryOnly
+        updatedAt
+      }
   }
 }`;
 

@@ -6,6 +6,7 @@ import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
 
 export interface TableProps {
   termId: string;
+  selectedTerm: string;
 }
 
 export interface Row {
@@ -20,11 +21,17 @@ export interface Cell {
   quarter: number;
 }
 
-export default function Variable({ termId }: TableProps) {
+export default function Variable({ termId, selectedTerm }: TableProps) {
+
   const [getTermView, { data: termView, refetch: refetchTermView }] =
     useLazyQuery(GET_VIEW_FOR_TERM, {
       variables: {
         termId: termId,
+        ...(
+          selectedTerm?.quarterWiseTable && {
+            quarter: 1,
+            year: 2023,
+      })
       },
     });
 
@@ -66,7 +73,7 @@ export default function Variable({ termId }: TableProps) {
         <thead className="w-full sticky top-0 z-20">
           <THR>
             <>
-              <TH>Title</TH>
+              {!selectedTerm?.quarterWiseTable && <TH>Title</TH>}
               {headers?.map((current: any) => {
                 return <TH key={current}>{current}</TH>;
               })}
@@ -78,7 +85,8 @@ export default function Variable({ termId }: TableProps) {
             return (
               <TDR key={index}>
                 <>
-                  <TD>{current.title ?? ""}</TD>
+                  {!selectedTerm?.quarterWiseTable && <TD>{current.title ?? ""}</TD>}
+                  
                   {current.cells.map((cur) => {
                     return (
                       <TD

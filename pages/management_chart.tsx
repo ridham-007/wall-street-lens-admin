@@ -147,7 +147,7 @@ export default function FinancialPage() {
           </button>
         </div>
         <div>
-          {<ParameterTable data={chartData} refetch={setRefetch}/>}
+          {<ParameterTable company={company} data={chartData} refetch={setRefetch}/>}
         </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter
