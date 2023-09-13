@@ -242,9 +242,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
           chartInfo: {
             title: val.title,
             type: val.graph,
-            visible: val.visible
-          },
-          keysInfo: {
+            visible: val.visible,
             termId: val.term,
             variableIds: selectedVariablesArr?.map(current => current?.id),
           },

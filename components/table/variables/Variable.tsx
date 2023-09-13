@@ -21,11 +21,13 @@ export interface Cell {
   value: string;
   year: number;
   quarter: number;
-  metadata: string;
+  groupKey: string;
+  quarterId: string;
+  termId: string;
+  variableId: string;
 }
 
 export default function Variable({ termId, selectedTerm, year, quarter }: TableProps) {
-  console.log({year, quarter})
   const [getTermView, { data: termView, refetch: refetchTermView }] =
     useLazyQuery(GET_VIEW_FOR_TERM, {
       variables: {
@@ -51,10 +53,14 @@ export default function Variable({ termId, selectedTerm, year, quarter }: TableP
   const [updateValue] = useMutation(UPDATE_MAPPED_VALUE);
   const { headers = [], rows = [] }: { headers: string[]; rows: Row[] } =
     termView?.getViewForTerm || {};
+
+  const checkValidId = (id: string) => {
+    return !!id && !id.startsWith('Dummy')
+  }
   const onSave = async (
     id: string, 
     value: string, 
-    metadata:string,
+    groupKey:string,
     quarterId: string,
     termId: string,
     variableId: string,
@@ -62,11 +68,11 @@ export default function Variable({ termId, selectedTerm, year, quarter }: TableP
     await updateValue({
       variables: {
         mappingInfo: {
-          ...(!!id && { id }),
+          ...(checkValidId(id) && { id }),
           value: value,
-          metaData: metadata,
+          groupKey: groupKey,
         },
-        ...(!id && {
+        ...(!checkValidId(id) && {
           quarterId: quarterId,
           termId: termId,
           variableId: variableId,
@@ -92,7 +98,7 @@ export default function Variable({ termId, selectedTerm, year, quarter }: TableP
         <thead className="w-full sticky top-0 z-20">
           <THR>
             <>
-              {!selectedTerm?.quarterWiseTable && <TH>Title</TH>}
+              {!selectedTerm?.quarterWiseTable && <TH>KPI Variable</TH>}
               {headers?.map((current: any) => {
                 return <TH key={current}>{current}</TH>;
               })}
@@ -118,7 +124,7 @@ export default function Variable({ termId, selectedTerm, year, quarter }: TableP
                             title: current.title,
                             year: cur.year,
                             quarter: cur.quarter,
-                            metadata: cur.metadata,
+                            groupKey: cur.groupKey,
                             quarterId: cur.quarterId,
                             termId: cur.termId,
                             variableId: cur.variableId
@@ -160,7 +166,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
       props.onSave(
           props.cellData.id,
           val,
-          props.cellData.metadata,
+          props.cellData.groupKey,
           props?.cellData?.quarterId,
           props?.cellData?.termId,
           props?.cellData?.variableId,

@@ -73,16 +73,19 @@ export default function FinancialPage() {
     }, [termsData])
 
 
-    const onAddUpdateParameter = async (data: any) => {
+    const onAddUpdateParameter = async (sheetsData: any) => {
         setShowLoader(true);
-        await bulkUpload({
-            variables: {
-                bulkUpload: {
-                    ...data,
-                }
-            },
-        })
+        for (let i = 0; i < sheetsData?.length ; i++){
+            await bulkUpload({
+                variables: {
+                    bulkUpload: {
+                        ...sheetsData[i],
+                    }
+                },
+            })
+        }
         setShowLoader(false);
+        setRefetch(true);
     };
 
     const [activeTab, setActiveTab] = useState('Variables');
@@ -129,16 +132,16 @@ export default function FinancialPage() {
                         onClick={() => handleTabClick('Variables')}
                     />
                     <TabButton
-                        label="Terms"
+                        label="KPI Terms"
                         activeTab={activeTab}
-                        onClick={() => handleTabClick('Terms')}
+                        onClick={() => handleTabClick('KPI Terms')}
                     />
                 </div>
                 {activeTab === 'Variables' ? <VariableTable term={term} data={termsVaribles} setTerm={setTerm} setRefetch={setRefetch} termsData={termsData} /> : <TermsTable data={termsData} company={company} setRefetch={setRefetch} />}
                 {showImport && (
                     <ImportData
                         onSuccess={onAddUpdateParameter}
-                        onClose={() => { setShowImport(false)}}
+                        onClose={() => { setShowImport(false) }}
                     ></ImportData>
                 )}
 
@@ -153,22 +156,44 @@ interface ImportDataProps {
     data?: any;
 }
 
+export interface SheetValue {
+    company: string;
+    name: string;
+    quarterWiseTable: boolean;
+    summaryOnly: boolean;
+    variables: Variable[];
+    title: string;
+    description: string;
+}
+
+
+export interface Variable {
+    title: string;
+    category: string;
+    priority: string;
+    yoy: string;
+    quarters: Quarter[];
+}
+
+export interface Quarter {
+    quarter: number;
+    year: number;
+    value: string;
+}
+
 function ImportData(props: ImportDataProps) {
+    const [sheetsData, setSheetsData] = useState<SheetValue[]>([]);
     const [val, setVal] = useState({
         company: '',
-        name: '',
-        quarterWiseTable: '',
-        summaryOnly: '',
-        variables: []
     })
 
     const regex = new RegExp('Q[1-4]{1}-[0-9]{4}$');
     const handleOnSave = () => {
-        if (!val.company) {
-            toast('Company is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+        if (!sheetsData.length) {
+            toast('Data is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
             return;
         }
-        props.onSuccess && props.onSuccess(val)
+        props.onSuccess && props.onSuccess(sheetsData)
         props.onClose && props.onClose()
     };
 
@@ -213,12 +238,13 @@ function ImportData(props: ImportDataProps) {
         return result;
     }
 
-    const getArrayofObject = (basicDetails: {}[], rows: any[][]) => {  
+    const getArrayofObject = (basicDetails: {}[], rows: any[][]) => {
         const {
             Quarter,
             Year,
         } = basicDetails[0] || {};
         const keys = rows[0];
+
         keys.push('VisibleToChart');
         const arrays = keys?.map((current, index) => {
             let quarters = [];
@@ -228,15 +254,15 @@ function ImportData(props: ImportDataProps) {
                 quarters.push({
                     quarter: Quarter,
                     year: Year,
-                    value: current ==="VisibleToChart" ? 'false' : values[index].toString(),
+                    value: current === "VisibleToChart" ? 'false' : values[index].toString(),
                     groupKey: i.toString(),
                 })
             }
             return {
                 title: current,
                 quarters: quarters,
-                category:'',
-                yoy:'',
+                category: '',
+                yoy: '',
                 priority: '',
             }
         })
@@ -253,82 +279,85 @@ function ImportData(props: ImportDataProps) {
             reader.onload = async (e) => {
                 const arrayBuffer = e.target?.result as ArrayBuffer;
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                const parsedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                let tableData: { tableName: string, header: string[], rows: any[][] }[] = [];
-                let currentTable: any[][] | null = null;
-                let header: string[] | null = null;
-                let tableName = '';
+                const sheetsArray: SheetValue[] = [];
+                for (const sheetName of workbook.SheetNames) {
+                    const worksheet = workbook.Sheets[sheetName];
+                    const parsedData: Array<any> = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    let tableData: { tableName: string, header: string[], rows: any[][] }[] = [];
+                    let currentTable: any[][] | null = null;
+                    let header: string[] | null = null;
+                    let tableName = '';
 
-                for (const row of parsedData) {
-                    if (row[0] && row[0].toString().startsWith('Table')) {
-                        if (currentTable) {
-                            tableData.push({ tableName, header: header!, rows: currentTable });
+                    for (const row of parsedData) {
+                        if (row[0] && row[0].toString().startsWith('Table')) {
+                            if (currentTable) {
+                                tableData.push({ tableName, header: header!, rows: currentTable });
+                            }
+                            currentTable = [];
+                            header = row.slice(1);
+                            tableName = row[0].toString();
+                        } else if (currentTable) {
+                            const sanitizedRow = row.map((cell: null | undefined) => {
+                                return cell !== null && cell !== undefined ? cell : ' '
+                            }
+                            );
+                            currentTable.push(sanitizedRow);
                         }
-                        currentTable = [];
-                        header = row.slice(1);
-                        tableName = row[0].toString();
-                    } else if (currentTable) {
-                        const sanitizedRow = row.map((cell: null | undefined) => {
-                            return cell !== null && cell !== undefined ? cell : ' '
-                        }
-                        );
-                        currentTable.push(sanitizedRow);
                     }
-                }
 
-                if (currentTable) {
-                    tableData.push({ tableName, header: header!, rows: currentTable });
-                }
-
-                const filteredTableData = tableData.map(({ tableName, header, rows }) => ({
-                    tableName,
-                    header,
-                    rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
-                }));
-
-                let arrayOfObjects: {}[] = [];
-                let basicDetails: {}[] = [];
-
-                if (filteredTableData?.length > 1) {
-                    basicDetails = convertDataToArrayOfObjects(filteredTableData[0].rows, true);
-                    if (basicDetails[0]?.QuaterSpecificTable === 'Enable'){
-                        arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows)
-                    }else {
-                        arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
+                    if (currentTable) {
+                        tableData.push({ tableName, header: header!, rows: currentTable });
                     }
-                }
-                const quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
-                setVal({
-                    company: basicDetails[0]?.Company,
-                    name: basicDetails[0]?.TermsName,
-                    quarterWiseTable: quarterWiseTable,
-                    summaryOnly: basicDetails[0]?.SummaryOnly === 'Enable',
-                    title: basicDetails[0]?.Title,
-                    description: basicDetails[0]?.Description,
-                    variables: quarterWiseTable ? arrayOfObjects : arrayOfObjects?.map(current => {
-                        return {
-                            title: current?.Variables?.toString() || '',
-                            category: current?.Category?.toString() || '',
-                            priority: current?.Priority?.toString() || '0',
-                            yoy: current?.YoY?.toString() || '0',
-                            quarters: current?.quarters?.map((cur: { quarter: any; year: any; value: any; }) => {
-                                return {
-                                    quarter: Number(cur?.quarter),
-                                    year: Number(cur?.year),
-                                    value: cur?.value?.toString() || '',
-                                }
-                            })
+
+                    const filteredTableData = tableData.map(({ tableName, header, rows }) => ({
+                        tableName,
+                        header,
+                        rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
+                    }));
+
+                    let arrayOfObjects: Array<any> = [];
+                    let basicDetails: Array<any> = [];
+
+                    if (filteredTableData?.length > 1) {
+                        basicDetails = convertDataToArrayOfObjects(filteredTableData[0].rows, true);
+                        if (basicDetails[0]?.QuaterSpecificTable === 'Enable') {
+                            arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows)
+                        } else {
+                            arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
                         }
+                    }
+                    const quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
+                    sheetsArray.push({
+                        company: basicDetails[0]?.Company,
+                        name: basicDetails[0]?.TermsName,
+                        quarterWiseTable: quarterWiseTable,
+                        summaryOnly: basicDetails[0]?.SummaryOnly === 'Enable',
+                        title: basicDetails[0]?.Title || '',
+                        description: basicDetails[0]?.Description,
+                        variables: quarterWiseTable ? arrayOfObjects : arrayOfObjects?.map(current => {
+                            return {
+                                title: current?.Variables?.toString() || '',
+                                category: current?.Category?.toString() || '',
+                                priority: current?.Priority?.toString() || '0',
+                                yoy: current?.YoY?.toString() || '0',
+                                quarters: current?.quarters?.map((cur: { quarter: any; year: any; value: any; }) => {
+                                    return {
+                                        quarter: Number(cur?.quarter),
+                                        year: Number(cur?.year),
+                                        value: cur?.value?.toString() || '',
+                                    }
+                                })
+                            }
+                        })
                     })
-                })
-
+                }
+                setSheetsData(sheetsArray);
             };
 
             reader.readAsArrayBuffer(file);
         }
     };
+
     return (
         <Modal
             showModal={true}

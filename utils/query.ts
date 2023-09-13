@@ -225,7 +225,8 @@ const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
           value
           quarter
           year
-          metadata
+          groupKey
+          extraInfo
           termId
           variableId
           quarterId

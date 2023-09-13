@@ -329,22 +329,6 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                         </div>
-                        <div className="flex flex-col">
-                            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-                                Graph Type
-                            </label>
-                            <select
-                                id="graphType"
-                                name="graph"
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                value={val.graph}
-                                onChange={handleOnChange}
-                            >
-                                <option value="">Select a option</option>
-                                <option value="Bar">Bar Chart</option>
-                                <option value="Linear">Linear Graph</option>
-                            </select>
-                        </div>
                         <div className="flex flex-col mb-[20px]">
                             <label htmlFor="quarter" className="text-sm  text-gray-700">
                                 KPIs Term:
@@ -367,6 +351,23 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                     }
                                     )
                                 }
+                            </select>
+                        </div>
+                        <div className="flex flex-col">
+                            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+                                Graph Type
+                            </label>
+                            <select
+                                id="graphType"
+                                name="graph"
+                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                value={val.graph}
+                                onChange={handleOnChange}
+                            >
+                                <option value="">Select a option</option>
+                                <option value="Bar">Bar Chart</option>
+                                <option value="Line">Line Chart</option>
+                                <option value="Stacked">Stacked Bar Chart</option>
                             </select>
                         </div>
                         <div className="flex flex-col">

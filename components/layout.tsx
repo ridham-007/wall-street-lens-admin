@@ -46,6 +46,36 @@ const CHANGE_PASSWORD = gql`
   }
 `;
 
+const industryData = [
+  {
+    industry: "Technology",
+    subIndustries: ["Software Development"]
+  },
+  {
+    industry: "Automotive",
+    subIndustries: ["Electric Vehicles"]
+  },
+  {
+    industry: "Retail and Technology",
+    subIndustries: ["E-commerce",]
+  },
+];
+
+const subIndustryDataArray = [
+  {
+    name: "Software Development",
+    companies: ["Microsoft", "Google", "Facebook"],
+  },
+  {
+    name: "Electric Vehicles",
+    companies: ["TESLA", "Rivian Automotive"],
+  },
+  {
+    name: "E-commerce",
+    companies: ["Amazon.com, Inc.", "Alibaba Group", "eBay Inc."],
+  },
+];
+
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
 
@@ -56,6 +86,8 @@ export default function Layout(props: LayoutProps) {
   const [reEnterPassword, setReEnterPassword] = useState("");
   const ref = useRef<HTMLInputElement | null>(null);
   const [company, setCompany] = useState('TESLA');
+  const [subIndustry, setSubIndustry] = useState('Electric Vehicles');
+  const [industry, setIndustry] = useState('Automotive');
   const router = useRouter();
 
   const [updatePassword, { data, error, loading }] = useMutation(
@@ -151,8 +183,26 @@ export default function Layout(props: LayoutProps) {
     router.push(`${router.pathname}?company=${company}`);
   }, [company])
 
-  const handleOnChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-    setCompany(event.target.value)
+  // const handleOnChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+  //   setCompany(event.target.value)
+  // }
+
+  const handleOnChange = (event: { target: { value: SetStateAction<string>; name: string; }; }) => {
+    switch (event.target.name) {
+      case 'industry':
+        setIndustry(event.target.value);
+        setCompany('');
+        setSubIndustry('');
+        break;
+      case 'subindustry':
+        setSubIndustry(event.target.value);
+        setCompany('');
+        break;
+      case 'company':
+        setCompany(event.target.value);
+        break;
+
+    }
   }
 
   return (
@@ -181,7 +231,45 @@ export default function Layout(props: LayoutProps) {
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Wall Street Lens
           </h1>
-          <div className="flex gap-[20px] items-center mr-auto ml-[20px]">
+          
+          <div className="flex gap-[20px] items-center ml-[20px]">
+            <select
+              id="quarter"
+              name="industry"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={industry}
+              onChange={handleOnChange}
+            >
+              <option value="">Select a option</option>
+              {
+                industryData.map((ele: { industry: string, }) => {
+                  return <option value={ele.industry}>{ele.industry}</option>;
+                })
+              }
+            </select>
+          </div>
+          <div className="flex gap-[20px] items-center mx-[20px]">
+            <select
+              id="quarter"
+              name="subindustry"
+              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              value={subIndustry}
+              onChange={handleOnChange}
+            >
+              <option value="">Select a option</option>
+              {
+                industryData.map((ele: { industry: string, subIndustries: string[] }) => {
+                  if (ele.industry === industry) {
+                    return ele.subIndustries.map((val) => {
+                      return <option value={val}>{val}</option>;
+                    });
+                  }
+                })
+              }
+
+            </select>
+          </div>
+          <div className="flex gap-[20px] items-center mr-auto">
             <select
               id="quarter"
               name="company"
@@ -190,8 +278,15 @@ export default function Layout(props: LayoutProps) {
               onChange={handleOnChange}
             >
               <option value="">Select a option</option>
-              <option value="TESLA">TESLA</option>
-              <option value="HSBC">HSBC</option>
+              {
+                subIndustryDataArray.map((ele: { name: string, companies: string[] }) => {
+                  if (ele.name === subIndustry) {
+                    return ele.companies.map((val) => {
+                      return <option value={val}>{val}</option>;
+                    });
+                  }
+                })
+              }
             </select>
           </div>
           <div className="flex align-right items-center">
