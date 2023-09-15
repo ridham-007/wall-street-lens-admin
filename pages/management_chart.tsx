@@ -399,9 +399,43 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 options={updatedOptions}
                 selectedValues={selectedVariablesArr}
                 showCheckbox
-                className="max-w-[250px]"
+                className=" mt-1 max-w-[250px]"
               />
+              
             </div>
+            <div className="flex flex-col">
+              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+                X-axis
+              </label>
+              <select
+                id="x-axis"
+                name="x-axis"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={val.graph}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                <option value="Bar">Bar Chart</option>
+                <option value="Linear">Linear Graph</option>
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
+                Y-axis
+              </label>
+              <select
+                id="y-axis"
+                name="yaxis"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={val.graph}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                <option value="Bar">Bar Chart</option>
+                <option value="Linear">Linear Graph</option>
+              </select>
+            </div>
+            
 
             <div className="flex flex-row">
               <label htmlFor="quarter" className="text-sm font-medium  text-gray-700">
