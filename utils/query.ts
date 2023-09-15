@@ -375,6 +375,33 @@ const GET_CHART_BY_KPI_TERM = gql`query getChartsByKpiTerm(
   }
 }`;
 
+const ADD_QUARTER = gql`
+  mutation addUpdateQuarter(
+    $variableInfo: AddUpdateQuarterDetail!,
+    $termId: String!
+    ) {
+    addUpdateQuarter(
+      variableInfo: $variableInfo,
+      termId: $termId
+      ) {
+      id
+    }
+  }
+`;
+
+
+const DELTE_QUARTER = gql`
+  mutation deleteValuesByQuarter(
+    $quarterId: String!
+    ) {
+    deleteValuesByQuarter(
+      quarterId: $quarterId
+      ) {
+      success
+    }
+  }
+`;
+
 export {
   ADD_FINANCIAL_SUMMARY_PARAMETER,
   GET_FINANCIAL_SUMMARY_PARAMETERS,
@@ -401,4 +428,6 @@ export {
   ADD_UPDATE_TERM_CHART_MUTATION,
   GET_CHART_BY_KPI_TERM,
   DELETE_CHART_BY_ID,
+  ADD_QUARTER,
+  DELTE_QUARTER,
 }

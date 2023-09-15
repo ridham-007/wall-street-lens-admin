@@ -2,11 +2,12 @@ import { SetStateAction, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import Variable from "@/components/table/variables/Variable";
 import "react-toastify/dist/ReactToastify.css";
-import { GET_TERMS_BY_COMPANY } from "@/utils/query";
-import { useLazyQuery } from "@apollo/client";
+import { DELTE_QUARTER, GET_TERMS_BY_COMPANY } from "@/utils/query";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
 import YearDropdown from "@/components/year_dropdown/year_dropdown";
 import { Modal } from "@/components/model";
+import { ADD_QUARTER } from "@/utils/query";
 
 
 interface KpiTerm {
@@ -25,6 +26,31 @@ export default function VariableDetails() {
   const [quarter, setQuarter] = useState('1');
   const [year, setYear] = useState('2023');
   const [showQuarter, setShowQuarter] = useState(false);
+  const [addQuarter] = useMutation(ADD_QUARTER);
+  const [deleteQuarter] = useMutation(DELTE_QUARTER);
+
+  const [showDelete, setShowDelete] = useState(false);
+
+
+  const handleOnAddQuarter = async (val: { quarter: any; year: any; }) => {
+    await addQuarter({
+      variables: {
+        variableInfo: {
+          quarter: Number(val.quarter),
+          year: Number(val.year)
+        },
+        termId: termId,
+      },
+    });
+  }
+
+  const handleOnDeleteQuarter = async (id: any) => {
+    await deleteQuarter({
+      variables: {
+        quarterId: id,
+      },
+    });
+  }
 
 
   const [getTermsDetails, { data: termsData }] =
@@ -134,7 +160,9 @@ export default function VariableDetails() {
           </button>
         </div>
         {!!termId && <Variable termId={termId} year={year} quarter={quarter} selectedTerm={selectedTerm}/>}
-        {showQuarter && (<QuarterData/>)}
+        {showQuarter && (<QuarterData onSuccess={handleOnAddQuarter} onClose={() => {setShowQuarter(false)}}/>)}
+        {showDelete && (<DeleteVariable onSuccess={handleOnDeleteQuarter} onClose={() => { setShowDelete(false) }} />)}
+
       </>
     </Layout>
   );
@@ -153,11 +181,22 @@ function QuarterData(props: QuarterDataProps) {
     year: "2023",
   });
 
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    const name = e.target.name;
+
+    setVal((prevVal) => ({
+      ...prevVal,
+      [name]: value
+    }));
+  };
+
   const handleOnSave = () => {
     if (!val.quarter || !val.year) {
-      props.onSuccess && props.onSuccess(val);
-      props.onClose && props.onClose();
+      return;
     };
+    props.onSuccess && props.onSuccess(val);
+    props.onClose && props.onClose();
   }
 
   return (
@@ -172,7 +211,7 @@ function QuarterData(props: QuarterDataProps) {
           <div className="grid gap-4">
             <div className="flex flex-row gap-5">
               <div className="flex flex-row items-center gap-[20px] mb-[20px]">
-                <YearDropdown onChange={(event: { target: { value: SetStateAction<string> }; }) => { setYear(event?.target.value); }} year={year} />
+                <YearDropdown onChange={handleOnChange} year={val.year} />
               </div>
               <div className="flex flex-col mb-[20px]">
                 <label
@@ -185,20 +224,48 @@ function QuarterData(props: QuarterDataProps) {
                   id="quarter"
                   name="quarter"
                   className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  value={quarter}
-                  onChange={(event) => {
-                    setQuarter(event.target?.value);
-                  }}
+                  value={val.quarter}
+                  onChange={handleOnChange}
                 >
                   <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
-                  <option value="4">3</option>
+                  <option value="4">4</option>
                 </select>
               </div>
             </div>
           </div>
         </form>
+      </>
+    </Modal>
+  );
+}
+
+interface DeleteVariableProps {
+  onSuccess?: any;
+  onClose?: any;
+  id?: any;
+}
+
+function DeleteVariable(props: DeleteVariableProps) {
+  const handleOnSave = () => {
+    if (!props?.id) {
+      // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      return;
+    }
+    props.onSuccess && props.onSuccess(props?.id)
+    props.onClose && props.onClose()
+  };
+
+  return (
+    <Modal
+      showModal={true}
+      handleOnSave={handleOnSave}
+      title="Delete a Veriable"
+      onClose={() => props.onClose && props.onClose()}
+    >
+      <>
+        <div>Are you sure you want to delete?</div>
       </>
     </Modal>
   );

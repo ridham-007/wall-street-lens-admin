@@ -3,7 +3,6 @@ import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
-import YearDropdown from "@/components/year_dropdown/year_dropdown";
 
 
 export interface TableProps {
