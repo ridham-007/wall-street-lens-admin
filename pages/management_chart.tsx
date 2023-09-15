@@ -367,7 +367,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               <select
                 id="quarter"
                 name="term"
-                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
                 value={val.term}
                 onChange={handleOnChange}
               >
@@ -399,6 +399,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 options={updatedOptions}
                 selectedValues={selectedVariablesArr}
                 showCheckbox
+                className="max-w-[250px]"
               />
             </div>
 

@@ -84,6 +84,8 @@ const VariableTable = (props: TableProps) => {
     };
 
     const tableData = props?.data?.getVariablesByKpiTerm;
+    const selectedTerm = props?.termsData?.getKpiTermsByCompanyId?.find((cur: { id: any; }) => cur.id === props.term);
+
     return <>
         <div className="flex items-center gap-[20px] justify-between">
             <div 
@@ -150,9 +152,12 @@ const VariableTable = (props: TableProps) => {
                         <>
                             <TH>Name</TH>
                             <TH>Terms name</TH>
-                            <TH>Priority</TH>
-                            <TH>Category</TH>
-                            <TH>YoY</TH>
+                            {!selectedTerm?.quarterWiseTable && (
+                            <>
+                                <TH>Priority</TH>
+                                <TH>Category</TH>
+                                <TH>YoY</TH>
+                            </>)}
                             <TH >Action</TH>
                         </>
                     </THR>
@@ -164,9 +169,12 @@ const VariableTable = (props: TableProps) => {
                         <>
                                 <TD>{current?.title}</TD>
                                 <TD>{current?.kpiTerm?.name}</TD>
-                                <TD>{current?.priority || ''}</TD>
-                                <TD>{current?.category}</TD>
-                                <TD>{current?.yoy}</TD>
+                                {!selectedTerm?.quarterWiseTable && (
+                                <>
+                                    <TD>{current?.priority || ''}</TD>
+                                    <TD>{current?.category}</TD>
+                                    <TD>{current?.yoy}</TD>
+                                </>)}
                             <TD style="text-center" key={uniqueId}>
                                 <>
                                         <div
@@ -197,7 +205,7 @@ const VariableTable = (props: TableProps) => {
                 </tbody>
             </table>
         </div >
-        {show && (<AddUpdateVariable termsData={props.termsData} data={currentData} onClose={() => { setShow(false); setCurrentData({}) }} onSuccess={onAddUpdateQuarter}/>)}
+        {show && (<AddUpdateVariable termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setShow(false); setCurrentData({}); setDeleteId('') }} onSuccess={onAddUpdateQuarter}/>)}
         {deletePopup && <DeleteVariable id={deleteId} onSuccess={onDeleteVeriable} onClose={() => {
             setDeleteId('');
             setDeletePopup(false);
@@ -210,6 +218,7 @@ interface AddUpdateParameterProps {
     onClose?: any;
     data?: any;
     termsData?: any;
+    selectedTerm?: any;
 }
 
 function AddUpdateVariable(props: AddUpdateParameterProps) {
@@ -268,7 +277,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                         </div>
-                        <div className="flex flex-col">
+                        {!props.selectedTerm?.quarterWiseTable && (<div className="flex flex-col">
                             <label
                                 htmlFor="Category"
                                 className="text-sm font-medium text-gray-700"
@@ -284,7 +293,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 required
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
-                        </div>
+                        </div>)}
                         <div className="flex flex-col mb-[20px]">
                             <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
                                 KPIs Term:
@@ -295,6 +304,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                                 value={val.term}
                                 onChange={handleOnChange}
+                                disabled={!!props?.data?.id}
                             >
                                 <option value="">Select a option</option>
                                 {(props?.termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
@@ -306,7 +316,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 })}
                             </select>
                         </div>
-                        <div className="flex flex-col">
+                        {!props.selectedTerm?.quarterWiseTable && (<><div className="flex flex-col">
                             <label
                                 htmlFor="YoY"
                                 className="text-sm font-medium text-gray-700"
@@ -339,7 +349,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 required
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
-                        </div>
+                            </div></>)}
                     </div>
                 </form>
             </>

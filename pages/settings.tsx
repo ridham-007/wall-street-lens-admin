@@ -327,6 +327,8 @@ function ImportData(props: ImportDataProps) {
                         }
                     }
                     const quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
+                    let prevPriority: any;
+                    let prevCategory: any;
                     sheetsArray.push({
                         company: basicDetails[0]?.Company,
                         name: basicDetails[0]?.TermsName,
@@ -335,10 +337,12 @@ function ImportData(props: ImportDataProps) {
                         title: basicDetails[0]?.Title || '',
                         description: basicDetails[0]?.Description,
                         variables: quarterWiseTable ? arrayOfObjects : arrayOfObjects?.map(current => {
+                            prevPriority = !current?.Priority?.toString() ? prevPriority : current?.Priority?.toString();
+                            prevCategory = !current?.Category?.toString() ? prevCategory : current?.Category?.toString();
                             return {
                                 title: current?.Variables?.toString() || '',
-                                category: current?.Category?.toString() || '',
-                                priority: current?.Priority?.toString() || '0',
+                                category: prevCategory || '',
+                                priority: prevPriority || '0',
                                 yoy: current?.YoY?.toString() || '0',
                                 quarters: current?.quarters?.map((cur: { quarter: any; year: any; value: any; }) => {
                                     return {
@@ -367,24 +371,7 @@ function ImportData(props: ImportDataProps) {
         >
             <>
                 <form className="form w-100">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col">
-                            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-                                Company
-                            </label>
-                            <select
-                                id="quarter"
-                                name="company"
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                value={val.company}
-                                onChange={handleOnChange}
-                                disabled
-                            >
-                                <option value="">Select a option</option>
-                                <option value="TESLA">TESLA</option>
-                                <option value="APPLE">APPLE</option>
-                            </select>
-                        </div>
+                    <div className="grid gap-4">
                         <div className="flex flex-col">
                             <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
                                 Select Excel Sheet

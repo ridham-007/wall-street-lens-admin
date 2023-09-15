@@ -242,8 +242,8 @@ export default function Layout(props: LayoutProps) {
             >
               <option value="">Select a option</option>
               {
-                industryData.map((ele: { industry: string, }) => {
-                  return <option value={ele.industry}>{ele.industry}</option>;
+                industryData.map((ele: { industry: string, }, index) => {
+                  return <option key={index}value={ele.industry}>{ele.industry}</option>;
                 })
               }
             </select>
@@ -260,8 +260,8 @@ export default function Layout(props: LayoutProps) {
               {
                 industryData.map((ele: { industry: string, subIndustries: string[] }) => {
                   if (ele.industry === industry) {
-                    return ele.subIndustries.map((val) => {
-                      return <option value={val}>{val}</option>;
+                    return ele.subIndustries.map((val, index) => {
+                      return <option key={index} value={val}>{val}</option>;
                     });
                   }
                 })
@@ -281,8 +281,8 @@ export default function Layout(props: LayoutProps) {
               {
                 subIndustryDataArray.map((ele: { name: string, companies: string[] }) => {
                   if (ele.name === subIndustry) {
-                    return ele.companies.map((val) => {
-                      return <option value={val}>{val}</option>;
+                    return ele.companies.map((val, index) => {
+                      return <option key={index} value={val}>{val}</option>;
                     });
                   }
                 })

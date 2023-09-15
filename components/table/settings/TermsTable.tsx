@@ -109,8 +109,8 @@ const TermsTable = (props: TableProps) => {
                         <>
                             <TH>Name</TH>
                             <TH>Company</TH>
-                            <TH>Quarter Wise Table</TH>
-                            <TH>Summary Only</TH>
+                            {/* <TH>Quarter Wise Table</TH>
+                            <TH>Summary Only</TH> */}
                             <TH >Action</TH>
                         </>
                     </THR>
@@ -122,8 +122,8 @@ const TermsTable = (props: TableProps) => {
                             <>
                                 <TD>{current?.name}</TD>
                                 <TD>{current?.company}</TD>
-                                <TD>{current?.quarterWiseTable? 'Enabled':'Disabled'}</TD>
-                                <TD>{current?.summaryOnly ? 'Enabled' : 'Disabled'}</TD>
+                                {/* <TD>{current?.quarterWiseTable? 'Enabled':'Disabled'}</TD>
+                                <TD>{current?.summaryOnly ? 'Enabled' : 'Disabled'}</TD> */}
                                 <TD style="text-center">
                                     <>
                                         <div
@@ -153,7 +153,7 @@ const TermsTable = (props: TableProps) => {
                 </tbody>
             </table>
         </div >
-        {show && (<AddUpdateTerms data={currentData} onClose={() => { setShow(false) }} onSuccess={onAddUpdateKpiTerm}/>)}
+        {show && (<AddUpdateTerms data={currentData} onClose={() => { setShow(false); setCurrentData({}) }} onSuccess={onAddUpdateKpiTerm}/>)}
         {deletePopup && <DeleteTerm id={deleteId} onSuccess={onDeleteKPI} onClose={() => {
             setDeleteId('');
             setDeletePopup(false);
@@ -220,7 +220,7 @@ function AddUpdateTerms(props: AddUpdateTermProps) {
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                         </div>
-                        <div className="flex gap-[10px]">
+                        {!props.data?.id && (<><div className="flex gap-[10px]">
                             <label
                                 htmlFor="quarterwise"
                                 className="text-sm font-medium text-gray-700"
@@ -249,7 +249,7 @@ function AddUpdateTerms(props: AddUpdateTermProps) {
                                 checked={val.summaryOnly}
                                 onChange={handleOnChange}
                             />
-                        </div>
+                            </div></>)}
                     </div>
                 </form>
             </>
