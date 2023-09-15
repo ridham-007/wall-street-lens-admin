@@ -1,8 +1,9 @@
-import { Key, useEffect, useState } from "react";
+import { Key, SetStateAction, useEffect, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
+import YearDropdown from "@/components/year_dropdown/year_dropdown";
 
 export interface TableProps {
   termId: string;
@@ -49,6 +50,7 @@ export default function Variable({ termId, selectedTerm, year, quarter }: TableP
     }, [year, quarter])
 
   const [show, setShow] = useState(false);
+  const [quarterShow, setAddQuarterShow] = useState(false);
   const [cellData, setCellData] = useState({});
   const [updateValue] = useMutation(UPDATE_MAPPED_VALUE);
   const { headers = [], rows = [] }: { headers: string[]; rows: Row[] } =
@@ -57,6 +59,7 @@ export default function Variable({ termId, selectedTerm, year, quarter }: TableP
   const checkValidId = (id: string) => {
     return !!id && !id.startsWith('Dummy')
   }
+
   const onSave = async (
     id: string, 
     value: string, 
@@ -98,9 +101,9 @@ export default function Variable({ termId, selectedTerm, year, quarter }: TableP
         <thead className="w-full sticky top-0 z-20">
           <THR>
             <>
-              {!selectedTerm?.quarterWiseTable && <TH>KPI Variable</TH>}
+              {!selectedTerm?.quarterWiseTable ? <TH>KPI Variable</TH>: <TH>Year</TH>}
               {headers?.map((current: any) => {
-                return <TH key={current}>{current}</TH>;
+                return  <TH key={current}>{current}</TH>;
               })}
             </>
           </THR>
@@ -110,7 +113,7 @@ export default function Variable({ termId, selectedTerm, year, quarter }: TableP
             return (
               <TDR key={index}>
                 <>
-                  {!selectedTerm?.quarterWiseTable && <TD>{current.title ?? ""}</TD>}
+                  {!selectedTerm?.quarterWiseTable ? <TD>{current.title ?? ""}</TD> : <TD>{year}</TD>}
                   
                   {current.cells.map((cur) => {
                     return (
