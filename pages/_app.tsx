@@ -20,12 +20,11 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     const user = LoginService.getUser();
     const token = LoginService.getToken();
-
     const client = new ApolloClient({
       uri: appConfig.serverGraph,
       cache: new InMemoryCache(),
       headers: {
-        authorization: token ? `bearer ${token}` : "",
+        authorization: token ? `Bearer ${token}` : "",
       },
     });
 

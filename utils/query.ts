@@ -1,6 +1,12 @@
 import { gql } from "@apollo/client";
 
-
+const LOG_IN = gql`
+mutation signIn($username: String!, $password: String!){
+  signIn(username: $username, password: $password){
+    accessToken
+  }
+}
+`
 const ADD_FINANCIAL_SUMMARY_PARAMETER = gql`
 mutation addUpdateFinancialQuarters($financialQuarter:AddUpdateFinancialQuarters!){
   addUpdateFinancialQuarters(
@@ -403,6 +409,7 @@ const DELTE_QUARTER = gql`
 `;
 
 export {
+  LOG_IN,
   ADD_FINANCIAL_SUMMARY_PARAMETER,
   GET_FINANCIAL_SUMMARY_PARAMETERS,
   ADD_QUARTERS_DETAILS,

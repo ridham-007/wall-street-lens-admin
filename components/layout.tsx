@@ -154,7 +154,7 @@ export default function Layout(props: LayoutProps) {
   const logout = () => {
     LoginService.deleteToken();
     LoginService.deleteUser();
-    // window.location.href = "/login";
+    window.location.href = "/login";
   };
 
   const handleOpen = () => {
@@ -178,7 +178,7 @@ export default function Layout(props: LayoutProps) {
       updatePassword();
     }
   };
-  
+
   useEffect(() => {
     router.push(`${router.pathname}?company=${company}`);
   }, [company])
@@ -231,7 +231,7 @@ export default function Layout(props: LayoutProps) {
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Wall Street Lens
           </h1>
-          
+
           <div className="flex gap-[20px] items-center ml-[20px]">
             <select
               id="quarter"
@@ -243,7 +243,7 @@ export default function Layout(props: LayoutProps) {
               <option value="">Select a option</option>
               {
                 industryData.map((ele: { industry: string, }, index) => {
-                  return <option key={index}value={ele.industry}>{ele.industry}</option>;
+                  return <option key={index} value={ele.industry}>{ele.industry}</option>;
                 })
               }
             </select>
@@ -518,11 +518,10 @@ export default function Layout(props: LayoutProps) {
 
               <Link href={`/variable_details?company=${company}`}>
                 <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.variable_details
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.variable_details
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -543,11 +542,10 @@ export default function Layout(props: LayoutProps) {
               </Link>
               <Link href={`/management_chart?company=${company}`}>
                 <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.management_chart
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.management_chart
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -569,8 +567,8 @@ export default function Layout(props: LayoutProps) {
               <Link href={`/settings?company=${company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.settings
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
                     }`}
                 >
                   <svg

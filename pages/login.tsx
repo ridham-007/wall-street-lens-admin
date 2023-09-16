@@ -1,18 +1,43 @@
 import { LoginService } from "@/utils/login";
 import Head from "next/head";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { useMutation } from "@apollo/client";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import { LOG_IN } from "@/utils/query";
+import { error } from "console";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [login] = useMutation(LOG_IN);
+
+
   // Below change is temporary, will be updated with token once user module implemented
-  const onLogin = () => {
-    if (email === 'admin@test.com' && password === 'test') {
-      LoginService.saveUser({ email, password });
-      window.location.href = "/financial_summary";
+  const onLogin = async () => {
+    if (email === '' && password === '') {
+      toast('Email or password is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      return;
     }
 
+    await login({
+      variables: {
+        username: email,
+        password: password
+      }
+    }).then((res: any) => {
+      if (res?.data?.signIn?.accessToken) {
+        toast('Login Successfully', { hideProgressBar: false, autoClose: 7000, type: 'success' })
+      }
+      LoginService.saveUser({ email, password });
+      LoginService.saveToken(res?.data?.signIn?.accessToken)
+      window.location.href = "/financial_summary";
+    }).catch((error: any) => {
+      toast('Invalid Email or password', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+    })
   };
 
   useEffect(() => {
@@ -80,6 +105,8 @@ export default function LoginPage() {
           </div>
         </div>
       </main>
+
+      <ToastContainer />
     </>
   );
 }

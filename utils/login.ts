@@ -1,11 +1,23 @@
+import CryptoJS from "crypto-js";
+const SECRET_KEY = "my_secret_key";
+
 export enum LoginStorageKeys {
   "token" = "token",
   "user" = "user",
 }
 
+function encryptString(str: any) {
+  const encrypted = CryptoJS.AES.encrypt(str, SECRET_KEY);
+  return encrypted.toString();
+}
+function decryptString(str: any) {
+  const decrypted = CryptoJS.AES.decrypt(str, SECRET_KEY);
+  return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
 export class LoginService {
   static saveToken(token: string) {
-    localStorage.setItem(LoginStorageKeys.token, token);
+    localStorage.setItem(LoginStorageKeys.token, encryptString(token));
   }
 
   static deleteToken() {
@@ -14,7 +26,8 @@ export class LoginService {
 
   static getToken() {
     try {
-      const token = localStorage.getItem(LoginStorageKeys.token);
+      const decryptToken = localStorage.getItem(LoginStorageKeys.token);
+      var token = decryptString(decryptToken || "")
       if (!token) throw token;
       return token;
     } catch (err) {
@@ -29,7 +42,7 @@ export class LoginService {
   static saveUser(user: any) {
     try {
       if (user)
-        localStorage.setItem(LoginStorageKeys.user, JSON.stringify(user));
+        localStorage.setItem(LoginStorageKeys.user, encryptString(JSON.stringify(user)));
       return user;
     } catch {
       return null;
@@ -38,12 +51,11 @@ export class LoginService {
 
   static getUser() {
     try {
-      const user = JSON.parse(
-        localStorage.getItem(LoginStorageKeys.user) || ""
-      );
+      const decryptUserData = localStorage.getItem(LoginStorageKeys.user) || "";
+      var user = decryptString(decryptUserData || "");
 
       if (!user) throw user;
-      return user;
+      return JSON.parse(user);
     } catch (err) {
       return null;
     }
