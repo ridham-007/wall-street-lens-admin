@@ -1,6 +1,7 @@
 import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
+import Loader from "@/components/loader";
 import { ADD_UPDATE_TERM_VERIABLE, DELETE_VERIABLE_BY_ID } from "@/utils/query";
 import { useMutation } from "@apollo/client";
 
@@ -25,6 +26,7 @@ interface KpiTerm {
 const VariableTable = (props: TableProps) => {
     const[show, setShow] = useState(false);
     const [uniqueId, setUniqueId] = useState('');
+    const [showLoader, setShowLoader] = useState(false);
     const [currentData, setCurrentData] = useState({});
     const [deletePopup, setDeletePopup] = useState(false);
     const [deleteId, setDeleteId] = useState('');
@@ -34,6 +36,7 @@ const VariableTable = (props: TableProps) => {
 
 
     const onAddUpdateQuarter = async (perameters: any) => {
+        setShowLoader(true);
         await addOrUpdateVeriable({
             variables: {
                 variableInfo: {
@@ -46,6 +49,7 @@ const VariableTable = (props: TableProps) => {
                 termId: perameters?.term,
             }
         })
+        setShowLoader(false);
         props.setRefetch(true);
     }
 
@@ -87,6 +91,7 @@ const VariableTable = (props: TableProps) => {
     const selectedTerm = props?.termsData?.getKpiTermsByCompanyId?.find((cur: { id: any; }) => cur.id === props.term);
 
     return <>
+        {showLoader && (<Loader />)}
         <div className="flex items-center gap-[20px] justify-between">
             <div 
                 className="w-full flex justify-start mb-[20px]"
@@ -379,6 +384,7 @@ function DeleteVariable(props: DeleteVariableProps) {
             handleOnSave={handleOnSave}
             title="Delete a Veriable"
             onClose={() => props.onClose && props.onClose()}
+            confirmButton="Delete"
         >
             <>
                 <div>Are you sure you want to delete?</div>

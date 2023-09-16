@@ -3,44 +3,49 @@ import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 import ParameterTable from "@/components/table/chart/ParameterTable";
-import Multiselect from 'multiselect-react-dropdown';
-import { ADD_UPDATE_TERM_CHART_MUTATION, GET_CHART_BY_KPI_TERM } from "@/utils/query";
+import Multiselect from "multiselect-react-dropdown";
+import {
+  ADD_UPDATE_TERM_CHART_MUTATION,
+  GET_CHART_BY_KPI_TERM,
+} from "@/utils/query";
 
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
-const selectedCompany = [{
-  id: 1,
-  name: 'TESLA',
-}]
+const selectedCompany = [
+  {
+    id: 1,
+    name: "TESLA",
+  },
+];
 
 export default function FinancialPage() {
   const [addUpdateParameter, setAddUpdateParameter] = useState(false);
   const [refetch, setRefetch] = useState(false);
-  const [term, setTerm] = useState('');
+  const [term, setTerm] = useState("");
   const [isOpenAction, setIsOpenAction] = useState("");
-  const [company, setCompany] = useState('');
+  const [company, setCompany] = useState("");
   const router = useRouter();
 
   useEffect(() => {
-    setCompany(router.query.company)
-  }, [router.query])
+    setCompany(router.query.company);
+  }, [router.query]);
 
   const [getTermsDetails, { data: termsData, refetch: refetchTerms }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
       variables: {
         companyId: company,
       },
-  });
+    });
 
   const [getChartDetails, { data: chartData, refetch: refetchCharts }] =
     useLazyQuery(GET_CHART_BY_KPI_TERM, {
       variables: {
         termId: term,
       },
-  });
+    });
 
   useEffect(() => {
     if (!!company && refetch) {
@@ -48,21 +53,19 @@ export default function FinancialPage() {
       refetchCharts();
     }
     setRefetch(false);
-  }, [refetch])
-
+  }, [refetch]);
 
   useEffect(() => {
     getChartDetails();
-  }, [term])
+  }, [term]);
 
   useEffect(() => {
-    if (termsData?.getKpiTermsByCompanyId.length){
-      setTerm(termsData?.getKpiTermsByCompanyId[0]?.id)
+    if (termsData?.getKpiTermsByCompanyId.length) {
+      setTerm(termsData?.getKpiTermsByCompanyId[0]?.id);
     } else {
-      setTerm('');
+      setTerm("");
     }
-    
-  }, [termsData])
+  }, [termsData]);
 
   useEffect(() => {
     getTermsDetails();
@@ -83,7 +86,6 @@ export default function FinancialPage() {
 
     document.addEventListener("mousedown", checkIfClickedOutside);
 
-
     return () => {
       // Cleanup the event listener
       document.removeEventListener("mousedown", checkIfClickedOutside);
@@ -95,7 +97,10 @@ export default function FinancialPage() {
       <>
         <div className="flex justify-between pr-4 gap-4 mb-4">
           <div className="flex items-center">
-            <label htmlFor="quarter" className="text-sm  text-gray-700 mr-[20px]">
+            <label
+              htmlFor="quarter"
+              className="text-sm  text-gray-700 mr-[20px]"
+            >
               KPIs Term:
             </label>
             <select
@@ -103,19 +108,18 @@ export default function FinancialPage() {
               name="term"
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
               value={term}
-              onChange={(event) => { setTerm(event?.target?.value)}}
+              onChange={(event) => {
+                setTerm(event?.target?.value);
+              }}
             >
               <option value="">Select a option</option>
-              {
-                (termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
-                  return (
-                    <option key={cur.id} value={cur?.id}>
-                      {cur?.name}
-                    </option>
-                  );
-                }
-                )
-              }
+              {(termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
+                return (
+                  <option key={cur.id} value={cur?.id}>
+                    {cur?.name}
+                  </option>
+                );
+              })}
             </select>
           </div>
           <button
@@ -147,20 +151,27 @@ export default function FinancialPage() {
           </button>
         </div>
         <div>
-          {<ParameterTable company={company} data={chartData} refetch={setRefetch}/>}
+          {
+            <ParameterTable
+              company={company}
+              data={chartData}
+              refetch={setRefetch}
+            />
+          }
         </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter
-            onSuccess={() => { }}
-            onClose={() => { setAddUpdateParameter(false) }}
+            onSuccess={() => {}}
+            onClose={() => {
+              setAddUpdateParameter(false);
+            }}
             selectedCompany={selectedCompany}
             company={company}
             refetch={setRefetch}
           ></AddUpdateParaMeter>
         )}
-
       </>
-    </Layout >
+    </Layout>
   );
 }
 
@@ -190,23 +201,25 @@ interface VariablesArray {
   id: string;
 }
 
-
-
-
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [val, setVal] = useState({
     title: "",
     graph: "",
     term: "",
     visible: false,
+    xAxis: "",
+    yAxis: "",
+    group: "",
   });
 
-  const [getTermsDetails, { data: termsData }] =
-    useLazyQuery(GET_TERMS_BY_COMPANY, {
+  const [getTermsDetails, { data: termsData }] = useLazyQuery(
+    GET_TERMS_BY_COMPANY,
+    {
       variables: {
         companyId: props.company,
       },
-    });
+    }
+  );
 
   useEffect(() => {
     getTermsDetails();
@@ -216,45 +229,44 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     GET_VARIBALES_KPI_TERM,
     {
       variables: {
-        termId: val.term || '',
+        termId: val.term || "",
       },
     }
   );
 
   useEffect(() => {
     getVariables();
-  }, [val.term])
+  }, [val.term]);
 
   const [addUpdateTermChart] = useMutation(ADD_UPDATE_TERM_CHART_MUTATION);
 
   const handleAddUpdateTermChart = async () => {
-    if(!val.title || !val.term){
+    if (!val.title || !val.term) {
       toast("Title or term missing", {
         hideProgressBar: false,
         autoClose: 7000,
         type: "error",
       });
-      return
+      return;
     }
     try {
-     await addUpdateTermChart({
+      await addUpdateTermChart({
         variables: {
           chartInfo: {
             title: val.title,
             type: val.graph,
             visible: val.visible,
             termId: val.term,
-            variableIds: selectedVariablesArr?.map(current => current?.id),
+            variableIds: selectedVariablesArr?.map((current) => current?.id),
           },
         },
       });
-      props.refetch(true)
+      props.refetch(true);
     } catch (error) {
       // Handle errors
-      console.error('Mutation error:', error);
+      console.error("Mutation error:", error);
     }
   };
-
 
   const handleOnSave = () => {
     if (!val.title || !val.term) {
@@ -263,20 +275,21 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
         autoClose: 7000,
         type: "error",
       });
-      return
+      return;
     }
     handleAddUpdateTermChart();
-    props.onSuccess && props.onSuccess(val)
-    props.onClose && props.onClose()
+    props.onSuccess && props.onSuccess(val);
+    props.onClose && props.onClose();
   };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
-    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    const value =
+      e.target.type === "checkbox" ? e.target.checked : e.target.value;
     const name = e.target.name;
 
     setVal((prevVal) => ({
       ...prevVal,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -286,11 +299,14 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
   if (termsVaribles?.getVariablesByKpiTerm) {
     const originalData = termsVaribles.getVariablesByKpiTerm;
-    const groupedOptions: Record<string, { cat: string; key: string, id: string }[]> = {};
+    const groupedOptions: Record<
+      string,
+      { cat: string; key: string; id: string }[]
+    > = {};
 
     // Iterate over the original data and group options by the "title" field
     originalData.forEach((item: VariablesArray) => {
-      const { category, title , id} = item;
+      const { category, title, id } = item;
 
       if (title) {
         if (!groupedOptions[title]) {
@@ -315,7 +331,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
   const OnRemoveChip = (selectedList: any[]) => {
     setselectedVariablesArr(selectedList);
-  }
+  };
 
   return (
     <Modal
@@ -344,22 +360,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>
-            <div className="flex flex-col">
-              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-                Graph Type
-              </label>
-              <select
-                id="graphType"
-                name="graph"
-                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={val.graph}
-                onChange={handleOnChange}
-              >
-                <option value="">Select a option</option>
-                <option value="Bar">Bar Chart</option>
-                <option value="Linear">Linear Graph</option>
-              </select>
-            </div>
             <div className="flex flex-col mb-[20px]">
               <label htmlFor="quarter" className="text-sm  text-gray-700">
                 KPIs Term:
@@ -372,77 +372,161 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 onChange={handleOnChange}
               >
                 <option value="">Select a option</option>
-                {
-                  (termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
+                {(termsData?.getKpiTermsByCompanyId ?? []).map(
+                  (cur: KpiTerm) => {
                     return (
                       <option key={cur.id} value={cur?.id}>
                         {cur?.name}
                       </option>
                     );
                   }
-                  )
-                }
+                )}
               </select>
             </div>
             <div className="flex flex-col">
-              <label htmlFor="variables_array" className="text-sm  text-gray-700">
+              <label
+                htmlFor="quarter"
+                className="text-sm font-medium text-gray-700"
+              >
+                Graph Type
+              </label>
+              <select
+                id="graphType"
+                name="graph"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={val.graph}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                <option value="Bar">Bar Chart</option>
+                <option value="Linear">Linear Chart</option>
+                <option value="stackedbar">Stacked Bar Chart</option>
+                
+              </select>
+            </div>
+            {val.graph === "Bar"||val.graph !== "stackedbar" && (
+            <div className="flex flex-col">
+              <label
+                htmlFor="variables_array"
+                className="text-sm  text-gray-700"
+              >
                 Variables Array
               </label>
               <Multiselect
                 id="variables_array"
                 displayValue="key"
                 placeholder="Select options"
-                onKeyPressFn={function noRefCheck() { }}
+                onKeyPressFn={function noRefCheck() {}}
                 onRemove={OnRemoveChip}
-                onSearch={function noRefCheck() { }}
+                onSearch={function noRefCheck() {}}
                 onSelect={handleSelect}
                 options={updatedOptions}
                 selectedValues={selectedVariablesArr}
                 showCheckbox
                 className=" mt-1 max-w-[250px]"
               />
-              
             </div>
-            <div className="flex flex-col">
-              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-                X-axis
-              </label>
-              <select
-                id="x-axis"
-                name="x-axis"
-                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={val.graph}
-                onChange={handleOnChange}
-              >
-                <option value="">Select a option</option>
-                <option value="Bar">Bar Chart</option>
-                <option value="Linear">Linear Graph</option>
-              </select>
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-                Y-axis
-              </label>
-              <select
-                id="y-axis"
-                name="yaxis"
-                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={val.graph}
-                onChange={handleOnChange}
-              >
-                <option value="">Select a option</option>
-                <option value="Bar">Bar Chart</option>
-                <option value="Linear">Linear Graph</option>
-              </select>
-            </div>
-            
+            )}
+
+            {val.graph !== "Linear"  && (
+             
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="quarter"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    X-axis
+                  </label>
+                  <select
+                    id="quarter"
+                    name="xAxis"
+                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
+                    value={val.xAxis}
+                    onChange={handleOnChange}
+                  >
+                    <option value="">Select a option</option>
+                    {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
+                      (cur: VariablesArray) => {
+                        return (
+                          <option key={cur.id} value={cur?.id}>
+                            {cur?.title}
+                          </option>
+                        );
+                      }
+                    )}
+                  </select>
+                </div>
+                )}
+                {val.graph !== "Linear" && (<div className="flex flex-col">
+                  <label
+                    htmlFor="quarter"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Y-axis
+                  </label>
+                  <select
+                    id="quarter"
+                    name="yAxis"
+                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
+                    value={val.yAxis}
+                    onChange={handleOnChange}
+                  >
+                    <option value="">Select a option</option>
+                    {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
+                      (cur: VariablesArray) => {
+                        return (
+                          <option key={cur.id} value={cur?.id}>
+                            {cur?.title}
+                          </option>
+                        );
+                      }
+                    )}
+                  </select>
+                </div>
+                )}
+                  {val.graph === "Bar" || val.graph !== "Linear" &&  (<div className="flex flex-col">
+                  <label
+                    htmlFor="quarter"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Group By
+                  </label>
+                  <select
+                    id="quarter"
+                    name="group"
+                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
+                    value={val.group}
+                    onChange={handleOnChange}
+                  >
+                    <option value="">Select a option</option>
+                    {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
+                      (cur: VariablesArray) => {
+                        return (
+                          <option key={cur.id} value={cur?.id}>
+                            {cur?.title}
+                          </option>
+                        );
+                      }
+                    )}
+                  </select>
+                </div>
+             
+            )}
 
             <div className="flex flex-row">
-              <label htmlFor="quarter" className="text-sm font-medium  text-gray-700">
+              <label
+                htmlFor="quarter"
+                className="text-sm font-medium  text-gray-700"
+              >
                 Visibility
               </label>
               <label className="toggle-switch">
-                <input type="checkbox" checked={val.visible} name='visible' onChange={handleOnChange} />
+                <input
+                  type="checkbox"
+                  checked={val.visible}
+                  name="visible"
+                  onChange={handleOnChange}
+                />
                 <span className="switch" />
               </label>
             </div>

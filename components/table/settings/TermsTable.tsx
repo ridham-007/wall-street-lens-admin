@@ -1,6 +1,7 @@
 import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
+import Loader from "@/components/loader";
 import { useMutation } from "@apollo/client";
 import { ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID } from "@/utils/query";
 
@@ -13,6 +14,7 @@ export interface TableProps {
 const TermsTable = (props: TableProps) => {
     const [isOpenAction, setIsOpenAction] = useState('');
     const [show, setShow] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
     const [currentData, setCurrentData] = useState({});
     const [deletePopup, setDeletePopup] = useState(false);
     const [deleteId, setDeleteId] = useState('');
@@ -20,7 +22,7 @@ const TermsTable = (props: TableProps) => {
     const [deleteKPI] = useMutation(DELETE_KPI_BY_ID);
 
     const onAddUpdateKpiTerm = async (perameters: any) => {
-
+        setShowLoader(true);
         await addOrUpdateKPIterm({
             variables: {
                 kpiInfo: {
@@ -32,6 +34,7 @@ const TermsTable = (props: TableProps) => {
                 },
             }
         })
+        setShowLoader(false);
         props.setRefetch(true);
     }
 
@@ -69,6 +72,7 @@ const TermsTable = (props: TableProps) => {
 
     const tableData = props?.data?.getKpiTermsByCompanyId;
     return <>
+        {showLoader && (<Loader />)}
         <div
             className="w-full flex justify-start mb-[20px]"
         >
@@ -279,6 +283,7 @@ function DeleteTerm(props: DeleteTermProps) {
             handleOnSave={handleOnSave}
             title="Delete a Term"
             onClose={() => props.onClose && props.onClose()}
+            confirmButton="Delete"
         >
             <>
                 <div>Are you sure you want to delete?</div>

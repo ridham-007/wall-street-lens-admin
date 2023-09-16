@@ -2,6 +2,7 @@ import { Key, ReactNode, SetStateAction, useEffect, useRef, useState } from "rea
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import { ADD_UPDATE_TERM_CHART_MUTATION, DELETE_CHART_BY_ID, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
+import Loader from "@/components/loader";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { ToastContainer, toast } from "react-toastify";
 import Multiselect from "multiselect-react-dropdown";
@@ -16,6 +17,7 @@ const ParameterTable = (props: TableProps) => {
     const [showDelete, setShowDelete] = useState(false);
     const [updateChart, setUpdateChart] = useState(false);
     const [currentData, setCurrentData] = useState({});
+    const [showLoader, setShowLoader] = useState(false);
     const [deleteId, setDeleteId] = useState('');
     const [isOpenAction, setIsOpenAction] = useState('');
     const [deleteChart] = useMutation(DELETE_CHART_BY_ID);
@@ -45,16 +47,19 @@ const ParameterTable = (props: TableProps) => {
     };
 
     const onDeleteChart = async (id: any) => {
+        setShowLoader(true);
         await deleteChart({
             variables: {
                 chartId: id,
             }
         })
+        setShowLoader(false);
         props.refetch(true);
     }
 
     const tableData = props.data?.getChartsByKpiTerm;
     return <>
+        {showLoader && (<Loader />)}
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
         }} className="w-[calc((w-screen)-(w-1/5)) overflow-scroll">
@@ -133,6 +138,7 @@ function DeleteChart(props: DeleteChartProps) {
             handleOnSave={handleOnSave}
             title="Delete a Chart"
             onClose={() => props.onClose && props.onClose()}
+            confirmButton="Delete"
         >
             <>
                 <div>Are you sure you want to delete?</div>
