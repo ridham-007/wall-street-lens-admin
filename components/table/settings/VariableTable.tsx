@@ -384,6 +384,7 @@ function DeleteVariable(props: DeleteVariableProps) {
             handleOnSave={handleOnSave}
             title="Delete a Veriable"
             onClose={() => props.onClose && props.onClose()}
+            confirmButton="Delete"
         >
             <>
                 <div>Are you sure you want to delete?</div>
