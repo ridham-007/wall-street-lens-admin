@@ -133,6 +133,7 @@ function DeleteChart(props: DeleteChartProps) {
             handleOnSave={handleOnSave}
             title="Delete a Chart"
             onClose={() => props.onClose && props.onClose()}
+            confirmButton="Delete"
         >
             <>
                 <div>Are you sure you want to delete?</div>

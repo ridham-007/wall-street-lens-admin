@@ -10,6 +10,7 @@ export interface Props {
   children?: JSX.Element;
   onClose: ModalOnClose;
   handleOnSave: ModalOnClose;
+  confirmButton?: string;
 }
 
 /**
@@ -32,7 +33,7 @@ export function Modal(props: Props) {
           <div className="relative w-75 my-6 mx-auto ">
             <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
               <div className="w-full flex items-center  gap-[20px] justify-between p-5 border-b border-solid border-slate-200 rounded-t">
-                <h3 className="text-2xl text-black font-semibold">
+                <h3 className="text-xl text-black font-semibold">
                   {props.title}
                 </h3>
                 <button
@@ -46,7 +47,7 @@ export function Modal(props: Props) {
               </div>
 
               {/*body*/}
-              <div className="relative p-6 flex-auto max-h-[70vh] overflow-auto ">{props.children}</div>
+              <div className="relative p-6 flex-auto max-h-[70vh] overflow-auto">{props.children}</div>
 
               {/*footer*/}
               <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
@@ -62,7 +63,7 @@ export function Modal(props: Props) {
                   type="button"
                   onClick={() => props.handleOnSave()}
                 >
-                  Save
+                  {props.confirmButton || 'save'}
                 </button>
               </div>
             </div>

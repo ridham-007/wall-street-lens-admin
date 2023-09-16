@@ -217,7 +217,11 @@ const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
     quarter: $quarter
     year: $year
   ) {
-      headers
+      headers{
+        id
+        name
+        quarterWise
+      }
       rows{
         title
         cells{
@@ -391,10 +395,10 @@ const ADD_QUARTER = gql`
 
 
 const DELTE_QUARTER = gql`
-  mutation deleteValuesByQuarter(
+  mutation deleteQuarterDetailsByQuarterId(
     $quarterId: String!
     ) {
-    deleteValuesByQuarter(
+    deleteQuarterDetailsByQuarterId(
       quarterId: $quarterId
       ) {
       success
