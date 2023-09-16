@@ -1,6 +1,7 @@
 import { Key, SetStateAction, useEffect, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
+import Loader from "@/components/loader";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
 
@@ -51,8 +52,10 @@ export default function Variable({ termId, selectedTerm, year, quarter, }: Table
 
   const [show, setShow] = useState(false);
   const [quarterShow, setAddQuarterShow] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
   const [cellData, setCellData] = useState({});
   const [updateValue] = useMutation(UPDATE_MAPPED_VALUE);
+
   const { headers = [], rows = [] }: { headers: string[]; rows: Row[] } =
     termView?.getViewForTerm || {};
 
@@ -68,6 +71,7 @@ export default function Variable({ termId, selectedTerm, year, quarter, }: Table
     termId: string,
     variableId: string,
     ) => {
+      setShowLoader(true);
     await updateValue({
       variables: {
         mappingInfo: {
@@ -82,6 +86,7 @@ export default function Variable({ termId, selectedTerm, year, quarter, }: Table
         }),
       },
     });
+    setShowLoader(false);
     setShow(false);
     refetchTermView();
   };
@@ -93,6 +98,8 @@ export default function Variable({ termId, selectedTerm, year, quarter, }: Table
   
 
   return (
+    <>
+     {showLoader && (<Loader />)}
     <div
       style={{
         maxHeight: "calc(100vh - 200px)",
@@ -163,6 +170,7 @@ export default function Variable({ termId, selectedTerm, year, quarter, }: Table
         />
       )}
     </div>
+    </>
   );
 }
 

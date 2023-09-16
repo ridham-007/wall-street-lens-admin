@@ -1,6 +1,7 @@
 import { SetStateAction, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import Variable from "@/components/table/variables/Variable";
+import Loader from "@/components/loader";
 import "react-toastify/dist/ReactToastify.css";
 import { DELTE_QUARTER, GET_TERMS_BY_COMPANY } from "@/utils/query";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -22,9 +23,11 @@ interface KpiTerm {
 
 export default function VariableDetails() {
   const [termId, setTermId] = useState("");
+  const [showLoader, setShowLoader] = useState(false);
   const [company, setCompany] = useState('');
   const [quarter, setQuarter] = useState('1');
   const [year, setYear] = useState('2023');
+  
   const [showQuarter, setShowQuarter] = useState(false);
   const [addQuarter] = useMutation(ADD_QUARTER);
   const [deleteQuarter] = useMutation(DELTE_QUARTER);
@@ -33,6 +36,7 @@ export default function VariableDetails() {
 
 
   const handleOnAddQuarter = async (val: { quarter: any; year: any; }) => {
+    setShowLoader(true);
     await addQuarter({
       variables: {
         variableInfo: {
@@ -42,6 +46,7 @@ export default function VariableDetails() {
         termId: termId,
       },
     });
+    setShowLoader(false);
   }
 
   const handleOnDeleteQuarter = async (id: any) => {
@@ -51,8 +56,7 @@ export default function VariableDetails() {
       },
     });
   }
-
-
+ 
   const [getTermsDetails, { data: termsData }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
       variables: {
@@ -85,6 +89,7 @@ export default function VariableDetails() {
   return (
     <Layout title="Financial Summary" page={LayoutPages.variable_details}>
       <>
+      {showLoader && (<Loader />)}
         <div className="flex justify-between gap-[20px]">
           <div className="flex  gap-[20px] ">
           <div className="flex flex-col mb-[20px]">
