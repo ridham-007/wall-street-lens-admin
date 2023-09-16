@@ -3,7 +3,7 @@ import Layout, { LayoutPages } from "@/components/layout";
 import Variable from "@/components/table/variables/Variable";
 import Loader from "@/components/loader";
 import "react-toastify/dist/ReactToastify.css";
-import { DELTE_QUARTER, GET_TERMS_BY_COMPANY } from "@/utils/query";
+import { CREATE_DEFAULT_MAPPING, DELTE_QUARTER, GET_TERMS_BY_COMPANY } from "@/utils/query";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
 import YearDropdown from "@/components/year_dropdown/year_dropdown";
@@ -31,14 +31,34 @@ export default function VariableDetails() {
   const [year, setYear] = useState('2023');
   
   const [showQuarter, setShowQuarter] = useState(false);
-  const [addQuarter] = useMutation(ADD_QUARTER);
+  const [addQuarter, {data: addQuarterData}] = useMutation(ADD_QUARTER);
   const [deleteQuarter] = useMutation(DELTE_QUARTER);
+  const [updateQuarter, setUpdateQuater] = useState(false);
+  const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING);
 
+  
   const [showDelete, setShowDelete] = useState(false);
+
+  const addDefaultMapping = async (id: any) => {
+    await defaultMapping({
+      variables: {
+        termId: termId,
+        quarterId: id,
+      },
+    })
+  }
+  useEffect(() => {
+    if (updateQuarter && addQuarterData?.addUpdateQuarter?.id){
+      addDefaultMapping(addQuarterData?.addUpdateQuarter?.id);
+    }
+    setUpdateQuater(false)
+
+  }, [addQuarterData])
 
 
   const handleOnAddQuarter = async (val: { quarter: any; year: any; }) => {
     setShowLoader(true);
+    setUpdateQuater(true);
     await addQuarter({
       variables: {
         variableInfo: {
