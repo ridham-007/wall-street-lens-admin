@@ -240,12 +240,10 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     }
   );
 
-  console.log({ termsVaribles })
-
-
   useEffect(() => {
     getVariables();
   }, [val.term]);
+
 
   const [addUpdateTermChart] = useMutation(ADD_UPDATE_TERM_CHART_MUTATION);
 
@@ -345,6 +343,8 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     setselectedVariablesArr(selectedList);
   };
 
+  const selectTerm = termsData?.getKpiTermsByCompanyId?.find((cur: any) => cur?.id === val.term)
+
   return (
     <Modal
       showModal={true}
@@ -410,37 +410,31 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 onChange={handleOnChange}
               >
                 <option value="">Select a option</option>
-                <option value="Bar">Bar Chart</option>
-                <option value="Linear">Linear Chart</option>
-                <option value="stackedbar">Stacked Bar Chart</option>
-
+                {!(selectTerm?.quarterWiseTable ?? false) && <option value="Bar">Bar Chart</option>}
+                {!(selectTerm?.quarterWiseTable ?? false) && <option value="Linear"> Linear Chart</option>}
+                {(selectTerm?.quarterWiseTable ?? true) && <option value="StackedBar"> StackedBar Chart</option>}
               </select>
             </div>
-            {val.graph === "Linear" && (
-                <div className="flex flex-col">
-                  <label
-                    htmlFor="variables_array"
-                    className="text-sm  text-gray-700"
-                  >
-                    Variables Array
-                  </label>
-                  <Multiselect
-                    id="variables_array"
-                    displayValue="key"
-                    placeholder="Select options"
-                    onKeyPressFn={function noRefCheck() { }}
-                    onRemove={OnRemoveChip}
-                    onSearch={function noRefCheck() { }}
-                    onSelect={handleSelect}
-                    options={updatedOptions}
-                    selectedValues={selectedVariablesArr}
-                    showCheckbox
-                    className=" mt-1 max-w-[250px]"
-                  />
-                </div>
-              )}
 
-            {val.graph && val.graph !== "Linear" && (
+            <div className="flex flex-col">
+              <label
+                htmlFor="quarter"
+                className="text-sm font-medium  text-gray-700"
+              >
+                Visibility
+              </label>
+              <label className="toggle-switch mt-2">
+                <input
+                  type="checkbox"
+                  checked={val.visible}
+                  name="visible"
+                  onChange={handleOnChange}
+                />
+                <span className="switch" />
+              </label>
+            </div>
+
+            {selectTerm?.quarterWiseTable && val.graph !== "Linear" && (
 
               <div className="flex flex-col">
                 <label
@@ -469,7 +463,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 </select>
               </div>
             )}
-            {val.graph  && val.graph !== "Linear" && (<div className="flex flex-col">
+            {selectTerm?.quarterWiseTable && (<div className="flex flex-col">
               <label
                 htmlFor="quarter"
                 className="text-sm font-medium text-gray-700"
@@ -496,7 +490,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               </select>
             </div>
             )}
-            {val.graph === "stackedbar" && (<div className="flex flex-col">
+            {selectTerm?.quarterWiseTable && (<div className="flex flex-col">
               <label
                 htmlFor="quarter"
                 className="text-sm font-medium text-gray-700"
@@ -525,24 +519,30 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
             )}
 
-            <div className="flex flex-row">
-              <label
-                htmlFor="quarter"
-                className="text-sm font-medium  text-gray-700"
-              >
-                Visibility
-              </label>
-              <label className="toggle-switch">
-                <input
-                  type="checkbox"
-                  checked={val.visible}
-                  name="visible"
-                  onChange={handleOnChange}
-                />
-                <span className="switch" />
-              </label>
-            </div>
           </div>
+          {!selectTerm?.quarterWiseTable && (
+            <div className="flex flex-col mt-5">
+              <label
+                htmlFor="variables_array"
+                className="text-sm font-medium text-gray-700"
+              >
+                Variables Array
+              </label>
+              <Multiselect
+                id="variables_array"
+                displayValue="key"
+                placeholder="Select options"
+                onKeyPressFn={function noRefCheck() { }}
+                onRemove={OnRemoveChip}
+                onSearch={function noRefCheck() { }}
+                onSelect={handleSelect}
+                options={updatedOptions}
+                selectedValues={selectedVariablesArr}
+                showCheckbox
+                className="mt-1"
+              />
+            </div>
+          )}
         </form>
         <ToastContainer />
       </>
