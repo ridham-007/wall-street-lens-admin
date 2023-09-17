@@ -427,6 +427,16 @@ const DELTE_QUARTER = gql`
   }
 `;
 
+const GET_COMPANIES = gql`query getCompanies {
+    getCompanies{
+      id
+      attributes {
+        name
+        slug
+      }
+  }
+}`;
+
 export {
   LOG_IN,
   ADD_FINANCIAL_SUMMARY_PARAMETER,
@@ -457,4 +467,5 @@ export {
   ADD_QUARTER,
   DELTE_QUARTER,
   CREATE_DEFAULT_MAPPING,
+  GET_COMPANIES,
 }
