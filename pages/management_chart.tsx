@@ -416,11 +416,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
               </select>
             </div>
-            {termsVaribles?.getVariablesByKpiTerm?.map((curr: any) => {
-              return (
-                curr?.kpiTerm?.quarterWiseTable
-              )
-            }) && (
+            {val.graph === "Linear" && (
                 <div className="flex flex-col">
                   <label
                     htmlFor="variables_array"
@@ -444,7 +440,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 </div>
               )}
 
-            {val.graph !== "Linear" && (
+            {val.graph && val.graph !== "Linear" && (
 
               <div className="flex flex-col">
                 <label
@@ -473,7 +469,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 </select>
               </div>
             )}
-            {val.graph !== "Linear" && (<div className="flex flex-col">
+            {val.graph  && val.graph !== "Linear" && (<div className="flex flex-col">
               <label
                 htmlFor="quarter"
                 className="text-sm font-medium text-gray-700"
@@ -500,7 +496,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               </select>
             </div>
             )}
-            {val.graph === "Bar" || val.graph !== "Linear" && (<div className="flex flex-col">
+            {val.graph === "stackedbar" && (<div className="flex flex-col">
               <label
                 htmlFor="quarter"
                 className="text-sm font-medium text-gray-700"
