@@ -366,8 +366,7 @@ export default function Layout(props: LayoutProps) {
 
         <div className="flex flex-row overflow-auto" style={{ height: "90%" }}>
           <div className="w-1/6  border-r border-gray-200 pb-5">
-            <div className="flex-1 py-4 space-y-1  divide-y divide-gray-200 dark:divide-gray-700">` `
-
+            <div className="flex-1 py-4 space-y-1  divide-y divide-gray-200 dark:divide-gray-700">
               <Link href={`/variable_details?company=${company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.variable_details
