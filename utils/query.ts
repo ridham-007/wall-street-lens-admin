@@ -399,6 +399,21 @@ const ADD_QUARTER = gql`
   }
 `;
 
+const CREATE_DEFAULT_MAPPING = gql`
+  mutation createDefaultMapping(
+    $termId: String!
+    $variableId: String
+    $quarterId: String
+
+    ) {
+    createDefaultMapping(
+      termId: $termId
+      variableId: $variableId
+      quarterId: $quarterId
+      ) 
+  }
+`;
+
 
 const DELTE_QUARTER = gql`
   mutation deleteQuarterDetailsByQuarterId(
@@ -411,6 +426,16 @@ const DELTE_QUARTER = gql`
     }
   }
 `;
+
+const GET_COMPANIES = gql`query getCompanies {
+    getCompanies{
+      id
+      attributes {
+        name
+        slug
+      }
+  }
+}`;
 
 export {
   LOG_IN,
@@ -441,4 +466,6 @@ export {
   DELETE_CHART_BY_ID,
   ADD_QUARTER,
   DELTE_QUARTER,
+  CREATE_DEFAULT_MAPPING,
+  GET_COMPANIES,
 }

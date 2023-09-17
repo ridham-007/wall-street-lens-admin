@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { useContext, useEffect, useState, useRef, use, SetStateAction } from "react";
 import { UserContext } from "@/config/auth";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/router";
+import { GET_COMPANIES } from "@/utils/query";
 
 export enum LayoutPages {
   "financial_summary" = "financial_summary",
@@ -78,6 +79,7 @@ const subIndustryDataArray = [
 
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
+  const companies = useQuery(GET_COMPANIES);
 
   const [isOpenAction, setIsOpenAction] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
@@ -183,10 +185,6 @@ export default function Layout(props: LayoutProps) {
     router.push(`${router.pathname}?company=${company}`);
   }, [company])
 
-  // const handleOnChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-  //   setCompany(event.target.value)
-  // }
-
   const handleOnChange = (event: { target: { value: SetStateAction<string>; name: string; }; }) => {
     switch (event.target.name) {
       case 'industry':
@@ -231,44 +229,6 @@ export default function Layout(props: LayoutProps) {
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Wall Street Lens
           </h1>
-
-          <div className="flex gap-[20px] items-center ml-[20px]">
-            <select
-              id="quarter"
-              name="industry"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={industry}
-              onChange={handleOnChange}
-            >
-              <option value="">Select a option</option>
-              {
-                industryData.map((ele: { industry: string, }, index) => {
-                  return <option key={index} value={ele.industry}>{ele.industry}</option>;
-                })
-              }
-            </select>
-          </div>
-          <div className="flex gap-[20px] items-center mx-[20px]">
-            <select
-              id="quarter"
-              name="subindustry"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={subIndustry}
-              onChange={handleOnChange}
-            >
-              <option value="">Select a option</option>
-              {
-                industryData.map((ele: { industry: string, subIndustries: string[] }) => {
-                  if (ele.industry === industry) {
-                    return ele.subIndustries.map((val, index) => {
-                      return <option key={index} value={val}>{val}</option>;
-                    });
-                  }
-                })
-              }
-
-            </select>
-          </div>
           <div className="flex gap-[20px] items-center mr-auto">
             <select
               id="quarter"
@@ -279,12 +239,8 @@ export default function Layout(props: LayoutProps) {
             >
               <option value="">Select a option</option>
               {
-                subIndustryDataArray.map((ele: { name: string, companies: string[] }) => {
-                  if (ele.name === subIndustry) {
-                    return ele.companies.map((val, index) => {
-                      return <option key={index} value={val}>{val}</option>;
-                    });
-                  }
+                companies?.data?.getCompanies.map((ele) => {
+                      return <option key={ele.id} value={ele.id}>{ele.attributes.name}</option>;
                 })
               }
             </select>
@@ -411,111 +367,6 @@ export default function Layout(props: LayoutProps) {
         <div className="flex flex-row overflow-auto" style={{ height: "90%" }}>
           <div className="w-1/6  border-r border-gray-200 pb-5">
             <div className="flex-1 py-4 space-y-1  divide-y divide-gray-200 dark:divide-gray-700">
-              {/* <Link href="/financial_summary">
-                <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.financial_summary
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6 mr-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  Financial Summary
-                </button>
-              </Link>
-
-              <Link href="/operational_summary">
-                <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.operational_summary
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6 mr-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"
-                    />
-                  </svg>
-                  Operational Summary
-                </button>
-              </Link>
-
-              <Link href="/vihicle_capacity">
-                <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.vihicle_capacity
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="mr-4 w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
-                    />
-                  </svg>
-                  Vihicle Capacity
-                </button>
-              </Link>
-
-              <Link href={`/outlook?company=${company}`}>
-                <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.outlook
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="mr-4 w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l1.41-.513M5.106 17.785l1.15-.964m11.49-9.642l1.149-.964M7.501 19.795l.75-1.3m7.5-12.99l.75-1.3m-6.063 16.658l.26-1.477m2.605-14.772l.26-1.477m0 17.726l-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205L12 12m6.894 5.785l-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864l-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495"
-                    />
-                  </svg>
-                  Outlook
-                </button>
-              </Link> */}
-
-
               <Link href={`/variable_details?company=${company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.variable_details

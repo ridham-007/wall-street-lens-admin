@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import Loader from "@/components/loader";
 import VariableTable from "@/components/table/settings/VariableTable";
@@ -9,8 +9,8 @@ import * as XLSX from 'xlsx';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { GET_COMPANIES, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 import { useRouter } from "next/router";
 
 export default function FinancialPage() {
@@ -183,10 +183,9 @@ export interface Quarter {
 }
 
 function ImportData(props: ImportDataProps) {
+    const companies = useQuery(GET_COMPANIES);
     const [sheetsData, setSheetsData] = useState<SheetValue[]>([]);
-    const [val, setVal] = useState({
-        company: '',
-    })
+    const [company, setCompany] = useState('')
 
     const regex = new RegExp('Q[1-4]{1}-[0-9]{4}$');
     const handleOnSave = () => {
@@ -196,16 +195,6 @@ function ImportData(props: ImportDataProps) {
         }
         props.onSuccess && props.onSuccess(sheetsData)
         props.onClose && props.onClose()
-    };
-
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
-        const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-        const name = e.target.name;
-
-        setVal((prevVal) => ({
-            ...prevVal,
-            [name]: value
-        }));
     };
 
     const convertDataToArrayOfObjects = (data: string | any[], table: Boolean) => {
@@ -331,7 +320,7 @@ function ImportData(props: ImportDataProps) {
                     let prevPriority: any;
                     let prevCategory: any;
                     sheetsArray.push({
-                        company: basicDetails[0]?.Company,
+                        company: company?.toString(),
                         name: basicDetails[0]?.TermsName,
                         quarterWiseTable: quarterWiseTable,
                         summaryOnly: basicDetails[0]?.SummaryOnly === 'Enable',
@@ -372,7 +361,27 @@ function ImportData(props: ImportDataProps) {
         >
             <>
                 <form className="form w-100">
-                    <div className="grid gap-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="flex gap-[20px] items-center mr-auto">
+                            <select
+                                id="quarter"
+                                name="company"
+                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                value={company}
+                                onChange={(event) => { setCompany(event.target.value) }}
+                            >
+                                <option value="">Select a option</option>
+                                {
+                                    companies?.data?.getCompanies.map((ele: {
+                                        id: readonly string[] | Key | null | undefined; attributes: {
+                                            slug: Key | null | undefined; name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined;
+                                        };
+                                    }) => {
+                                        return <option key={ele.attributes.slug} value={ele.id}>{ele.attributes.name}</option>;
+                                    })
+                                }
+                            </select>
+                        </div>
                         <div className="flex flex-col">
                             <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
                                 Select Excel Sheet
@@ -381,6 +390,7 @@ function ImportData(props: ImportDataProps) {
                                 type="file"
                                 accept=".xlsx, .xls"
                                 onChange={handleFileUpload}
+                                disabled={!company}
                                 className=" text-white font-bold py-2 px-4 rounded-full"
                             />
                         </div>
