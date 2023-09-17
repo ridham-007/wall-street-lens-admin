@@ -35,6 +35,7 @@ export default function FinancialPage() {
 
   const [getTermsDetails, { data: termsData, refetch: refetchTerms }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
+      fetchPolicy: 'network-only',
       variables: {
         companyId: company,
       },
@@ -42,11 +43,13 @@ export default function FinancialPage() {
 
   const [getChartDetails, { data: chartData, refetch: refetchCharts }] =
     useLazyQuery(GET_CHART_BY_KPI_TERM, {
+      fetchPolicy: 'network-only',
       variables: {
         termId: term,
       },
     });
 
+  console.log({})
   useEffect(() => {
     if (!!company && refetch) {
       refetchTerms();
@@ -161,7 +164,7 @@ export default function FinancialPage() {
         </div>
         {addUpdateParameter && (
           <AddUpdateParaMeter
-            onSuccess={() => {}}
+            onSuccess={() => { }}
             onClose={() => {
               setAddUpdateParameter(false);
             }}
@@ -212,9 +215,11 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     group: "",
   });
 
+
   const [getTermsDetails, { data: termsData }] = useLazyQuery(
     GET_TERMS_BY_COMPANY,
     {
+      fetchPolicy: 'network-only',
       variables: {
         companyId: props.company,
       },
@@ -228,11 +233,15 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [getVariables, { data: termsVaribles }] = useLazyQuery(
     GET_VARIBALES_KPI_TERM,
     {
+      fetchPolicy: 'network-only',
       variables: {
         termId: val.term || "",
       },
     }
   );
+
+  console.log({ termsVaribles })
+
 
   useEffect(() => {
     getVariables();
@@ -258,6 +267,9 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             visible: val.visible,
             termId: val.term,
             variableIds: selectedVariablesArr?.map((current) => current?.id),
+            xAxisId: val.xAxis,
+            yAxisId: val.yAxis,
+            groupById: val.group
           },
         },
       });
@@ -401,116 +413,120 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 <option value="Bar">Bar Chart</option>
                 <option value="Linear">Linear Chart</option>
                 <option value="stackedbar">Stacked Bar Chart</option>
-                
+
               </select>
             </div>
-            {val.graph === "Bar"||val.graph !== "stackedbar" && (
-            <div className="flex flex-col">
-              <label
-                htmlFor="variables_array"
-                className="text-sm  text-gray-700"
-              >
-                Variables Array
-              </label>
-              <Multiselect
-                id="variables_array"
-                displayValue="key"
-                placeholder="Select options"
-                onKeyPressFn={function noRefCheck() {}}
-                onRemove={OnRemoveChip}
-                onSearch={function noRefCheck() {}}
-                onSelect={handleSelect}
-                options={updatedOptions}
-                selectedValues={selectedVariablesArr}
-                showCheckbox
-                className=" mt-1 max-w-[250px]"
-              />
-            </div>
-            )}
-
-            {val.graph !== "Linear"  && (
-             
+            {termsVaribles?.getVariablesByKpiTerm?.map((curr: any) => {
+              return (
+                curr?.kpiTerm?.quarterWiseTable
+              )
+            }) && (
                 <div className="flex flex-col">
                   <label
-                    htmlFor="quarter"
-                    className="text-sm font-medium text-gray-700"
+                    htmlFor="variables_array"
+                    className="text-sm  text-gray-700"
                   >
-                    X-axis
+                    Variables Array
                   </label>
-                  <select
-                    id="quarter"
-                    name="xAxis"
-                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
-                    value={val.xAxis}
-                    onChange={handleOnChange}
-                  >
-                    <option value="">Select a option</option>
-                    {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
-                      (cur: VariablesArray) => {
-                        return (
-                          <option key={cur.id} value={cur?.id}>
-                            {cur?.title}
-                          </option>
-                        );
-                      }
-                    )}
-                  </select>
+                  <Multiselect
+                    id="variables_array"
+                    displayValue="key"
+                    placeholder="Select options"
+                    onKeyPressFn={function noRefCheck() { }}
+                    onRemove={OnRemoveChip}
+                    onSearch={function noRefCheck() { }}
+                    onSelect={handleSelect}
+                    options={updatedOptions}
+                    selectedValues={selectedVariablesArr}
+                    showCheckbox
+                    className=" mt-1 max-w-[250px]"
+                  />
                 </div>
+              )}
+
+            {val.graph !== "Linear" && (
+
+              <div className="flex flex-col">
+                <label
+                  htmlFor="quarter"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  X-axis
+                </label>
+                <select
+                  id="quarter"
+                  name="xAxis"
+                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
+                  value={val.xAxis}
+                  onChange={handleOnChange}
+                >
+                  <option value="">Select a option</option>
+                  {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
+                    (cur: VariablesArray) => {
+                      return (
+                        <option key={cur.id} value={cur?.id}>
+                          {cur?.title}
+                        </option>
+                      );
+                    }
+                  )}
+                </select>
+              </div>
+            )}
+            {val.graph !== "Linear" && (<div className="flex flex-col">
+              <label
+                htmlFor="quarter"
+                className="text-sm font-medium text-gray-700"
+              >
+                Y-axis
+              </label>
+              <select
+                id="quarter"
+                name="yAxis"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
+                value={val.yAxis}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
+                  (cur: VariablesArray) => {
+                    return (
+                      <option key={cur.id} value={cur?.id}>
+                        {cur?.title}
+                      </option>
+                    );
+                  }
                 )}
-                {val.graph !== "Linear" && (<div className="flex flex-col">
-                  <label
-                    htmlFor="quarter"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Y-axis
-                  </label>
-                  <select
-                    id="quarter"
-                    name="yAxis"
-                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
-                    value={val.yAxis}
-                    onChange={handleOnChange}
-                  >
-                    <option value="">Select a option</option>
-                    {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
-                      (cur: VariablesArray) => {
-                        return (
-                          <option key={cur.id} value={cur?.id}>
-                            {cur?.title}
-                          </option>
-                        );
-                      }
-                    )}
-                  </select>
-                </div>
+              </select>
+            </div>
+            )}
+            {val.graph === "Bar" || val.graph !== "Linear" && (<div className="flex flex-col">
+              <label
+                htmlFor="quarter"
+                className="text-sm font-medium text-gray-700"
+              >
+                Group By
+              </label>
+              <select
+                id="quarter"
+                name="group"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
+                value={val.group}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
+                  (cur: VariablesArray) => {
+                    return (
+                      <option key={cur.id} value={cur?.id}>
+                        {cur?.title}
+                      </option>
+                    );
+                  }
                 )}
-                  {val.graph === "Bar" || val.graph !== "Linear" &&  (<div className="flex flex-col">
-                  <label
-                    htmlFor="quarter"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Group By
-                  </label>
-                  <select
-                    id="quarter"
-                    name="group"
-                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
-                    value={val.group}
-                    onChange={handleOnChange}
-                  >
-                    <option value="">Select a option</option>
-                    {(termsVaribles?.getVariablesByKpiTerm ?? []).map(
-                      (cur: VariablesArray) => {
-                        return (
-                          <option key={cur.id} value={cur?.id}>
-                            {cur?.title}
-                          </option>
-                        );
-                      }
-                    )}
-                  </select>
-                </div>
-             
+              </select>
+            </div>
+
             )}
 
             <div className="flex flex-row">

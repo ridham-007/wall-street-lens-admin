@@ -35,6 +35,7 @@ export default function FinancialPage() {
   const [getQuarterDetails, { data: quarterData, refetch: refetchQuarter }] = useLazyQuery(
     FINANCIAL_REPORT_BY_COMPANY_NAME,
     {
+      fetchPolicy: 'network-only',
       variables: {
         companyName: selectedCompany[0]?.name,
       },
@@ -54,7 +55,7 @@ export default function FinancialPage() {
     setShowLoader(true);
     await addParameter({
       variables: {
-        financialQuarter:{
+        financialQuarter: {
           financialSummary: {
             company: data.company,
             title: data.title,
@@ -65,10 +66,11 @@ export default function FinancialPage() {
           quarters: data.quarterData.map((current: any) => {
             return {
               ...current,
-              value: Number(current?.value), 
+              value: Number(current?.value),
               year: Number(data.year)
-            }})
-      }
+            }
+          })
+        }
       },
     })
     setShowLoader(false);
@@ -76,7 +78,7 @@ export default function FinancialPage() {
     closePopups();
   };
 
-  const onAddUpdateQuarter = async(perameters: any) => {
+  const onAddUpdateQuarter = async (perameters: any) => {
     setShowLoader(true);
     const {
       year,
@@ -90,12 +92,12 @@ export default function FinancialPage() {
         quarter: selectedQuarter,
         year,
         value: current?.value,
-        financialSummaryId: current?.id, 
+        financialSummaryId: current?.id,
       })
     })
 
     await addQuarters({
-      variables:{
+      variables: {
         addQuarters: {
           quarters: mutationData
         },
@@ -239,15 +241,15 @@ const dummyQuarters = [
   {
     quarter: 2,
     value: "",
-},
+  },
   {
     quarter: 3,
     value: "",
-},
+  },
   {
     quarter: 4,
     value: "",
-}
+  }
 ];
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
@@ -261,7 +263,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     year: "",
   })
   const handleOnSave = () => {
-    if (!val.title){
+    if (!val.title) {
       toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
       return;
     }
@@ -281,7 +283,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
   const handleQuarterUpdate = (event: ChangeEvent<HTMLInputElement>, id: number) => {
     const updatedQuarter = val.quarterData?.map(current => {
-      if (current?.quarter === id){
+      if (current?.quarter === id) {
         return {
           ...current,
           value: event?.target?.value
@@ -321,8 +323,8 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 <option value="APPLE">APPLE</option>
               </select>
             </div>
-            
-            <YearDropdown onChange={handleOnChange} year={val.year}/>
+
+            <YearDropdown onChange={handleOnChange} year={val.year} />
 
             <div className="flex flex-col">
               <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
@@ -393,9 +395,9 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             </div>
           </div>
 
-            <div className="w-full">
-              <h1 className="text-xl font-semibold mb-2 mt-4">Quarter Values</h1>
-              <div className="flex gap-5 flex-wrap ">
+          <div className="w-full">
+            <h1 className="text-xl font-semibold mb-2 mt-4">Quarter Values</h1>
+            <div className="flex gap-5 flex-wrap ">
               {
                 val.quarterData?.map(current => {
                   return <div key={current?.quarter} className="flex flex-col">
@@ -417,10 +419,10 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                   </div>
                 })
               }
-              </div> 
             </div>
+          </div>
         </form>
-        <ToastContainer />  
+        <ToastContainer />
       </>
     </Modal>
   );
@@ -446,7 +448,7 @@ const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
   };
   const handleOnSave = () => {
     const errorPresent = val?.find((current: { value: any; }) => !current?.value);
-    if (errorPresent){
+    if (errorPresent) {
       toast('Please fill the required fields.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
       return;
     }
@@ -521,7 +523,7 @@ const AddUpdateQuarter = (props: AddUpdateParameterProps) => {
                   name={`value-${item.id}`}
                   className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                   value={item.value}
-                  onChange={(e) => { item.id && handleOnChange(e, item.id)}}
+                  onChange={(e) => { item.id && handleOnChange(e, item.id) }}
                 />
               </div>
             ))}

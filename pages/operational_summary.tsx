@@ -5,9 +5,9 @@ import { TabButton } from "@/components/TabButton";
 import ParameterTable from "@/components/table/operational/ParameterTable";
 import QuarterTable from "@/components/table/operational/QuarterTable";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { 
+import {
   ADD_QUARTERS_DETAILS,
-  CREATE_OPERATIONAL_SUMMARY, 
+  CREATE_OPERATIONAL_SUMMARY,
   OPERATIONAL_REPORT_BY_COMPANY_NAME
 } from "@/utils/query";
 import Loader from "@/components/loader";
@@ -34,6 +34,7 @@ export default function OperationPage() {
   const [getQuarterDetails, { data: quarterData, refetch: refetchQuarters }] = useLazyQuery(
     OPERATIONAL_REPORT_BY_COMPANY_NAME,
     {
+      fetchPolicy: 'network-only',
       variables: {
         companyName: selectedCompany[0]?.name,
       },
@@ -42,7 +43,7 @@ export default function OperationPage() {
 
   useEffect(() => {
     getQuarterDetails();
-  },[])
+  }, [])
 
   const onAddUpdateQuarter = async (perameters: any) => {
     setShowLoader(true);
@@ -79,22 +80,22 @@ export default function OperationPage() {
     await addParameter({
       variables: {
         operationalQuarter: {
-            operationalSummary: {
-              company: data.company,
-              title: data.title,
-              operationType: data.operation,
-              graphType: data.graph,
-              yoy: Number(data.YoY),
-              priority: Number(data.priority)
+          operationalSummary: {
+            company: data.company,
+            title: data.title,
+            operationType: data.operation,
+            graphType: data.graph,
+            yoy: Number(data.YoY),
+            priority: Number(data.priority)
           },
           quarters: data?.quarterData?.map((current: any) => {
-            return { 
+            return {
               ...current,
               value: Number(current?.value),
               year: Number(data?.year)
             }
           }),
-},
+        },
       },
     })
     setShowLoader(false);
@@ -198,7 +199,7 @@ export default function OperationPage() {
             activeTab={activeTab}
             onClick={() => handleTabClick('Descriptions')}
           />
-  
+
         </div>
         <div>
           {activeTab === 'Descriptions' && <ParameterTable data={quarterData} />}
@@ -216,7 +217,7 @@ export default function OperationPage() {
             oprationalInitData={perametersData}
           ></AddUpdateParaQuarter>
         )}
-      <ToastContainer/>
+        <ToastContainer />
       </>
     </Layout >
   );
@@ -254,7 +255,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     graph: "",
     quarterData: dummyQuarters,
     YoY: "",
-    priority:"",
+    priority: "",
     year: "",
     operation: "",
   })
@@ -434,7 +435,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               })
             }
           </div>
-        </div>        
+        </div>
       </form>
 
     </Modal >

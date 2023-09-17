@@ -29,6 +29,7 @@ export default function FinancialPage() {
     const [getTermsDetails, { data: termsData, refetch: refetchTerms }] = useLazyQuery(
         GET_TERMS_BY_COMPANY,
         {
+            fetchPolicy: 'network-only',
             variables: {
                 companyId: company,
             },
@@ -75,7 +76,7 @@ export default function FinancialPage() {
 
     const onAddUpdateParameter = async (sheetsData: any) => {
         setShowLoader(true);
-        for (let i = 0; i < sheetsData?.length ; i++){
+        for (let i = 0; i < sheetsData?.length; i++) {
             await bulkUpload({
                 variables: {
                     bulkUpload: {

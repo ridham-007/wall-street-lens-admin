@@ -29,7 +29,7 @@ export default function VariableDetails() {
   const [refetch, setRefetch] = useState(false);
   const [quarter, setQuarter] = useState('1');
   const [year, setYear] = useState('2023');
-  
+
   const [showQuarter, setShowQuarter] = useState(false);
   const [addQuarter] = useMutation(ADD_QUARTER);
   const [deleteQuarter] = useMutation(DELTE_QUARTER);
@@ -60,9 +60,10 @@ export default function VariableDetails() {
     });
     setRefetch(true);
   }
- 
+
   const [getTermsDetails, { data: termsData }] =
     useLazyQuery(GET_TERMS_BY_COMPANY, {
+      fetchPolicy: 'network-only',
       variables: {
         companyId: company,
       },
@@ -93,7 +94,7 @@ export default function VariableDetails() {
   return (
     <Layout title="Financial Summary" page={LayoutPages.variable_details}>
       <>
-      {showLoader && (<Loader />)}
+        {showLoader && (<Loader />)}
         <div className="flex justify-between gap-[20px]">
           <div className="flex  gap-[20px] ">
             <div className="flex flex-col mb-[20px]">
@@ -186,10 +187,10 @@ export default function VariableDetails() {
         {!!termId &&
           <Variable
             termId={termId}
-            year={year} 
+            year={year}
             quarter={quarter}
-            selectedTerm={selectedTerm} 
-            setShowDelete={setShowDelete} 
+            selectedTerm={selectedTerm}
+            setShowDelete={setShowDelete}
             setDeleteId={setDeleteId}
             refetch={refetch}
           />}

@@ -35,12 +35,12 @@ const ParameterTable = (props: TableProps) => {
             document.removeEventListener("mousedown", checkIfClickedOutside)
         }
     }, [isOpenAction])
-    
+
     const toggleMenu = (id: string | number | ((prevState: string) => string) | null | undefined) => {
         if (isOpenAction) {
             setIsOpenAction('');
         } else {
-            if(id){
+            if (id) {
                 setIsOpenAction(id?.toString());
             }
         }
@@ -82,7 +82,7 @@ const ParameterTable = (props: TableProps) => {
                             <>
                                 <TD>{current?.title}</TD>
                                 <TD>{current?.type}</TD>
-                                <TD>{current?.visible ? 'Visible' :'Hidden'}</TD>
+                                <TD>{current?.visible ? 'Visible' : 'Hidden'}</TD>
                                 <TD>Financial Summary</TD>
                                 <TD style="text-center">
                                     <div
@@ -107,13 +107,13 @@ const ParameterTable = (props: TableProps) => {
                             </>
                         </TDR>
                     })
-                }
+                    }
                 </tbody>
             </table>
         </div >
-        {showDelete && <DeleteChart id={deleteId} onClose={() => { setDeleteId(''); setShowDelete(false) }} onSuccess={onDeleteChart}/>}
-        {updateChart && <UpdateChart company={props.company} refetch={props.refetch} onSuccess={()=>{}}currentData={currentData} onClose={() => {setUpdateChart(false); setCurrentData({})}}/>}
-   </>
+        {showDelete && <DeleteChart id={deleteId} onClose={() => { setDeleteId(''); setShowDelete(false) }} onSuccess={onDeleteChart} />}
+        {updateChart && <UpdateChart company={props.company} refetch={props.refetch} onSuccess={() => { }} currentData={currentData} onClose={() => { setUpdateChart(false); setCurrentData({}) }} />}
+    </>
 }
 
 interface DeleteChartProps {
@@ -185,6 +185,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
 
     const [getTermsDetails, { data: termsData }] =
         useLazyQuery(GET_TERMS_BY_COMPANY, {
+            fetchPolicy: 'network-only',
             variables: {
                 companyId: props.company,
             },
@@ -222,7 +223,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
             await addUpdateTermChart({
                 variables: {
                     chartInfo: {
-                        id:val.id,
+                        id: val.id,
                         title: val.title,
                         type: val.graph,
                         visible: val.visible,
@@ -265,8 +266,8 @@ function UpdateChart(props: AddUpdateParameterProps) {
 
     const selectedStates = props?.currentData?.termVariables?.map((cur: { title: any; id: any; }) => {
         return {
-            cat:cur?.title,
-            key:cur?.title,
+            cat: cur?.title,
+            key: cur?.title,
             id: cur?.id
         }
     })

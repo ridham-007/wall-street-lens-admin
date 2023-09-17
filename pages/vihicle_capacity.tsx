@@ -31,6 +31,7 @@ export default function Capacity() {
   const [getParametersData, { data, error, loading, refetch }] = useLazyQuery(
     GET_VEHICLE_CAPACITY_SUMMARY,
     {
+      fetchPolicy: 'network-only',
       variables: {
         companyName: selectedCompany[0]?.name,
       },
@@ -158,7 +159,7 @@ export default function Capacity() {
           />
         </div>
         <div>
-          {activeTab === 'Descriptions' && <ParameterTable data={data}/>}
+          {activeTab === 'Descriptions' && <ParameterTable data={data} />}
           {activeTab === 'Details' && <QuarterTable />}
         </div>
         {addUpdateQuarter && (
@@ -167,7 +168,7 @@ export default function Capacity() {
             onClose={onAddUpdateParameterClose}
           ></AddUpdateParaQuarter>
         )}
-        <ToastContainer/>
+        <ToastContainer />
       </>
     </Layout >
   );
@@ -189,8 +190,8 @@ const dummyQuarters = [
       {
         index: 1,
         region: '',
-        modal:'',
-        capacity:'',
+        modal: '',
+        capacity: '',
         status: '',
       }
     ]
@@ -260,7 +261,7 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const { name, value } = e.target;
     const updatedQuarters = val.quarters?.map(current => {
-      if(current?.quarter === selectedTab){
+      if (current?.quarter === selectedTab) {
         return {
           ...current,
           [name]: value
@@ -277,7 +278,7 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
   const onTabChange = (tab: SetStateAction<number>) => {
     setSelectedTab(tab);
   }
- 
+
   const handleOnSave = () => {
     if (!val.company || !val.year) {
       toast('Company or Year is missing', { hideProgressBar: false, autoClose: 7000, type: 'error' });
@@ -313,7 +314,7 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
               id="quarter"
               name="company"
               className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-            value={val.company}
+              value={val.company}
               onChange={handleOnChange}
             >
               <option value="">Select a option</option>
@@ -328,22 +329,22 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
             onTabChange={onTabChange}
             selectedTab={selectedTab}
             content={<>
-            <div className="w-full flex flex-wrap gap-5 mt-5">
-              <div className="w-full flex flex-col">
-                <label htmlFor="title" className="text-sm font-medium text-gray-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  className="w-full mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+              <div className="w-full flex flex-wrap gap-5 mt-5">
+                <div className="w-full flex flex-col">
+                  <label htmlFor="title" className="text-sm font-medium text-gray-700">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    className="w-full mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                     value={selectedQuarter?.title}
-                  onChange={handleInputChange}
-                />
-              </div>
+                    onChange={handleInputChange}
+                  />
+                </div>
 
-            </div>
+              </div>
               <div className="mt-5">
                 <label htmlFor="summary" className="text-sm font-medium text-gray-700">
                   Summary
@@ -356,9 +357,9 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
                   onChange={handleInputChange}
                 />
               </div>
-              <CollapsibleForm updateQuarters={updateQuarters} quarters={val.quarters} selectedTab={selectedTab}/>
-              </>
-          }
+              <CollapsibleForm updateQuarters={updateQuarters} quarters={val.quarters} selectedTab={selectedTab} />
+            </>
+            }
           />
         </div>
       </form>

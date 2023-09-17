@@ -30,6 +30,7 @@ export default function Outlook() {
   const [getParametersData, { data, error, loading, refetch }] = useLazyQuery(
     GET_OUT_LOOK_SUMMARY,
     {
+      fetchPolicy: 'network-only',
       variables: {
         companyName: selectedCompany[0]?.name,
       },
@@ -156,7 +157,7 @@ export default function Outlook() {
             setTitle={setTitle}
           ></AddUpdateParaQuarter>
         )}
-        <ToastContainer/>
+        <ToastContainer />
       </>
     </Layout >
   );
@@ -176,17 +177,17 @@ const dummyQuarters = [
     cash: '',
     profit: '',
     product: '',
-    growthRate: ['',''],
-    production: ['',''],
+    growthRate: ['', ''],
+    production: ['', ''],
   },
   {
     quarter: 2,
     volume: '',
     cash: '',
     profit: '',
-    product:'',
-    growthRate: ['',''],
-    production: ['',''],
+    product: '',
+    growthRate: ['', ''],
+    production: ['', ''],
   },
   {
     quarter: 3,
@@ -195,7 +196,7 @@ const dummyQuarters = [
     profit: '',
     product: '',
     growthRate: ['', ''],
-    production: ['',''],
+    production: ['', ''],
   },
   {
     quarter: 4,
@@ -238,7 +239,7 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
   const onTabChange = (tab: SetStateAction<number>) => {
     setSelectedTab(tab);
   }
-  
+
   const handleOnSave = () => {
     if (!val) {
       toast('Summary is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
@@ -264,8 +265,8 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
     const updatedQuarters = val.quarters?.map(current => {
       if (current?.quarter === selectedTab) {
         let newVal = [];
-        if (field === 'growthRate'){
-          newVal = current?.growthRate?.map((cur, ind )=> ind === index ? value : cur );
+        if (field === 'growthRate') {
+          newVal = current?.growthRate?.map((cur, ind) => ind === index ? value : cur);
         } else {
           newVal = current?.production?.map((cur, ind) => ind === index ? value : cur);
         }
@@ -308,116 +309,116 @@ const AddUpdateParaQuarter = (props: AddUpdateParameterProps) => {
               <option value="APPLE">APPLE</option>
             </select>
           </div>
-          <YearDropdown onChange={handleOnChange} year={val.year.toString()}/>
+          <YearDropdown onChange={handleOnChange} year={val.year.toString()} />
 
         </div>
 
-        <Tablist 
+        <Tablist
           onTabChange={onTabChange}
           selectedTab={selectedTab}
-        content={<div className="mt-4">
-          <div className="w-full flex flex-wrap gap-5 mt-5">
-            <div className="w-full flex flex-col">
-              <label htmlFor="volume" className="text-sm font-medium text-gray-700">
-                Volume
-              </label>
-              <textarea
+          content={<div className="mt-4">
+            <div className="w-full flex flex-wrap gap-5 mt-5">
+              <div className="w-full flex flex-col">
+                <label htmlFor="volume" className="text-sm font-medium text-gray-700">
+                  Volume
+                </label>
+                <textarea
 
-                id="volume"
-                name="volume"
-                className="w-full mt-1 p-2 h-[50px] border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={selectedQuarter?.volume}
-                onChange={handleInputChange}
-              />
-            </div>
-
-          </div>
-
-          <div className="w-full flex flex-wrap gap-5 mt-5">
-            <div className="w-full flex flex-col">
-              <label htmlFor="cash" className="text-sm font-medium text-gray-700">
-                Cash
-              </label>
-              <textarea
-                id="cash"
-                name="cash"
-                className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={selectedQuarter?.cash}
-                onChange={handleInputChange}
-              />
-            </div>
-
-          </div>
-
-          <div className="w-full flex flex-wrap gap-5 mt-5">
-            <div className="w-full flex flex-col">
-              <label htmlFor="profit" className="text-sm font-medium text-gray-700">
-                Profit
-              </label>
-              <textarea
-                id="profit"
-                name="profit"
-                className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={selectedQuarter?.profit}
-                onChange={handleInputChange}
-              />
-            </div>
-
-          </div>
-
-          <div className="w-full flex flex-wrap gap-5 mt-5">
-            <div className="w-full flex flex-col">
-              <label htmlFor="product" className="text-sm font-medium text-gray-700">
-                Product
-              </label>
-              <textarea
-                id="product"
-                name="product"
-                className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={selectedQuarter?.product}
-                onChange={handleInputChange}
-              />
-            </div>
-
-          </div>
-
-          {/* <GrawthRate quarters={val.quarters} updateQuarters={updateQuarters} selectedTab={selectedTab}/> */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mt-5">Growth Rate </label>
-              <div className="flex gap-5">
-              {selectedQuarter?.growthRate.map((value, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  value={value}
-                  placeholder={`Value ${index + 1}`}
-                  onChange={(e) => handleGrowthaOrProductionChange('growthRate', index, e.target.value)}
-                  className="border rounded p-2 mt-2"
+                  id="volume"
+                  name="volume"
+                  className="w-full mt-1 p-2 h-[50px] border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={selectedQuarter?.volume}
+                  onChange={handleInputChange}
                 />
-              ))}
+              </div>
+
+            </div>
+
+            <div className="w-full flex flex-wrap gap-5 mt-5">
+              <div className="w-full flex flex-col">
+                <label htmlFor="cash" className="text-sm font-medium text-gray-700">
+                  Cash
+                </label>
+                <textarea
+                  id="cash"
+                  name="cash"
+                  className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={selectedQuarter?.cash}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+            </div>
+
+            <div className="w-full flex flex-wrap gap-5 mt-5">
+              <div className="w-full flex flex-col">
+                <label htmlFor="profit" className="text-sm font-medium text-gray-700">
+                  Profit
+                </label>
+                <textarea
+                  id="profit"
+                  name="profit"
+                  className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={selectedQuarter?.profit}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+            </div>
+
+            <div className="w-full flex flex-wrap gap-5 mt-5">
+              <div className="w-full flex flex-col">
+                <label htmlFor="product" className="text-sm font-medium text-gray-700">
+                  Product
+                </label>
+                <textarea
+                  id="product"
+                  name="product"
+                  className="w-full h-[50px] mt-1 p-2 border min-w-[322px] rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={selectedQuarter?.product}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+            </div>
+
+            {/* <GrawthRate quarters={val.quarters} updateQuarters={updateQuarters} selectedTab={selectedTab}/> */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mt-5">Growth Rate </label>
+                <div className="flex gap-5">
+                  {selectedQuarter?.growthRate.map((value, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      value={value}
+                      placeholder={`Value ${index + 1}`}
+                      onChange={(e) => handleGrowthaOrProductionChange('growthRate', index, e.target.value)}
+                      className="border rounded p-2 mt-2"
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Production </label>
+                <div className="flex gap-5">
+
+                  {selectedQuarter?.production.map((value, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      value={value}
+                      placeholder={`Value ${index + 1}`}
+                      onChange={(e) => handleGrowthaOrProductionChange('production', index, e.target.value)}
+                      className="border rounded p-2 mt-2"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Production </label>
-              <div className="flex gap-5">
-
-              {selectedQuarter?.production.map((value, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  value={value}
-                  placeholder={`Value ${index + 1}`}
-                  onChange={(e) => handleGrowthaOrProductionChange('production', index, e.target.value)}
-                  className="border rounded p-2 mt-2"
-                />
-              ))}
-              </div>
-            </div>
           </div>
-        </div>
-      
-      }/>
+
+          } />
       </form>
     </Modal >
   );
