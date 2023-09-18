@@ -2,8 +2,9 @@ import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID } from "@/utils/query";
+import { GET_COMPANIES } from "@/utils/query";
 
 export interface TableProps {
     data: any;
@@ -12,6 +13,8 @@ export interface TableProps {
 }
 
 const TermsTable = (props: TableProps) => {
+    const companies = useQuery(GET_COMPANIES);
+
     const [isOpenAction, setIsOpenAction] = useState('');
     const [show, setShow] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
@@ -113,8 +116,8 @@ const TermsTable = (props: TableProps) => {
                         <>
                             <TH>Name</TH>
                             <TH>Company</TH>
-                            {/* <TH>Quarter Wise Table</TH>
-                            <TH>Summary Only</TH> */}
+                            <TH>Industry</TH>
+                            <TH>Sub Industry</TH>
                             <TH >Action</TH>
                         </>
                     </THR>
@@ -128,6 +131,8 @@ const TermsTable = (props: TableProps) => {
                                 <TD>{current?.company}</TD>
                                 {/* <TD>{current?.quarterWiseTable? 'Enabled':'Disabled'}</TD>
                                 <TD>{current?.summaryOnly ? 'Enabled' : 'Disabled'}</TD> */}
+                                <TD>Industry</TD>
+                                <TD>Sub Industry</TD>
                                 <TD style="text-center">
                                     <>
                                         <div
