@@ -31,12 +31,12 @@ export default function VariableDetails() {
   const [year, setYear] = useState('2023');
 
   const [showQuarter, setShowQuarter] = useState(false);
-  const [addQuarter, {data: addQuarterData}] = useMutation(ADD_QUARTER);
+  const [addQuarter, { data: addQuarterData }] = useMutation(ADD_QUARTER);
   const [deleteQuarter] = useMutation(DELTE_QUARTER);
   const [updateQuarter, setUpdateQuater] = useState(false);
   const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING);
 
-  
+
   const [showDelete, setShowDelete] = useState(false);
 
   const addDefaultMapping = async (id: any) => {
@@ -48,7 +48,7 @@ export default function VariableDetails() {
     })
   }
   useEffect(() => {
-    if (updateQuarter && addQuarterData?.addUpdateQuarter?.id){
+    if (updateQuarter && addQuarterData?.addUpdateQuarter?.id) {
       addDefaultMapping(addQuarterData?.addUpdateQuarter?.id);
     }
     setUpdateQuater(false)
@@ -139,29 +139,31 @@ export default function VariableDetails() {
                 })}
               </select>
             </div>
-            {selectedTerm?.quarterWiseTable && (<><div className="flex flex-row items-center gap-[20px] mb-[20px]">
-              <YearDropdown onChange={(event: { target: { value: SetStateAction<string>; }; }) => { setYear(event?.target.value) }} year={year} />
-            </div>
-              <div className="flex flex-col mb-[20px]">
-                <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
-                  Quarter:
-                </label>
-                <select
-                  id="quarter"
-                  name="quarter"
-                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  value={quarter}
-                  onChange={(event) => {
-                    setQuarter(event.target?.value);
-                  }}
-                >
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                </select>
-              </div>
-            </>
+            {(selectedTerm?.quarterWiseTable || selectedTerm?.summaryOnly) && (
+              <>
+                <div className="flex flex-row items-center gap-[20px] mb-[20px]">
+                  <YearDropdown onChange={(event: { target: { value: SetStateAction<string>; }; }) => { setYear(event?.target.value) }} year={year} />
+                </div>
+                <div className="flex flex-col mb-[20px]">
+                  <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
+                    Quarter:
+                  </label>
+                  <select
+                    id="quarter"
+                    name="quarter"
+                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={quarter}
+                    onChange={(event) => {
+                      setQuarter(event.target?.value);
+                    }}
+                  >
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                  </select>
+                </div>
+              </>
             )}
           </div>
           <div>

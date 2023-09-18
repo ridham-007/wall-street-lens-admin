@@ -228,14 +228,15 @@ function ImportData(props: ImportDataProps) {
         return result;
     }
 
-    const getArrayofObject = (basicDetails: {}[], rows: any[][]) => {
+    const getArrayofObject = (basicDetails: {}[], rows: any[][], quarterWiseTable: boolean) => {
         const {
             Quarter,
             Year,
         } = basicDetails[0] || {};
         const keys = rows[0];
-
-        keys.push('VisibleToChart');
+        if(quarterWiseTable){
+            keys.push('VisibleToChart');
+        }
         const arrays = keys?.map((current, index) => {
             let quarters = [];
             for (let i = 1; i < rows.length; i++) {
@@ -248,12 +249,13 @@ function ImportData(props: ImportDataProps) {
                     groupKey: i.toString(),
                 })
             }
+
             return {
                 title: current,
                 quarters: quarters,
                 category: '',
                 yoy: '',
-                priority: '',
+                priority: (index+1).toString(),
             }
         })
 
@@ -307,26 +309,28 @@ function ImportData(props: ImportDataProps) {
 
                     let arrayOfObjects: Array<any> = [];
                     let basicDetails: Array<any> = [];
-
+                    let quarterWiseTable = false;
+                    let summaryOnly = false;
                     if (filteredTableData?.length > 1) {
                         basicDetails = convertDataToArrayOfObjects(filteredTableData[0].rows, true);
-                        if (basicDetails[0]?.QuaterSpecificTable === 'Enable') {
-                            arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows)
+                        quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
+                         summaryOnly = basicDetails[0]?.SummaryOnly === 'Enable';
+                        if (quarterWiseTable || summaryOnly) {
+                            arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows, quarterWiseTable)
                         } else {
                             arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
                         }
                     }
-                    const quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
                     let prevPriority: any;
                     let prevCategory: any;
                     sheetsArray.push({
                         company: company?.toString(),
-                        name: basicDetails[0]?.TermsName,
+                        name: sheetName,
                         quarterWiseTable: quarterWiseTable,
-                        summaryOnly: basicDetails[0]?.SummaryOnly === 'Enable',
+                        summaryOnly: summaryOnly,
                         title: basicDetails[0]?.Title || '',
                         description: basicDetails[0]?.Description,
-                        variables: quarterWiseTable ? arrayOfObjects : arrayOfObjects?.map(current => {
+                        variables: quarterWiseTable || summaryOnly ? arrayOfObjects : arrayOfObjects?.map(current => {
                             prevPriority = !current?.Priority?.toString() ? prevPriority : current?.Priority?.toString();
                             prevCategory = !current?.Category?.toString() ? prevCategory : current?.Category?.toString();
                             return {

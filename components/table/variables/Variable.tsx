@@ -39,7 +39,7 @@ export default function Variable({ termId, refetch, selectedTerm, year, quarter,
       variables: {
         termId: termId,
         ...(
-          selectedTerm?.quarterWiseTable && {
+          (selectedTerm?.quarterWiseTable || selectedTerm?.summaryOnly) && {
             quarter: Number(quarter),
             year: Number(year),
           })
@@ -112,7 +112,7 @@ export default function Variable({ termId, refetch, selectedTerm, year, quarter,
         }}
         className="w-[calc((w-screen)- (w-1/5)) overflow-scroll"
       >
-        <table className="app-table w-full">
+        {!selectedTerm?.summaryOnly && (<table className="app-table w-full">
           <thead className="w-full sticky top-0 z-20">
             <THR>
               <>
@@ -167,7 +167,10 @@ export default function Variable({ termId, refetch, selectedTerm, year, quarter,
               );
             })}
           </tbody>
-        </table>
+        </table>)}
+        {/* {selectedTerm.summaryOnly && {
+
+        }} */}
         {show && (
           <AddUpdateParaMeter
             onClose={() => setShow(false)}

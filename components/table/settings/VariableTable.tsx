@@ -77,15 +77,6 @@ const VariableTable = (props: TableProps) => {
             document.removeEventListener("mousedown", checkIfClickedOutside)
         }
     }, [isOpenAction])
-    const toggleMenu = (id: string | number | ((prevState: string) => string) | null | undefined) => {
-        if (isOpenAction) {
-            setIsOpenAction('');
-        } else {
-            if(id){
-                setIsOpenAction(id?.toString());
-            }
-        }
-    };
 
     const tableData = props?.data?.getVariablesByKpiTerm;
     const selectedTerm = props?.termsData?.getKpiTermsByCompanyId?.find((cur: { id: any; }) => cur.id === props.term);

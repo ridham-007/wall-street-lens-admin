@@ -153,6 +153,10 @@ export default function Layout(props: LayoutProps) {
     }
   });
 
+  useEffect(() => {
+    setCompany(companies?.data?.getCompanies[0]?.id)
+  }, [companies])
+
   const logout = () => {
     LoginService.deleteToken();
     LoginService.deleteUser();
