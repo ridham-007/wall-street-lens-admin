@@ -36,16 +36,6 @@ const ParameterTable = (props: TableProps) => {
         }
     }, [isOpenAction])
 
-    const toggleMenu = (id: string | number | ((prevState: string) => string) | null | undefined) => {
-        if (isOpenAction) {
-            setIsOpenAction('');
-        } else {
-            if (id) {
-                setIsOpenAction(id?.toString());
-            }
-        }
-    };
-
     const onDeleteChart = async (id: any) => {
         setShowLoader(true);
         await deleteChart({
@@ -234,7 +224,6 @@ function UpdateChart(props: AddUpdateParameterProps) {
             });
             props.refetch(true)
         } catch (error) {
-            // Handle errors
             console.error('Mutation error:', error);
         }
     };
@@ -280,7 +269,6 @@ function UpdateChart(props: AddUpdateParameterProps) {
         const originalData = termsVaribles.getVariablesByKpiTerm;
         const groupedOptions: Record<string, { cat: string; key: string, id: string }[]> = {};
 
-        // Iterate over the original data and group options by the "title" field
         originalData.forEach((item: VariablesArray) => {
             const { category, title, id } = item;
 
@@ -293,27 +281,17 @@ function UpdateChart(props: AddUpdateParameterProps) {
             }
         });
 
-        // Flatten the grouped options into a single array
         updatedOptions = Object.values(groupedOptions).reduce(
             (accumulator, categoryOptions) => [...accumulator, ...categoryOptions],
             []
         );
     }
 
-    // Handler function to update selectedVariablesArr
-    const handleSelect = (selectedList: any[]) => {
-        setselectedVariablesArr(selectedList);
-    };
-
-    const OnRemoveChip = (selectedList: any[]) => {
-        setselectedVariablesArr(selectedList);
-    }
-
     return (
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Add a chart"
+            title="Update a chart"
             onClose={() => props.onClose && props.onClose()}
         >
             <>
@@ -336,7 +314,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                         </div>
-                        <div className="flex flex-col mb-[20px]">
+                        {/* <div className="flex flex-col mb-[20px]">
                             <label htmlFor="quarter" className="text-sm  text-gray-700">
                                 KPIs Term:
                             </label>
@@ -359,8 +337,8 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                     )
                                 }
                             </select>
-                        </div>
-                        <div className="flex flex-col">
+                        </div> */}
+                        {/* <div className="flex flex-col">
                             <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
                                 Graph Type
                             </label>
@@ -374,10 +352,10 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                 <option value="">Select a option</option>
                                 <option value="Bar">Bar Chart</option>
                                 <option value="Line">Line Chart</option>
-                                <option value="Stacked">Stacked Bar Chart</option>
+                                <option value="StackedBar">Stacked Bar Chart</option>
                             </select>
-                        </div>
-                        <div className="flex flex-col">
+                        </div> */}
+                        {/* <div className="flex flex-col">
                             <label htmlFor="variables_array" className="text-sm  text-gray-700">
                                 Variables Array
                             </label>
@@ -393,10 +371,10 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                 selectedValues={selectedVariablesArr}
                                 showCheckbox
                             />
-                        </div>
+                        </div> */}
 
-                        <div className="flex flex-row">
-                            <label htmlFor="quarter" className="text-sm font-medium  text-gray-700">
+                        <div className="flex flex-col">
+                            <label htmlFor="quarter" className="text-sm mb-[20px] font-medium  text-gray-700">
                                 Visibility
                             </label>
                             <label className="toggle-switch">

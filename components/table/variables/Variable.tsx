@@ -206,36 +206,39 @@ export default function Variable({
           </table>
         )}
         {selectedTerm.summaryOnly &&
-          (headers ?? []).map((header, index) => {
-            const currCell =  rows[0]?.cells[index];
-            return (
-              <div className="flex flex-col">
-                <div className="text-[18px] font-medium my-[16px]">
-                  {header.name}
+          (<div className="border-solid rounded-xl border-2 p-[16px]">
+            {(headers ?? []).map((header, index) => {
+              const currCell = rows[0]?.cells[index];
+              return (
+                <div className="flex flex-col border-solid rounded-sm" key={index}>
+                  <div className="text-[18px] font-medium my-[16px]">
+                    {header.name}
+                  </div>
+                  <div
+                    className="text-[14px] leading-[22px] cursor-pointer"
+                    onClick={() => {
+                      setShow(true);
+                      setCellData({
+                        id: currCell.id,
+                        value: currCell.value,
+                        title: rows[0]?.title,
+                        year: currCell.year,
+                        quarter: currCell.quarter,
+                        groupKey: currCell.groupKey,
+                        quarterId: currCell.quarterId,
+                        termId: currCell.termId,
+                        variableId: currCell.variableId,
+                      });
+                    }}
+                    key={currCell?.id}
+                  >
+                    {currCell?.value ?? ""}
+                  </div>
                 </div>
-                <div
-                  className="text-[14px] leading-[22px] cursor-pointer"
-                  onClick={() => {
-                    setShow(true);
-                    setCellData({
-                      id: currCell.id,
-                      value: currCell.value,
-                      title: rows[0]?.title,
-                      year: currCell.year,
-                      quarter: currCell.quarter,
-                      groupKey: currCell.groupKey,
-                      quarterId: currCell.quarterId,
-                      termId: currCell.termId,
-                      variableId: currCell.variableId,
-                    });
-                  }}
-                  key={currCell?.id}
-                >
-                  {currCell?.value ?? ""}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>)
+        }
         {show && (
           <AddUpdateParaMeter
             onClose={() => setShow(false)}

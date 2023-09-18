@@ -49,7 +49,6 @@ export default function FinancialPage() {
       },
     });
 
-  console.log({})
   useEffect(() => {
     if (!!company && refetch) {
       refetchTerms();
@@ -171,6 +170,7 @@ export default function FinancialPage() {
             selectedCompany={selectedCompany}
             company={company}
             refetch={setRefetch}
+            term={term}
           ></AddUpdateParaMeter>
         )}
       </>
@@ -185,6 +185,7 @@ interface AddUpdateParameterProps {
   financialInitData?: any;
   company: any;
   refetch: any;
+  term:any;
 }
 
 interface KpiTerm {
@@ -208,7 +209,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
   const [val, setVal] = useState({
     title: "",
     graph: "",
-    term: "",
+    term: props.term,
     visible: false,
     xAxis: "",
     yAxis: "",
@@ -349,7 +350,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     <Modal
       showModal={true}
       handleOnSave={handleOnSave}
-      title="Add a chart"
+      title={`Add a chart for ${selectTerm?.name}`}
       onClose={() => props.onClose && props.onClose()}
     >
       <>
@@ -371,29 +372,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 required
                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
-            </div>
-            <div className="flex flex-col mb-[20px]">
-              <label htmlFor="quarter" className="text-sm  text-gray-700">
-                KPIs Term:
-              </label>
-              <select
-                id="quarter"
-                name="term"
-                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none max-w-[250px]"
-                value={val.term}
-                onChange={handleOnChange}
-              >
-                <option value="">Select a option</option>
-                {(termsData?.getKpiTermsByCompanyId ?? []).map(
-                  (cur: KpiTerm) => {
-                    return (
-                      <option key={cur.id} value={cur?.id}>
-                        {cur?.name}
-                      </option>
-                    );
-                  }
-                )}
-              </select>
             </div>
             <div className="flex flex-col">
               <label
@@ -539,7 +517,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                 options={updatedOptions}
                 selectedValues={selectedVariablesArr}
                 showCheckbox
-                className="mt-1"
+                className="mt-1 max-w-[350px]"
               />
             </div>
           )}
