@@ -370,6 +370,18 @@ const GET_CHART_BY_KPI_TERM = gql`query getChartsByKpiTerm(
       title
       type
       visible
+      xAxis {
+        id 
+        title
+      }
+      yAxis {
+        id
+        title
+      }
+      groupBy {
+        id
+        title
+      }
       termVariables {
         id
         title

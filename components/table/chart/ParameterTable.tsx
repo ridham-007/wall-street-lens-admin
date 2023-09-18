@@ -67,13 +67,15 @@ const ParameterTable = (props: TableProps) => {
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { id: ((prevState: string) => string) | Key | null | undefined; title: string | JSX.Element | undefined; type: string | JSX.Element | undefined; visible: any; }) => {
+                    {tableData?.map((current: {
+                        kpiTerm: any; id: ((prevState: string) => string) | Key | null | undefined; title: string | JSX.Element | undefined; type: string | JSX.Element | undefined; visible: any; 
+}) => {
                         return <TDR key={current?.id}>
                             <>
                                 <TD>{current?.title}</TD>
                                 <TD>{current?.type}</TD>
                                 <TD>{current?.visible ? 'Visible' : 'Hidden'}</TD>
-                                <TD>Financial Summary</TD>
+                                <TD>{current?.kpiTerm?.name}</TD>
                                 <TD style="text-center">
                                     <div
                                         className="flex justify-center gap-[10px] items-center"
@@ -171,6 +173,9 @@ function UpdateChart(props: AddUpdateParameterProps) {
         graph: props?.currentData?.type,
         term: props?.currentData?.kpiTerm?.id,
         visible: props?.currentData?.visible,
+        xAxisId: props?.currentData?.xAxis?.id,
+        yAxisId: props?.currentData?.yAxis?.id,
+        groupById: props?.currentData?.groupBy?.id,
     });
 
     const [getTermsDetails, { data: termsData }] =
@@ -219,6 +224,9 @@ function UpdateChart(props: AddUpdateParameterProps) {
                         visible: val.visible,
                         termId: val.term,
                         variableIds: selectedVariablesArr?.map(current => current?.id),
+                        xAxisId: val.xAxisId,
+                        yAxisId: val.yAxisId,
+                        groupById: val.groupById,
                     },
                 },
             });
