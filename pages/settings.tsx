@@ -228,13 +228,13 @@ function ImportData(props: ImportDataProps) {
         return result;
     }
 
-    const getArrayofObject = (basicDetails: {}[], rows: any[][], quarterWiseTable: boolean) => {
+    const getArrayofObject = (basicDetails: {}[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) => {
         const {
             Quarter,
             Year,
         } = basicDetails[0] || {};
         const keys = rows[0];
-        if(quarterWiseTable){
+        if (quarterWiseTable && !summaryOnly){
             keys.push('VisibleToChart');
         }
         const arrays = keys?.map((current, index) => {
@@ -316,7 +316,7 @@ function ImportData(props: ImportDataProps) {
                         quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
                          summaryOnly = basicDetails[0]?.SummaryOnly === 'Enable';
                         if (quarterWiseTable || summaryOnly) {
-                            arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows, quarterWiseTable)
+                            arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows, quarterWiseTable, summaryOnly)
                         } else {
                             arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
                         }
@@ -326,7 +326,7 @@ function ImportData(props: ImportDataProps) {
                     sheetsArray.push({
                         company: company?.toString(),
                         name: sheetName,
-                        quarterWiseTable: quarterWiseTable,
+                        quarterWiseTable: quarterWiseTable || summaryOnly,
                         summaryOnly: summaryOnly,
                         title: basicDetails[0]?.Title || '',
                         description: basicDetails[0]?.Description,
