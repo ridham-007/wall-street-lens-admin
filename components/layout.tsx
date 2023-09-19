@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/router";
-import { GET_COMPANIES } from "@/utils/query";
+import { GET_COMPANIES, GET_INDUSTRIES, GET_SUB_INDUSTRIES } from "@/utils/query";
 
 export enum LayoutPages {
   "financial_summary" = "financial_summary",
@@ -80,6 +80,8 @@ const subIndustryDataArray = [
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
   const companies = useQuery(GET_COMPANIES);
+  const industries = useQuery(GET_INDUSTRIES);
+  const subIndustries = useQuery(GET_SUB_INDUSTRIES);
 
   const [isOpenAction, setIsOpenAction] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
@@ -87,9 +89,7 @@ export default function Layout(props: LayoutProps) {
   const [newPassword, setNewPassword] = useState("");
   const [reEnterPassword, setReEnterPassword] = useState("");
   const ref = useRef<HTMLInputElement | null>(null);
-  const [company, setCompany] = useState('TESLA');
-  const [subIndustry, setSubIndustry] = useState('Electric Vehicles');
-  const [industry, setIndustry] = useState('Automotive');
+  const [company, setCompany] = useState(0);
   const router = useRouter();
 
   const [updatePassword, { data, error, loading }] = useMutation(
@@ -192,20 +192,29 @@ export default function Layout(props: LayoutProps) {
   const handleOnChange = (event: { target: { value: SetStateAction<string>; name: string; }; }) => {
     switch (event.target.name) {
       case 'industry':
-        setIndustry(event.target.value);
-        setCompany('');
-        setSubIndustry('');
+        setCompany(0);
         break;
       case 'subindustry':
-        setSubIndustry(event.target.value);
-        setCompany('');
+        setCompany(0);
         break;
       case 'company':
-        setCompany(event.target.value);
+        setCompany(Number(event.target.value));
         break;
 
     }
   }
+
+  let selectedSubIndustry = {};
+
+  if (companies?.data?.getCompanies?.length && subIndustries?.data?.getSubIndustries?.length){
+    const selectedCompany = companies?.data?.getCompanies?.find((cur: { id: string; }) => cur.id === company);
+    const subId = selectedCompany?.attributes?.subIndustries[0]?.id;
+    selectedSubIndustry = subIndustries?.data?.getSubIndustries?.find((cur: { id: any; }) => cur.id === subId)
+  }
+
+  const industryName = selectedSubIndustry?.attributes?.industry?.name;
+  const subIndustryName = selectedSubIndustry?.attributes?.name;
+  console.log({ industryName, subIndustryName })
 
   return (
     <>
@@ -233,21 +242,42 @@ export default function Layout(props: LayoutProps) {
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Wall Street Lens
           </h1>
-          <div className="flex gap-[20px] items-center mr-auto">
-            <select
-              id="quarter"
-              name="company"
-              className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={company}
-              onChange={handleOnChange}
+          <div className="mr-auto flex gap-[15px]">
+            <div className="flex gap-[20px] mr-[10px] items-center">
+              <select
+                id="quarter"
+                name="company"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={company}
+                onChange={handleOnChange}
+              >
+                <option value="">Select a option</option>
+                {
+                  companies?.data?.getCompanies.map((ele) => {
+                    return <option key={ele.id} value={ele.id}>{ele.attributes.name}</option>;
+                  })
+                }
+              </select>
+            </div>
+          {industryName && (<div className="flex items-center mr-auto">
+            <label
+              htmlFor="title"
+              className="text-sm mr-[10px] font-bold text-gray-700"
             >
-              <option value="">Select a option</option>
-              {
-                companies?.data?.getCompanies.map((ele) => {
-                      return <option key={ele.id} value={ele.id}>{ele.attributes.name}</option>;
-                })
-              }
-            </select>
+              Industry:
+            </label>
+            <div className="text-sm">{industryName}</div>
+          </div>)}
+            {subIndustryName && (<div className="flex items-center mr-auto">
+            <label
+              htmlFor="title"
+                className="text-sm mr-[10px] font-bold text-gray-700"
+            >
+              SubIdustry:
+            </label>
+            <div className="text-sm">{subIndustryName}</div>
+          </div>)}
+          
           </div>
           <div className="flex align-right items-center">
             <button onClick={handleOpen}>

@@ -316,7 +316,6 @@ function ImportData(props: ImportDataProps) {
                             currentTable.push(sanitizedRow);
                         }
                     }
-
                     if (currentTable) {
                         tableData.push({ tableName, header: header!, rows: currentTable });
                     }
