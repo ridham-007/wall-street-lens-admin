@@ -445,6 +445,10 @@ const GET_COMPANIES = gql`query getCompanies {
       attributes {
         name
         slug
+        subIndustries {
+          id
+          name
+        }
       }
   }
 }`;
@@ -465,6 +469,10 @@ const GET_SUB_INDUSTRIES = gql`
         id
         attributes {
           name
+          industry {
+            id
+            name
+          }
         }
     }
 }
