@@ -186,6 +186,7 @@ function ImportData(props: ImportDataProps) {
     const companies = useQuery(GET_COMPANIES);
     const [sheetsData, setSheetsData] = useState<SheetValue[]>([]);
     const [company, setCompany] = useState('')
+    const [selectedFileName, setSelectedFileName] = useState('');
 
     const regex = new RegExp('Q[1-4]{1}-[0-9]{4}$');
     const handleOnSave = () => {
@@ -242,11 +243,14 @@ function ImportData(props: ImportDataProps) {
             for (let i = 1; i < rows.length; i++) {
                 const values = rows[i];
 
+                const date = new Date(); // Replace with your date
+                const formattedDate = formatDateAsYYYYMMDDHHMMSS(date);
+
                 quarters.push({
-                    quarter: Quarter,
-                    year: Year,
+                    quarter: Number(Quarter),
+                    year: Number(Year),
                     value: current === "VisibleToChart" ? 'false' : values[index].toString(),
-                    groupKey: i.toString(),
+                    groupKey: `${formattedDate}-${i.toString()}`,
                 })
             }
 
@@ -262,19 +266,35 @@ function ImportData(props: ImportDataProps) {
         return arrays;
     }
 
+    function formatDateAsYYYYMMDDHHMMSS(date: Date): string {
+      const year = date.getFullYear().toString();
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      const day = date.getDate().toString().padStart(2, "0");
+      const hour = date.getHours().toString().padStart(2, "0");
+      const minute = date.getMinutes().toString().padStart(2, "0");
+      const second = date.getSeconds().toString().padStart(2, "0");
+
+      return `${year}${month}${day}${hour}${minute}${second}`;
+    }
+      
+
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target?.files?.[0];
-
+        if (file) {
+            setSelectedFileName(file.name);
+          } else {
+            setSelectedFileName('');
+          }
         if (file) {
             const reader = new FileReader();
 
             reader.onload = async (e) => {
                 const arrayBuffer = e.target?.result as ArrayBuffer;
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const workbook = XLSX.read(arrayBuffer, { type: 'array', raw: false });
                 const sheetsArray: SheetValue[] = [];
                 for (const sheetName of workbook.SheetNames) {
                     const worksheet = workbook.Sheets[sheetName];
-                    const parsedData: Array<any> = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    const parsedData: Array<any> = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
                     let tableData: { tableName: string, header: string[], rows: any[][] }[] = [];
                     let currentTable: any[][] | null = null;
                     let header: string[] | null = null;
@@ -357,51 +377,58 @@ function ImportData(props: ImportDataProps) {
     };
 
     return (
-        <Modal
-            showModal={true}
-            handleOnSave={handleOnSave}
-            title="Import Data from Excel sheet"
-            onClose={() => props.onClose && props.onClose()}
-        >
-            <>
-                <form className="form w-100">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex gap-[20px] items-center mr-auto">
-                            <select
-                                id="quarter"
-                                name="company"
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                value={company}
-                                onChange={(event) => { setCompany(event.target.value) }}
-                            >
-                                <option value="">Select a option</option>
-                                {
-                                    companies?.data?.getCompanies.map((ele: {
-                                        id: readonly string[] | Key | null | undefined; attributes: {
-                                            slug: Key | null | undefined; name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined;
-                                        };
-                                    }) => {
-                                        return <option key={ele.attributes.slug} value={ele.id}>{ele.attributes.name}</option>;
-                                    })
-                                }
-                            </select>
-                        </div>
-                        <div className="flex flex-col">
-                            <label htmlFor="quarter" className="text-sm font-medium text-gray-700">
-                                Select Excel Sheet
-                            </label>
-                            <input
-                                type="file"
-                                accept=".xlsx, .xls"
-                                onChange={handleFileUpload}
-                                disabled={!company}
-                                className=" text-white font-bold py-2 px-4 rounded-full"
-                            />
-                        </div>
-                    </div>
-                </form>
-                <ToastContainer />
-            </>
-        </Modal>
+      <Modal
+        showModal={true}
+        handleOnSave={handleOnSave}
+        title="Import Data from Excel sheet"
+        onClose={() => props.onClose && props.onClose()}
+      >
+        <>
+          <form className="form">
+            <div className="flex  gap-[20px]">
+              <div className="flex items-start">
+                <select
+                  id="quarter"
+                  name="company"
+                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={company}
+                  onChange={(event) => {
+                    setCompany(event.target.value);
+                  }}
+                >
+                  <option value="">Select a option</option>
+                  {companies?.data?.getCompanies.map(
+                    (ele: {
+                      id: readonly string[] | Key | null | undefined;
+                      attributes: {
+                        slug: Key | null | undefined;
+                        name: string
+                      };
+                    }) => {
+                      return (
+                        <option key={ele.attributes.slug} value={ele.id}>
+                          {ele.attributes.name}
+                        </option>
+                      );
+                    }
+                  )}
+                </select>
+              </div>
+              <div className="flex items-center flex-col">
+                
+                <input
+                  type="file"
+                  accept=".xlsx, .xls"
+                  onChange={handleFileUpload}
+                  disabled={!company}
+                  className=" text-white font-bold py-2 px-4 w-[150px] rounded-full"
+                />
+                <span> {selectedFileName}</span>
+              </div>
+            </div>
+          </form>
+          <ToastContainer />
+        </>
+      </Modal>
     );
 }
