@@ -305,7 +305,6 @@ function ImportData(props: ImportDataProps) {
                         header,
                         rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
                     }));
-                    console.log({ filteredTableData })
 
                     let arrayOfObjects: Array<any> = [];
                     let basicDetails: Array<any> = [];
