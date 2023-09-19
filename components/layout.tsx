@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/router";
-import { GET_COMPANIES } from "@/utils/query";
+import { GET_COMPANIES, GET_INDUSTRIES, GET_SUB_INDUSTRIES } from "@/utils/query";
 
 export enum LayoutPages {
   "financial_summary" = "financial_summary",
@@ -80,7 +80,10 @@ const subIndustryDataArray = [
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
   const companies = useQuery(GET_COMPANIES);
+  const industries = useQuery(GET_INDUSTRIES);
+  const subIndustries = useQuery(GET_SUB_INDUSTRIES);
 
+  console.log({ industries, subIndustries })
   const [isOpenAction, setIsOpenAction] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
   const [oldPassword, setOldPassword] = useState("");

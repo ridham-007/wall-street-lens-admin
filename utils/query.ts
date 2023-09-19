@@ -449,6 +449,27 @@ const GET_COMPANIES = gql`query getCompanies {
   }
 }`;
 
+const GET_INDUSTRIES = gql`query getIndustries {
+      getIndustries{
+        id
+        attributes {
+          name
+        }
+    }
+}
+`;
+
+const GET_SUB_INDUSTRIES = gql`
+  query getSubIndustries {
+      getSubIndustries{
+        id
+        attributes {
+          name
+        }
+    }
+}
+`;
+
 export {
   LOG_IN,
   ADD_FINANCIAL_SUMMARY_PARAMETER,
@@ -480,4 +501,6 @@ export {
   DELTE_QUARTER,
   CREATE_DEFAULT_MAPPING,
   GET_COMPANIES,
+  GET_INDUSTRIES,
+  GET_SUB_INDUSTRIES,
 }
