@@ -93,7 +93,7 @@ export default function FinancialPage() {
       document.removeEventListener("mousedown", checkIfClickedOutside);
     };
   }, [isOpenAction]);
-
+  const selectTerm = termsData?.getKpiTermsByCompanyId?.find((cur: any) => cur?.id === term)
   return (
     <Layout title="Management Chart" page={LayoutPages.management_chart}>
       <>
@@ -158,6 +158,7 @@ export default function FinancialPage() {
               company={company}
               data={chartData}
               refetch={setRefetch}
+              selectTerm={selectTerm}
             />
           }
         </div>

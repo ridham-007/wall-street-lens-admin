@@ -270,11 +270,11 @@ function ImportData(props: ImportDataProps) {
 
             reader.onload = async (e) => {
                 const arrayBuffer = e.target?.result as ArrayBuffer;
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const workbook = XLSX.read(arrayBuffer, { type: 'array', raw: true });
                 const sheetsArray: SheetValue[] = [];
                 for (const sheetName of workbook.SheetNames) {
                     const worksheet = workbook.Sheets[sheetName];
-                    const parsedData: Array<any> = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    const parsedData: Array<any> = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
                     let tableData: { tableName: string, header: string[], rows: any[][] }[] = [];
                     let currentTable: any[][] | null = null;
                     let header: string[] | null = null;
@@ -296,7 +296,6 @@ function ImportData(props: ImportDataProps) {
                             currentTable.push(sanitizedRow);
                         }
                     }
-
                     if (currentTable) {
                         tableData.push({ tableName, header: header!, rows: currentTable });
                     }
@@ -306,6 +305,7 @@ function ImportData(props: ImportDataProps) {
                         header,
                         rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
                     }));
+                    console.log({ filteredTableData })
 
                     let arrayOfObjects: Array<any> = [];
                     let basicDetails: Array<any> = [];
