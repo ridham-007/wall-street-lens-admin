@@ -115,6 +115,8 @@ export default function Variable({
     setDeleteId(identifier);
   };
 
+  const selectedColumn = headers[cellData?.columnIndex];
+
   return (
     <>
       {showLoader && <Loader />}
@@ -174,7 +176,8 @@ export default function Variable({
                         <TD>{year}</TD>
                       )}
 
-                      {current.cells.map((cur) => {
+                      {current.cells.map((cur, index) => {
+                        const selectedColumn = headers[index];
                         return (
                           <TD
                             style="cursor-pointer"
@@ -190,11 +193,42 @@ export default function Variable({
                                 quarterId: cur.quarterId,
                                 termId: cur.termId,
                                 variableId: cur.variableId,
+                                columnIndex: index,
                               });
                             }}
                             key={cur.id}
                           >
-                            {cur?.value}
+                            <>
+                              {selectedColumn.name !== "VisibleToChart" &&
+                                cur?.value}
+                              {cur.value === "true" &&
+                                selectedColumn.name === "VisibleToChart" && (
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    data-name="Layer 1"
+                                    viewBox="0 0 99 123.75"
+                                    x="0px"
+                                    y="0px"
+                                    className="w-7 h-7"
+                                  >
+                                    <path d="M72.69,40,46.44,66.31a2.62,2.62,0,0,1-3.65,0L26.3,49.82a2.6,2.6,0,0,1,0-3.65L30,42.44a2.65,2.65,0,0,1,3.63,0l10.94,11L65.33,32.67a2.65,2.65,0,0,1,3.63,0l3.73,3.75A2.55,2.55,0,0,1,72.69,40Z" />
+                                  </svg>
+                                )}
+
+                              {cur.value === "false" &&
+                                selectedColumn.name === "VisibleToChart" && (
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    data-name="Layer 1"
+                                    viewBox="0 0 99 123.75"
+                                    x="0px"
+                                    y="0px"
+                                    className="w-7 h-7"
+                                  >
+                                    <path d="M70.25,62.65a2.66,2.66,0,0,1,0,3.76L66.4,70.26a2.64,2.64,0,0,1-3.75,0L49.49,57.1,36.34,70.26a2.73,2.73,0,0,1-3.75,0l-3.87-3.85a2.71,2.71,0,0,1,0-3.76L41.89,49.5,28.73,36.35a2.71,2.71,0,0,1,0-3.76l3.87-3.85A2.65,2.65,0,0,1,34.47,28a2.68,2.68,0,0,1,1.87.78L49.49,41.9,62.65,28.74a2.73,2.73,0,0,1,3.75,0l3.85,3.85a2.66,2.66,0,0,1,0,3.76L57.09,49.5Z" />
+                                  </svg>
+                                )}
+                            </>
                           </TD>
                         );
                       })}
@@ -205,12 +239,15 @@ export default function Variable({
             </tbody>
           </table>
         )}
-        {selectedTerm.summaryOnly &&
-          (<div className="border-solid rounded-xl border-2 p-[16px]">
+        {selectedTerm.summaryOnly && (
+          <div className="border-solid rounded-xl border-2 p-[16px]">
             {(headers ?? []).map((header, index) => {
               const currCell = rows[0]?.cells[index];
               return (
-                <div className="flex flex-col border-solid rounded-sm" key={index}>
+                <div
+                  className="flex flex-col border-solid rounded-sm"
+                  key={index}
+                >
                   <div className="text-[18px] font-medium my-[16px]">
                     {header.name}
                   </div>
@@ -237,13 +274,14 @@ export default function Variable({
                 </div>
               );
             })}
-          </div>)
-        }
+          </div>
+        )}
         {show && (
           <AddUpdateParaMeter
             onClose={() => setShow(false)}
             onSave={onSave}
             cellData={cellData}
+            selectedColumn={selectedColumn}
           />
         )}
       </div>
@@ -255,6 +293,7 @@ interface AddUpdateParameterProps {
   onSave?: any;
   onClose?: any;
   cellData?: any;
+  selectedColumn?: any;
 }
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
@@ -274,7 +313,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const value =
-      e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      e.target.type === "checkbox" ? e.target.checked?.toString() : e.target.value;
     setVal(value);
   };
 
@@ -311,17 +350,28 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             <label htmlFor="value" className="text-lg font-bold text-gray-700">
               Value:
             </label>
-            {val.length < 30 && (
-              <input
-                type="text"
-                id="value"
-                name="value"
-                value={val}
-                onChange={handleOnChange}
-                required
-                className="w-full mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-              />
+            {props.selectedColumn.name === "VisibleToChart" && (
+              <div>
+                <input
+                  type="checkbox"
+                  checked={val === "true"}
+                  onChange={handleOnChange}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+              </div>
             )}
+            {val.length < 30 &&
+              props.selectedColumn.name !== "VisibleToChart" && (
+                <input
+                  type="text"
+                  id="value"
+                  name="value"
+                  value={val}
+                  onChange={handleOnChange}
+                  required
+                  className="w-full mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
+              )}
             {val.length >= 31 && (
               <textarea
                 id="value"
