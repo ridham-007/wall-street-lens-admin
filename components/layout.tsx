@@ -47,40 +47,9 @@ const CHANGE_PASSWORD = gql`
   }
 `;
 
-const industryData = [
-  {
-    industry: "Technology",
-    subIndustries: ["Software Development"]
-  },
-  {
-    industry: "Automotive",
-    subIndustries: ["Electric Vehicles"]
-  },
-  {
-    industry: "Retail and Technology",
-    subIndustries: ["E-commerce",]
-  },
-];
-
-const subIndustryDataArray = [
-  {
-    name: "Software Development",
-    companies: ["Microsoft", "Google", "Facebook"],
-  },
-  {
-    name: "Electric Vehicles",
-    companies: ["TESLA", "Rivian Automotive"],
-  },
-  {
-    name: "E-commerce",
-    companies: ["Amazon.com, Inc.", "Alibaba Group", "eBay Inc."],
-  },
-];
-
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
   const companies = useQuery(GET_COMPANIES);
-  const industries = useQuery(GET_INDUSTRIES);
   const subIndustries = useQuery(GET_SUB_INDUSTRIES);
 
   const [isOpenAction, setIsOpenAction] = useState(false);
@@ -206,15 +175,14 @@ export default function Layout(props: LayoutProps) {
 
   let selectedSubIndustry = {};
 
-  if (companies?.data?.getCompanies?.length && subIndustries?.data?.getSubIndustries?.length){
-    const selectedCompany = companies?.data?.getCompanies?.find((cur: { id: string; }) => cur.id === company);
+  if (companies?.data?.getCompanies?.length && subIndustries?.data?.getSubIndustries?.length) {
+    const selectedCompany = companies?.data?.getCompanies?.find((cur: { id: number; }) => cur.id === company);
     const subId = selectedCompany?.attributes?.subIndustries[0]?.id;
     selectedSubIndustry = subIndustries?.data?.getSubIndustries?.find((cur: { id: any; }) => cur.id === subId)
   }
 
   const industryName = selectedSubIndustry?.attributes?.industry?.name;
   const subIndustryName = selectedSubIndustry?.attributes?.name;
-  console.log({ industryName, subIndustryName })
 
   return (
     <>
@@ -259,25 +227,25 @@ export default function Layout(props: LayoutProps) {
                 }
               </select>
             </div>
-          {industryName && (<div className="flex items-center mr-auto">
-            <label
-              htmlFor="title"
-              className="text-sm mr-[10px] font-bold text-gray-700"
-            >
-              Industry:
-            </label>
-            <div className="text-sm">{industryName}</div>
-          </div>)}
-            {subIndustryName && (<div className="flex items-center mr-auto">
-            <label
-              htmlFor="title"
+            {industryName && (<div className="flex items-center mr-auto">
+              <label
+                htmlFor="title"
                 className="text-sm mr-[10px] font-bold text-gray-700"
-            >
-              SubIdustry:
-            </label>
-            <div className="text-sm">{subIndustryName}</div>
-          </div>)}
-          
+              >
+                Industry:
+              </label>
+              <div className="text-sm">{industryName}</div>
+            </div>)}
+            {subIndustryName && (<div className="flex items-center mr-auto">
+              <label
+                htmlFor="title"
+                className="text-sm mr-[10px] font-bold text-gray-700"
+              >
+                SubIdustry:
+              </label>
+              <div className="text-sm">{subIndustryName}</div>
+            </div>)}
+
           </div>
           <div className="flex align-right items-center">
             <button onClick={handleOpen}>

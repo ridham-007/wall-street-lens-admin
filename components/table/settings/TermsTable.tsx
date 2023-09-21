@@ -3,7 +3,7 @@ import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
 import { useMutation, useQuery } from "@apollo/client";
-import { ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID } from "@/utils/query";
+import { ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID, GET_SUB_INDUSTRIES } from "@/utils/query";
 import { GET_COMPANIES } from "@/utils/query";
 
 export interface TableProps {
@@ -14,7 +14,7 @@ export interface TableProps {
 
 const TermsTable = (props: TableProps) => {
     const companies = useQuery(GET_COMPANIES);
-
+    const subIndustries = useQuery(GET_SUB_INDUSTRIES);
     const [isOpenAction, setIsOpenAction] = useState('');
     const [show, setShow] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
@@ -74,6 +74,19 @@ const TermsTable = (props: TableProps) => {
     };
 
     const tableData = props?.data?.getKpiTermsByCompanyId;
+
+    let selectedSubIndustry = {};
+    let companyName = '';
+    if (companies?.data?.getCompanies?.length && subIndustries?.data?.getSubIndustries?.length) {
+        const selectedCompany = companies?.data?.getCompanies?.find((cur: { id: number; }) => cur.id === Number(props.company));
+        companyName = selectedCompany?.attributes?.name;
+        const subId = selectedCompany?.attributes?.subIndustries[0]?.id;
+        selectedSubIndustry = subIndustries?.data?.getSubIndustries?.find((cur: { id: any; }) => cur.id === subId)
+    }
+
+    const industryName = selectedSubIndustry?.attributes?.industry?.name;
+    const subIndustryName = selectedSubIndustry?.attributes?.name;
+
     return <>
         {showLoader && (<Loader />)}
         <div
@@ -128,11 +141,11 @@ const TermsTable = (props: TableProps) => {
                         return <TDR key={current?.id || Math.random().toString()}>
                             <>
                                 <TD>{current?.name}</TD>
-                                <TD>{current?.company}</TD>
+                                <TD>{companyName || '-'}</TD>
                                 {/* <TD>{current?.quarterWiseTable? 'Enabled':'Disabled'}</TD>
                                 <TD>{current?.summaryOnly ? 'Enabled' : 'Disabled'}</TD> */}
-                                <TD>Industry</TD>
-                                <TD>Sub Industry</TD>
+                                <TD>{industryName || '-'}</TD>
+                                <TD>{subIndustryName || '-'}</TD>
                                 <TD style="text-center">
                                     <>
                                         <div
@@ -162,11 +175,11 @@ const TermsTable = (props: TableProps) => {
                 </tbody>
             </table>
         </div >
-        {show && (<AddUpdateTerms data={currentData} onClose={() => { setShow(false); setCurrentData({}) }} onSuccess={onAddUpdateKpiTerm}/>)}
+        {show && (<AddUpdateTerms data={currentData} onClose={() => { setShow(false); setCurrentData({}) }} onSuccess={onAddUpdateKpiTerm} />)}
         {deletePopup && <DeleteTerm id={deleteId} onSuccess={onDeleteKPI} onClose={() => {
             setDeleteId('');
             setDeletePopup(false);
-        }} />}      
+        }} />}
     </>
 }
 
