@@ -4,6 +4,7 @@ import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
+import SummaryView from "./SummaryView";
 
 export interface TableProps {
   termId: string;
@@ -251,7 +252,25 @@ export default function Variable({
                   <div className="text-[18px] font-medium my-[16px]">
                     {header.name}
                   </div>
-                  <div
+                  <SummaryView 
+                    key={currCell?.id}
+                    contentString={currCell?.value ?? ""}
+                    onClick={() => {
+                      setShow(true);
+                      setCellData({
+                        id: currCell.id,
+                        value: currCell.value,
+                        title: rows[0]?.title,
+                        year: currCell.year,
+                        quarter: currCell.quarter,
+                        groupKey: currCell.groupKey,
+                        quarterId: currCell.quarterId,
+                        termId: currCell.termId,
+                        variableId: currCell.variableId,
+                      });
+                    }}
+                  />
+                  {/* <div
                     className="text-[14px] leading-[22px] cursor-pointer"
                     onClick={() => {
                       setShow(true);
@@ -267,10 +286,10 @@ export default function Variable({
                         variableId: currCell.variableId,
                       });
                     }}
-                    key={currCell?.id}
+                    
                   >
                     {currCell?.value ?? ""}
-                  </div>
+                  </div> */}
                 </div>
               );
             })}

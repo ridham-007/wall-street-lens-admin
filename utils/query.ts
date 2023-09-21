@@ -445,9 +445,38 @@ const GET_COMPANIES = gql`query getCompanies {
       attributes {
         name
         slug
+        subIndustries {
+          id
+          name
+        }
       }
   }
 }`;
+
+const GET_INDUSTRIES = gql`query getIndustries {
+      getIndustries{
+        id
+        attributes {
+          name
+        }
+    }
+}
+`;
+
+const GET_SUB_INDUSTRIES = gql`
+  query getSubIndustries {
+      getSubIndustries{
+        id
+        attributes {
+          name
+          industry {
+            id
+            name
+          }
+        }
+    }
+}
+`;
 
 export {
   LOG_IN,
@@ -480,4 +509,6 @@ export {
   DELTE_QUARTER,
   CREATE_DEFAULT_MAPPING,
   GET_COMPANIES,
+  GET_INDUSTRIES,
+  GET_SUB_INDUSTRIES,
 }
