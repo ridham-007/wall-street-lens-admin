@@ -176,6 +176,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
         xAxisId: props?.currentData?.xAxis?.id,
         yAxisId: props?.currentData?.yAxis?.id,
         groupById: props?.currentData?.groupBy?.id,
+        fullScreen: props?.currentData?.width === 100,
     });
 
     const [getTermsDetails, { data: termsData }] =
@@ -227,6 +228,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
                         xAxisId: val.xAxisId,
                         yAxisId: val.yAxisId,
                         groupById: val.groupById,
+                        width: val.fullScreen ? 100 : 50,
                     },
                 },
             });
@@ -464,6 +466,24 @@ function UpdateChart(props: AddUpdateParameterProps) {
                             </label>
                             <label className="toggle-switch">
                                 <input type="checkbox" checked={val.visible} name='visible' onChange={handleOnChange} />
+                                <span className="switch" />
+                            </label>
+                        </div>
+
+                        <div className="flex flex-col">
+                            <label
+                                htmlFor="quarter"
+                                className="text-sm font-medium  text-gray-700"
+                            >
+                                Full Screen View
+                            </label>
+                            <label className="toggle-switch mt-2">
+                                <input
+                                    type="checkbox"
+                                    checked={val.fullScreen}
+                                    name="fullScreen"
+                                    onChange={handleOnChange}
+                                />
                                 <span className="switch" />
                             </label>
                         </div>

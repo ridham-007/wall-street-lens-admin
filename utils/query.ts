@@ -370,6 +370,7 @@ const GET_CHART_BY_KPI_TERM = gql`query getChartsByKpiTerm(
       title
       type
       visible
+      width
       xAxis {
         id 
         title

@@ -218,10 +218,10 @@ export default function Variable({
                             key={cur.id}
                           >
                             <>
-                              {selectedColumn.name !== "VisibleToChart" &&
+                              {selectedColumn?.name !== "VisibleToChart" &&
                                 cur?.value}
                               {cur.value === "true" &&
-                                selectedColumn.name === "VisibleToChart" && (
+                                selectedColumn?.name === "VisibleToChart" && (
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     data-name="Layer 1"
@@ -235,7 +235,7 @@ export default function Variable({
                                 )}
 
                               {cur.value === "false" &&
-                                selectedColumn.name === "VisibleToChart" && (
+                                selectedColumn?.name === "VisibleToChart" && (
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     data-name="Layer 1"
@@ -258,7 +258,7 @@ export default function Variable({
             </tbody>
           </table>
         )}
-        {selectedTerm.summaryOnly && (
+        {selectedTerm?.summaryOnly && (
           <div className="border-solid rounded-xl border-2 p-[16px]">
             {(headers ?? []).map((header, index) => {
               const currCell = rows[0]?.cells[index];
@@ -387,7 +387,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             <label htmlFor="value" className="text-lg font-bold text-gray-700">
               Value:
             </label>
-            {props.selectedColumn.name === "VisibleToChart" && (
+            {props.selectedColumn?.name === "VisibleToChart" && (
               <div>
                 <input
                   type="checkbox"
@@ -398,7 +398,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
               </div>
             )}
             {val.length < 30 &&
-              props.selectedColumn.name !== "VisibleToChart" && (
+              props.selectedColumn?.name !== "VisibleToChart" && (
                 <input
                   type="text"
                   id="value"
