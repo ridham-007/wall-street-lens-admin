@@ -14,7 +14,6 @@ import YearDropdown from "@/components/year_dropdown/year_dropdown";
 import { Modal } from "@/components/model";
 import { ADD_QUARTER } from "@/utils/query";
 
-
 interface KpiTerm {
   id: string;
   name: string;
@@ -51,7 +50,6 @@ export default function VariableDetails() {
       },
     });
   };
-
   useEffect(() => {
     if (updateQuarter && addQuarterData?.addUpdateQuarter?.id) {
       addDefaultMapping(addQuarterData?.addUpdateQuarter?.id);
@@ -59,12 +57,19 @@ export default function VariableDetails() {
     setUpdateQuater(false);
   }, [addQuarterData]);
 
-  const handleOnAddQuarter = async (val: { quarter: any; year: any }) => {
+  const handleOnAddQuarter = async (val: {
+    id: string;
+    highlightColor: string;
+    quarter: any;
+    year: any;
+  }) => {
     setShowLoader(true);
     setUpdateQuater(true);
     await addQuarter({
       variables: {
         variableInfo: {
+          ...(val.id && { id: val.id }),
+          highlightColor: val?.highlightColor || "",
           quarter: Number(val.quarter),
           year: Number(val.year),
         },
@@ -124,7 +129,6 @@ export default function VariableDetails() {
   const selectedTerm = termsData?.getKpiTermsByCompanyId?.find(
     (cur: { id: string }) => cur.id === termId
   );
-
   return (
     <Layout title="Financial Summary" page={LayoutPages.variable_details}>
       <>
@@ -287,7 +291,6 @@ export default function VariableDetails() {
   );
 }
 
-
 interface QuarterDataProps {
   onSuccess?: any;
   onClose?: any;
@@ -301,22 +304,23 @@ function QuarterData(props: QuarterDataProps) {
   });
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
-    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    const value =
+      e.target.type === "checkbox" ? e.target.checked : e.target.value;
     const name = e.target.name;
 
     setVal((prevVal) => ({
       ...prevVal,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleOnSave = () => {
     if (!val.quarter || !val.year) {
       return;
-    };
+    }
     props.onSuccess && props.onSuccess(val);
     props.onClose && props.onClose();
-  }
+  };
 
   return (
     <Modal
