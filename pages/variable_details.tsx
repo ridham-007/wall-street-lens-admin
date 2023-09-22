@@ -29,7 +29,7 @@ export default function VariableDetails() {
   const [showLoader, setShowLoader] = useState(false);
   const [company, setCompany] = useState("");
   const [deleteId, setDeleteId] = useState("");
-  const [editId,setEditId] = useState("");
+  const [editData, setEditId] = useState({});
   const [refetch, setRefetch] = useState(false);
   const [quarter, setQuarter] = useState("1");
   const [year, setYear] = useState("2023");
@@ -38,8 +38,6 @@ export default function VariableDetails() {
   const [deleteQuarter] = useMutation(DELTE_QUARTER);
   const [updateQuarter, setUpdateQuater] = useState(false);
   const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING);
-  const [cellData, setCellData] = useState({});
-
   const [showDelete, setShowDelete] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const addDefaultMapping = async (id: any) => {
@@ -80,6 +78,29 @@ export default function VariableDetails() {
     setRefetch(true);
   };
 
+
+  const handleOnUpdateQuarter = async (val: {
+    id: string;
+    highlightColor: string;
+    quarter: any;
+    year: any;
+  }) => {
+    setShowLoader(true);
+    await addQuarter({
+      variables: {
+        variableInfo: {
+          ...(val.id && { id: val.id }),
+          highlightColor: val?.highlightColor || "",
+          quarter: Number(val.quarter),
+          year: Number(val.year),
+        },
+        termId: termId,
+      },
+    });
+    setShowLoader(false);
+    setRefetch(true);
+  };
+
   const handleOnDeleteQuarter = async () => {
     await deleteQuarter({
       variables: {
@@ -88,12 +109,6 @@ export default function VariableDetails() {
     });
     setRefetch(true);
   };
-
-  const handleOnEditQuarter = async () => {
-    setRefetch(true);
-  };
-
-  
 
   const [getTermsDetails, { data: termsData }] = useLazyQuery(
     GET_TERMS_BY_COMPANY,
@@ -259,6 +274,7 @@ export default function VariableDetails() {
             setDeleteId={setDeleteId}
             refetch={refetch}
             setEditId={setEditId}
+            setRefetch={setRefetch}
           />
         )}
         {showQuarter && (
@@ -278,11 +294,12 @@ export default function VariableDetails() {
           />
         )}
         {showEdit && (
-          <EditVariable
-            cellData={cellData}
-            onSuccess={handleOnEditQuarter}
+          <EditQuarter
+            cellData={editData}
+            onSuccess={handleOnUpdateQuarter}
             onClose={() => {
               setShowEdit(false);
+              setEditId({});
             }}
           />
         )}
@@ -391,34 +408,34 @@ function DeleteVariable(props: DeleteVariableProps) {
   );
 }
 
-interface EditVariableProps {
-  onSave?: any;
+interface EditQuarterProps {
   onClose?: any;
   cellData?: any;
   selectedColumn?: any;
   onSuccess?: any;
 }
 
-function EditVariable(props: EditVariableProps) {
- 
+function EditQuarter(props: EditQuarterProps) {
+  const [selectedOption, setSelectedOption] = useState(props?.cellData?.highlightColor);
   const handleOnSave = async () => {
-    if (!!props.onSave) {
-      props.onSave(
-        props.cellData.id,
-        props.cellData.groupKey,
-        props?.cellData?.quarterId,
-        props?.cellData?.termId,
-        props?.cellData?.variableId
+    if (!!props.onSuccess) {
+      props.onSuccess(
+        {
+          id: props.cellData.id,
+          year: props.cellData.year,
+          quarter: props?.cellData?.quarter,
+          highlightColor: selectedOption
+        }
       );
     }
+    props.onClose()
   };
 
-  const [selectedOption, setSelectedOption] = useState("option1"); // Default selected option
 
-  const handleOptionChange = (e) => {
+  const handleOptionChange = (e: { target: { value: any; }; }) => {
     setSelectedOption(e.target.value);
   };
- 
+
   return (
     <Modal
       showModal={true}
@@ -449,38 +466,38 @@ function EditVariable(props: EditVariableProps) {
             </div>
           </div>
           <div className="flex items-center gap-[20px] mt-[20px]">
-              <label
-                htmlFor="value"
-                className="text-lg font-bold text-gray-700"
-              >
-                Colum Background:
-              </label>
+            <label
+              htmlFor="value"
+              className="text-lg font-bold text-gray-700"
+            >
+              Colum Background:
+            </label>
           </div>
           <div className="mt-5">
-              <label className="mr-3">
-                <input
-                  type="radio"
-                  name="options"
-                  value="option1"
-                  checked={selectedOption === "option1"}
-                  onChange={handleOptionChange}
-                  className="m-1"
-                />
-                Red
-              </label>
+            <label className="mr-3">
+              <input
+                type="radio"
+                name="options"
+                value="red"
+                checked={selectedOption === "red"}
+                onChange={handleOptionChange}
+                className="m-1"
+              />
+              Red
+            </label>
 
-              <label>
-                <input
-                  type="radio"
-                  name="options"
-                  value="option2"
-                  checked={selectedOption === "option2"}
-                  onChange={handleOptionChange}
-                  className="m-1"
-                />
-                Green
-              </label>
-            </div>
+            <label>
+              <input
+                type="radio"
+                name="options"
+                value="green"
+                checked={selectedOption === "green"}
+                onChange={handleOptionChange}
+                className="m-1"
+              />
+              Green
+            </label>
+          </div>
         </form>
       </>
     </Modal>

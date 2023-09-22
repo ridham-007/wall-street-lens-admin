@@ -215,6 +215,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     xAxis: "",
     yAxis: "",
     group: "",
+    fullScreen: false,
   });
 
 
@@ -269,7 +270,8 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
             variableIds: selectedVariablesArr?.map((current) => current?.id),
             xAxisId: val.xAxis,
             yAxisId: val.yAxis,
-            groupById: val.group
+            groupById: val.group,
+            width: val.fullScreen ? 100 : 50,
           },
         },
       });
@@ -407,6 +409,24 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
                   type="checkbox"
                   checked={val.visible}
                   name="visible"
+                  onChange={handleOnChange}
+                />
+                <span className="switch" />
+              </label>
+            </div>
+
+            <div className="flex flex-col">
+              <label
+                htmlFor="quarter"
+                className="text-sm font-medium  text-gray-700"
+              >
+                Full Screen View
+              </label>
+              <label className="toggle-switch mt-2">
+                <input
+                  type="checkbox"
+                  checked={val.fullScreen}
+                  name="fullScreen"
                   onChange={handleOnChange}
                 />
                 <span className="switch" />

@@ -142,8 +142,6 @@ const TermsTable = (props: TableProps) => {
                             <>
                                 <TD>{current?.name}</TD>
                                 <TD>{companyName || '-'}</TD>
-                                {/* <TD>{current?.quarterWiseTable? 'Enabled':'Disabled'}</TD>
-                                <TD>{current?.summaryOnly ? 'Enabled' : 'Disabled'}</TD> */}
                                 <TD>{industryName || '-'}</TD>
                                 <TD>{subIndustryName || '-'}</TD>
                                 <TD style="text-center">
