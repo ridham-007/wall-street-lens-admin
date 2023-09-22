@@ -227,6 +227,7 @@ const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
         id
         name
         quarterWise
+        highlightColor
       }
       rows{
         title
@@ -240,6 +241,7 @@ const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
           termId
           variableId
           quarterId
+          highlightColor
         }
       }
       description

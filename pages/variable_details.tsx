@@ -29,7 +29,7 @@ export default function VariableDetails() {
   const [showLoader, setShowLoader] = useState(false);
   const [company, setCompany] = useState("");
   const [deleteId, setDeleteId] = useState("");
-  const [editId,setEditId] = useState("");
+  const [editData,setEditId] = useState({});
   const [refetch, setRefetch] = useState(false);
   const [quarter, setQuarter] = useState("1");
   const [year, setYear] = useState("2023");
@@ -38,8 +38,6 @@ export default function VariableDetails() {
   const [deleteQuarter] = useMutation(DELTE_QUARTER);
   const [updateQuarter, setUpdateQuater] = useState(false);
   const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING);
-  const [cellData, setCellData] = useState({});
-
   const [showDelete, setShowDelete] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const addDefaultMapping = async (id: any) => {
@@ -88,12 +86,6 @@ export default function VariableDetails() {
     });
     setRefetch(true);
   };
-
-  const handleOnEditQuarter = async () => {
-    setRefetch(true);
-  };
-
-  
 
   const [getTermsDetails, { data: termsData }] = useLazyQuery(
     GET_TERMS_BY_COMPANY,
@@ -278,9 +270,9 @@ export default function VariableDetails() {
           />
         )}
         {showEdit && (
-          <EditVariable
-            cellData={cellData}
-            onSuccess={handleOnEditQuarter}
+          <EditQuarter
+            cellData={editData}
+            onSuccess={handleOnAddQuarter}
             onClose={() => {
               setShowEdit(false);
             }}
@@ -391,7 +383,7 @@ function DeleteVariable(props: DeleteVariableProps) {
   );
 }
 
-interface EditVariableProps {
+interface EditQuarterProps {
   onSave?: any;
   onClose?: any;
   cellData?: any;
@@ -399,23 +391,23 @@ interface EditVariableProps {
   onSuccess?: any;
 }
 
-function EditVariable(props: EditVariableProps) {
- 
+function EditQuarter(props: EditQuarterProps) {
+  const [selectedOption, setSelectedOption] = useState(props?.cellData?.color);
   const handleOnSave = async () => {
     if (!!props.onSave) {
       props.onSave(
-        props.cellData.id,
-        props.cellData.groupKey,
-        props?.cellData?.quarterId,
-        props?.cellData?.termId,
-        props?.cellData?.variableId
+        {
+          id: props.cellData.id,
+          year: props.cellData.year,
+          quarter: props?.cellData?.quarter,
+          highlightColor: props?.cellData?.highlightColor
+        }
       );
     }
   };
 
-  const [selectedOption, setSelectedOption] = useState("option1"); // Default selected option
 
-  const handleOptionChange = (e) => {
+  const handleOptionChange = (e: { target: { value: any; }; }) => {
     setSelectedOption(e.target.value);
   };
  
