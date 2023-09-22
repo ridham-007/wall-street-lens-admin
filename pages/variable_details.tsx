@@ -29,7 +29,7 @@ export default function VariableDetails() {
   const [showLoader, setShowLoader] = useState(false);
   const [company, setCompany] = useState("");
   const [deleteId, setDeleteId] = useState("");
-  const [editData,setEditId] = useState({});
+  const [editData, setEditId] = useState({});
   const [refetch, setRefetch] = useState(false);
   const [quarter, setQuarter] = useState("1");
   const [year, setYear] = useState("2023");
@@ -63,6 +63,29 @@ export default function VariableDetails() {
   }) => {
     setShowLoader(true);
     setUpdateQuater(true);
+    await addQuarter({
+      variables: {
+        variableInfo: {
+          ...(val.id && { id: val.id }),
+          highlightColor: val?.highlightColor || "",
+          quarter: Number(val.quarter),
+          year: Number(val.year),
+        },
+        termId: termId,
+      },
+    });
+    setShowLoader(false);
+    setRefetch(true);
+  };
+
+
+  const handleOnUpdateQuarter = async (val: {
+    id: string;
+    highlightColor: string;
+    quarter: any;
+    year: any;
+  }) => {
+    setShowLoader(true);
     await addQuarter({
       variables: {
         variableInfo: {
@@ -251,6 +274,7 @@ export default function VariableDetails() {
             setDeleteId={setDeleteId}
             refetch={refetch}
             setEditId={setEditId}
+            setRefetch={setRefetch}
           />
         )}
         {showQuarter && (
@@ -272,9 +296,10 @@ export default function VariableDetails() {
         {showEdit && (
           <EditQuarter
             cellData={editData}
-            onSuccess={handleOnAddQuarter}
+            onSuccess={handleOnUpdateQuarter}
             onClose={() => {
               setShowEdit(false);
+              setEditId({});
             }}
           />
         )}
@@ -384,7 +409,6 @@ function DeleteVariable(props: DeleteVariableProps) {
 }
 
 interface EditQuarterProps {
-  onSave?: any;
   onClose?: any;
   cellData?: any;
   selectedColumn?: any;
@@ -392,25 +416,26 @@ interface EditQuarterProps {
 }
 
 function EditQuarter(props: EditQuarterProps) {
-  const [selectedOption, setSelectedOption] = useState(props?.cellData?.color);
+  const [selectedOption, setSelectedOption] = useState(props?.cellData?.highlightColor);
   const handleOnSave = async () => {
-    if (!!props.onSave) {
-      props.onSave(
+    if (!!props.onSuccess) {
+      props.onSuccess(
         {
           id: props.cellData.id,
           year: props.cellData.year,
           quarter: props?.cellData?.quarter,
-          highlightColor: props?.cellData?.highlightColor
+          highlightColor: selectedOption
         }
       );
     }
+    props.onClose()
   };
 
 
   const handleOptionChange = (e: { target: { value: any; }; }) => {
     setSelectedOption(e.target.value);
   };
- 
+
   return (
     <Modal
       showModal={true}
@@ -441,38 +466,38 @@ function EditQuarter(props: EditQuarterProps) {
             </div>
           </div>
           <div className="flex items-center gap-[20px] mt-[20px]">
-              <label
-                htmlFor="value"
-                className="text-lg font-bold text-gray-700"
-              >
-                Colum Background:
-              </label>
+            <label
+              htmlFor="value"
+              className="text-lg font-bold text-gray-700"
+            >
+              Colum Background:
+            </label>
           </div>
           <div className="mt-5">
-              <label className="mr-3">
-                <input
-                  type="radio"
-                  name="options"
-                  value="option1"
-                  checked={selectedOption === "option1"}
-                  onChange={handleOptionChange}
-                  className="m-1"
-                />
-                Red
-              </label>
+            <label className="mr-3">
+              <input
+                type="radio"
+                name="options"
+                value="red"
+                checked={selectedOption === "red"}
+                onChange={handleOptionChange}
+                className="m-1"
+              />
+              Red
+            </label>
 
-              <label>
-                <input
-                  type="radio"
-                  name="options"
-                  value="option2"
-                  checked={selectedOption === "option2"}
-                  onChange={handleOptionChange}
-                  className="m-1"
-                />
-                Green
-              </label>
-            </div>
+            <label>
+              <input
+                type="radio"
+                name="options"
+                value="green"
+                checked={selectedOption === "green"}
+                onChange={handleOptionChange}
+                className="m-1"
+              />
+              Green
+            </label>
+          </div>
         </form>
       </>
     </Modal>
