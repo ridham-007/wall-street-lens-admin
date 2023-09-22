@@ -49,7 +49,8 @@ export default function Variable({
   setShowDelete,
   setShowEdit,
   setDeleteId,
-  setEditId
+  setEditId,
+  
 }: TableProps) {
   const [getTermView, { data: termView, refetch: refetchTermView }] =
     useLazyQuery(GET_VIEW_FOR_TERM, {
@@ -122,10 +123,21 @@ export default function Variable({
   const handleShowEdit = (identifier: any) => {
     setShowEdit(true);
     setEditId(identifier);
-    
   };
   
   const selectedColumn = headers[cellData?.columnIndex];
+
+  const fetchColor = (color:any) => {
+ 
+  if (color === "red") {
+    return " bg-red-200 text-red-600";
+  } else if (color === "green") {
+    return " bg-green-200 text-green-600";
+  } else {
+    return" bg-transparent";
+  }
+}
+
 
   return (
     <>
@@ -199,7 +211,7 @@ export default function Variable({
                         const selectedColumn = headers[index];
                         return (
                           <TD
-                            style="cursor-pointer"
+                            style={`cursor-pointer ${fetchColor("green")}`}
                             onClick={() => {
                               setShow(true);
                               setCellData({
