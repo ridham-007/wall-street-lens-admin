@@ -17,7 +17,7 @@ export interface TableProps {
 }
 
 const VariableTable = (props: TableProps) => {
-    const[show, setShow] = useState(false);
+    const [show, setShow] = useState(false);
     const [uniqueId, setUniqueId] = useState('');
     const [showLoader, setShowLoader] = useState(false);
     const [currentData, setCurrentData] = useState({});
@@ -35,9 +35,9 @@ const VariableTable = (props: TableProps) => {
                 variableInfo: {
                     id: perameters?.id,
                     title: perameters?.name,
-                    category: perameters?.category,
+                    category: perameters?.category || '-',
                     priority: perameters?.priority,
-                    yoy: perameters?.YoY,
+                    yoy: perameters?.YoY || '-',
                 },
                 termId: perameters?.term,
             }
@@ -77,7 +77,7 @@ const VariableTable = (props: TableProps) => {
     return <>
         {showLoader && (<Loader />)}
         <div className="flex items-center gap-[20px] justify-between">
-            <div 
+            <div
                 className="w-full flex justify-start mb-[20px]"
             >
                 <button
@@ -142,11 +142,11 @@ const VariableTable = (props: TableProps) => {
                             <TH>Name</TH>
                             <TH>Terms name</TH>
                             {!selectedTerm?.quarterWiseTable && (
-                            <>
-                                <TH>Priority</TH>
-                                <TH>Category</TH>
-                                <TH>YoY</TH>
-                            </>)}
+                                <>
+                                    <TH>Priority</TH>
+                                    <TH>Category</TH>
+                                    <TH>YoY</TH>
+                                </>)}
                             <TH >Action</TH>
                         </>
                     </THR>
@@ -155,17 +155,17 @@ const VariableTable = (props: TableProps) => {
                 <tbody className="w-full">
                     {tableData?.map((current) => {
                         return <TDR key={current?.id}>
-                        <>
+                            <>
                                 <TD>{current?.title}</TD>
                                 <TD>{current?.kpiTerm?.name}</TD>
                                 {!selectedTerm?.quarterWiseTable && (
-                                <>
-                                    <TD>{current?.priority || ''}</TD>
-                                    <TD>{current?.category}</TD>
-                                    <TD>{current?.yoy}</TD>
-                                </>)}
-                            <TD style="text-center" key={uniqueId}>
-                                <>
+                                    <>
+                                        <TD>{current?.priority || ''}</TD>
+                                        <TD>{current?.category}</TD>
+                                        <TD>{current?.yoy}</TD>
+                                    </>)}
+                                <TD style="text-center" key={uniqueId}>
+                                    <>
                                         <div
                                             className="flex justify-center gap-[10px] items-center"
                                         >
@@ -186,19 +186,19 @@ const VariableTable = (props: TableProps) => {
 
                                             </button>
                                         </div>
-                                </>
-                            </TD>
-                        </>
-                    </TDR>
-})}
+                                    </>
+                                </TD>
+                            </>
+                        </TDR>
+                    })}
                 </tbody>
             </table>
         </div >
-        {show && (<AddUpdateVariable termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setShow(false); setCurrentData({}); setDeleteId('') }} onSuccess={onAddUpdateQuarter}/>)}
+        {show && (<AddUpdateVariable termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setShow(false); setCurrentData({}); setDeleteId('') }} onSuccess={onAddUpdateQuarter} />)}
         {deletePopup && <DeleteVariable id={deleteId} onSuccess={onDeleteVeriable} onClose={() => {
             setDeleteId('');
             setDeletePopup(false);
-        }}/>}
+        }} />}
     </>
 }
 
@@ -314,22 +314,22 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                         </div>
-                        <div className="flex flex-col">
-                            <label
-                                htmlFor="priority"
-                                className="text-sm font-medium text-gray-700"
-                            >
-                                Priority
-                            </label>
-                            <input
-                                type="number"
-                                id="priority"
-                                name="priority"
-                                value={val.priority}
-                                onChange={handleOnChange}
-                                required
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                            />
+                            <div className="flex flex-col">
+                                <label
+                                    htmlFor="priority"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    Priority
+                                </label>
+                                <input
+                                    type="number"
+                                    id="priority"
+                                    name="priority"
+                                    value={val.priority}
+                                    onChange={handleOnChange}
+                                    required
+                                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                />
                             </div></>)}
                     </div>
                 </form>

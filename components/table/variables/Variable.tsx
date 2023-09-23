@@ -144,16 +144,16 @@ export default function Variable({
 
 	const selectedColumn = headers[cellData?.columnIndex];
 
-  const fetchColor = (color:any) => {
- 
-    if (color === "red") {
-      return " bg-red-200 text-red-600";
-    } else if (color === "green") {
-      return " bg-green-200 text-green-600";
-    } else {
-      return" bg-transparent";
-    }
-  }
+	const fetchColor = (color: any) => {
+
+		if (color === "red") {
+			return " bg-red-200 text-red-600";
+		} else if (color === "green") {
+			return " bg-green-200 text-green-600";
+		} else {
+			return " bg-transparent";
+		}
+	}
 
 	return (
 		<>
@@ -164,6 +164,33 @@ export default function Variable({
 				}}
 				className="w-[calc((w-screen)- (w-1/5)) overflow-scroll"
 			>
+				{selectedTerm?.quarterWiseTable && (<button
+					type="button"
+					className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]"
+					onClick={() => setShowQuarter(true)}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						className="ionicon w-7 h-7"
+						viewBox="0 0 512 512"
+					>
+						<path
+							d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="32"
+						/>
+						<path
+							fill="none"
+							stroke="currentColor"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="32"
+							d="M256 176v160M336 256H176"
+						/>
+					</svg>
+					<span>Add a Quarter</span>
+				</button>)}
 				{!selectedTerm?.summaryOnly && (
 					<table className="app-table w-full">
 						<thead className="w-full sticky top-0 z-20">
@@ -224,10 +251,11 @@ export default function Variable({
 											)}
 
 											{current.cells.map((cur, index) => {
+												console.log({ cur })
 												const selectedColumn = headers[index];
 												return (
-													<TD 
-														style={`cursor-pointer ${fetchColor("red")}`}
+													<TD
+														style={`cursor-pointer ${fetchColor(cur.highlightColor)}`}
 														onClick={() => {
 															setShow(true);
 															setCellData({
