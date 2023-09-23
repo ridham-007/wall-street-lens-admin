@@ -246,6 +246,8 @@ const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
       }
       description
       title
+      quarterId
+      quarterWiseTable
   }
 }`;
 
