@@ -96,12 +96,14 @@ export default function VariableDetails() {
   };
 
   const handleOnDeleteQuarter = async () => {
-    await deleteQuarter({
-      variables: {
-        quarterId: deleteId,
-      },
-    });
-    setRefetch(true);
+    if (!!deleteId) {
+      await deleteQuarter({
+        variables: {
+          quarterId: deleteId,
+        },
+      });
+      setRefetch(true);
+    }
   };
 
   const [getTermsDetails, { data: termsData }] = useLazyQuery(
