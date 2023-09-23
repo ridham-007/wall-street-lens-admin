@@ -6,7 +6,6 @@ import { useMutation } from "@apollo/client";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { LOG_IN } from "@/utils/query";
-import { error } from "console";
 
 
 export default function LoginPage() {

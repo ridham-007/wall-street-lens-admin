@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import {LayoutPages} from "@/components/layout"
+import { LayoutPages } from "@/components/layout"
 
 export interface KpiTerm {
   id: string;
@@ -103,7 +103,7 @@ export interface TableProps {
   setShowEdit?: any;
   setDeleteId?: any;
   setEditId?: any;
- 
+  setQuarterId?: any;
 }
 export interface TableView {
   headers: Header[];
@@ -132,7 +132,7 @@ export interface Cell {
   quarterId: string;
   termId: string;
   variableId: string;
-	highlightColor?: string;
+  highlightColor?: string;
 }
 export interface DropdownProps {
   onChange: any;

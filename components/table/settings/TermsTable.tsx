@@ -5,9 +5,9 @@ import Loader from "@/components/loader";
 import { useMutation, useQuery } from "@apollo/client";
 import { ADD_COLUMN_FOR_KPI_TERM, ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID, GET_SUB_INDUSTRIES } from "@/utils/query";
 import { GET_COMPANIES } from "@/utils/query";
-import {AddUpdateTermProps} from "@/utils/data"
-import {DeleteTermProps} from "@/utils/data"
-import {TableProps} from "@/utils/data"
+import { AddUpdateTermProps } from "@/utils/data"
+import { DeleteTermProps } from "@/utils/data"
+import { TableProps } from "@/utils/data"
 
 const TermsTable = (props: TableProps) => {
     const companies = useQuery(GET_COMPANIES);
@@ -203,7 +203,8 @@ function AddUpdateTerms(props: AddUpdateTermProps) {
 
         setVal((prevVal) => ({
             ...prevVal,
-            [name]: value
+            [name]: value,
+            ...(name === 'summaryOnly' && { quarterWise: true })
         }));
     };
 
@@ -245,6 +246,7 @@ function AddUpdateTerms(props: AddUpdateTermProps) {
                                 name='quarterWise'
                                 type="checkbox"
                                 className="h-5 w-5 text-blue-600 rounded border-gray-300"
+                                disabled={val.summaryOnly}
                                 checked={val.quarterWise}
                                 onChange={handleOnChange}
                             />

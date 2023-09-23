@@ -73,7 +73,6 @@ export default function VariableDetails() {
     setRefetch(true);
   };
 
-
   const handleOnUpdateQuarter = async (val: {
     id: string;
     highlightColor: string;
@@ -141,6 +140,11 @@ export default function VariableDetails() {
   const selectedTerm = termsData?.getKpiTermsByCompanyId?.find(
     (cur: { id: string }) => cur.id === termId
   );
+
+  const handleShowDelete = (identifier: any) => {
+    setShowDelete(true);
+    setDeleteId(identifier);
+  };
   return (
     <Layout title="Financial Summary" page={LayoutPages.variable_details}>
       <>
@@ -244,7 +248,7 @@ export default function VariableDetails() {
               <button
                 type="button"
                 className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg ml-3 py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]"
-              // onClick={ }
+                onClick={() => handleShowDelete(deleteId)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -272,6 +276,7 @@ export default function VariableDetails() {
             refetch={refetch}
             setEditId={setEditId}
             setRefetch={setRefetch}
+            setQuarterId={setDeleteId}
           />
         )}
         {showQuarter && (
@@ -287,6 +292,7 @@ export default function VariableDetails() {
             onSuccess={handleOnDeleteQuarter}
             onClose={() => {
               setShowDelete(false);
+              setDeleteId('');
             }}
           />
         )}

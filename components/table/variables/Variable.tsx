@@ -12,7 +12,7 @@ import SummaryView from "./SummaryView";
 import { AddUpdateParameterProps } from "@/utils/data";
 import { TraverseMap } from "@/utils/data";
 
-import {TableProps, TableView, Row, Header} from "@/utils/data"
+import { TableProps, TableView, Row, Header } from "@/utils/data"
 
 export default function Variable({
 	termId,
@@ -25,10 +25,12 @@ export default function Variable({
 	setDeleteId,
 	setEditId,
 	setRefetch,
+	setQuarterId,
 }: TableProps) {
 	const [addRow] = useMutation(ADD_ROW_FOR_QUARTER_WISE_TABLE);
+	const [termData, setTermData] = useState<Record<string, any>>({});
 
-	const [getTermView, { data: termView, refetch: refetchTermView }] =
+	const [getTermView, { data: termView, refetch: refetchTermView, error }] =
 		useLazyQuery(GET_VIEW_FOR_TERM, {
 			fetchPolicy: "network-only",
 			variables: {
@@ -45,6 +47,19 @@ export default function Variable({
 	}, [termId]);
 
 	useEffect(() => {
+		const { quarterId }: { quarterId: string } =
+			termView?.getViewForTerm || { quarterId: '' };
+		setQuarterId(quarterId)
+		setTermData(termView);
+	}, [termView])
+
+	useEffect(() => {
+		if (error?.message === "INVALID_VALUES") {
+			setTermData({});
+		}
+	}, [error])
+
+	useEffect(() => {
 		if (refetch) {
 			refetchTermView();
 			setRefetch(false);
@@ -56,8 +71,8 @@ export default function Variable({
 	const [showLoader, setShowLoader] = useState(false);
 
 	const [updateValue] = useMutation(UPDATE_MAPPED_VALUE);
-	const { headers = [], rows = [] }: { headers: Header[]; rows: Row[] } =
-		termView?.getViewForTerm || { headers: [], rows: [] };
+	const { headers = [], rows = [], quarterId }: { headers: Header[]; rows: Row[]; quarterId: string } =
+		termData?.getViewForTerm || { headers: [], rows: [] };
 
 	const checkValidId = (id: string) => {
 		return !!id && !id.startsWith("Dummy");
