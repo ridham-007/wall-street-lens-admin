@@ -61,7 +61,6 @@ export default function VariableDetails() {
       variables: {
         variableInfo: {
           ...(val.id && { id: val.id }),
-          highlightColor: val?.highlightColor || "",
           quarter: Number(val.quarter),
           year: Number(val.year),
         },
@@ -83,8 +82,8 @@ export default function VariableDetails() {
     await addQuarter({
       variables: {
         variableInfo: {
-          ...(val.id && { id: val.id }),
-          highlightColor: val?.highlightColor || "",
+          ...(val.id && { id: val.id, highlightColor: val?.highlightColor || "", }),
+
           quarter: Number(val.quarter),
           year: Number(val.year),
         },
@@ -209,7 +208,7 @@ export default function VariableDetails() {
             )}
           </div>
           <div>
-            {!selectedTerm?.quarterWiseTable && (
+            {
               <button
                 type="button"
                 className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]"
@@ -237,7 +236,7 @@ export default function VariableDetails() {
                 </svg>
                 <span>Add a Quarter</span>
               </button>
-            )}
+            }
             {selectedTerm?.quarterWiseTable && (
               <button
                 type="button"
