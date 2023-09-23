@@ -208,10 +208,10 @@ function ImportData(props: ImportDataProps) {
             Year,
         } = basicDetails[0] || {};
         const keys = rows[0];
-        const timeStamp:Array<string> = [];
+        const timeStamp: Array<string> = [];
         for (let i = 0; i < rows.length; i++) {
           const date = new Date();
-          await new Promise((resolve, reject) => setTimeout(resolve, 10))
+          await new Promise((resolve, reject) => setTimeout(resolve, 10));
           timeStamp.push(date.getTime().toString());
         }
 
