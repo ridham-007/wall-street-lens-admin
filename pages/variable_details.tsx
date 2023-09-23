@@ -14,9 +14,9 @@ import YearDropdown from "@/components/year_dropdown/year_dropdown";
 import { Modal } from "@/components/model";
 import { ADD_QUARTER } from "@/utils/query";
 import { KpiTerm } from "@/utils/data";
-import { QuarterDataProps } from "@/utils/data"
-import { DeleteVariableProps } from "@/utils/data"
-import { EditQuarterProps } from "@/utils/data"
+import { QuarterDataProps } from "@/utils/data";
+import { DeleteVariableProps } from "@/utils/data";
+import { EditQuarterProps } from "@/utils/data";
 
 export default function VariableDetails() {
   const [termId, setTermId] = useState("");
@@ -43,13 +43,6 @@ export default function VariableDetails() {
       },
     });
   };
-
-  useEffect(() => {
-    if (updateQuarter && addQuarterData?.addUpdateQuarter?.id) {
-      addDefaultMapping(addQuarterData?.addUpdateQuarter?.id);
-    }
-    setUpdateQuater(false);
-  }, [addQuarterData]);
 
   const handleOnAddQuarter = async (val: {
     id: string;
@@ -115,6 +108,22 @@ export default function VariableDetails() {
       },
     }
   );
+
+  const selectedTerm = termsData?.getKpiTermsByCompanyId?.find(
+    (cur: { id: string }) => cur.id === termId
+  );
+
+  useEffect(() => {
+    if (
+      !(selectedTerm?.quarterWiseTable) &&
+      updateQuarter &&
+      addQuarterData?.addUpdateQuarter?.id
+    ) {
+      addDefaultMapping(addQuarterData?.addUpdateQuarter?.id);
+    }
+    setUpdateQuater(false);
+  }, [addQuarterData]);
+
   const router = useRouter();
   useEffect(() => {
     if (typeof router.query.company === 'string') {
@@ -139,10 +148,7 @@ export default function VariableDetails() {
   useEffect(() => {
     getTermsDetails();
   }, [company]);
-  const selectedTerm = termsData?.getKpiTermsByCompanyId?.find(
-    (cur: { id: string }) => cur.id === termId
-  );
-
+ 
   const handleShowDelete = (identifier: any) => {
     setShowDelete(true);
     setDeleteId(identifier);

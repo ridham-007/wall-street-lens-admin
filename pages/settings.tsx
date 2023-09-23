@@ -202,12 +202,19 @@ function ImportData(props: ImportDataProps) {
         return result;
     }
 
-    const getArrayofObject = (basicDetails: { [key: string]: any }[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) => {
+    const getArrayofObject = async (basicDetails: { [key: string]: any }[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) =>  {
         const {
             Quarter,
             Year,
         } = basicDetails[0] || {};
         const keys = rows[0];
+        const timeStamp:Array<string> = [];
+        for (let i = 0; i < rows.length; i++) {
+          const date = new Date();
+          await new Promise((resolve, reject) => setTimeout(resolve, 10))
+          timeStamp.push(date.getTime().toString());
+        }
+
         const arrays = keys?.map((current, index) => {
             let quarters = [];
             for (let i = 1; i < rows.length; i++) {
@@ -219,7 +226,7 @@ function ImportData(props: ImportDataProps) {
                     quarter: Number(Quarter),
                     year: Number(Year),
                     value: values[index].toString(),
-                    groupKey: `${date.getTime()}`,
+                    groupKey: timeStamp[i],
                 })
             }
 
@@ -304,7 +311,7 @@ function ImportData(props: ImportDataProps) {
                         quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
                         summaryOnly = basicDetails[0]?.SummaryOnly === 'Enable';
                         if (quarterWiseTable || summaryOnly) {
-                            arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows, quarterWiseTable, summaryOnly)
+                            arrayOfObjects = await getArrayofObject(basicDetails, filteredTableData[1].rows, quarterWiseTable, summaryOnly)
                         } else {
                             arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
                         }
