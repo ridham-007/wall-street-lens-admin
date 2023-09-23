@@ -12,8 +12,8 @@ import { ToastContainer } from 'react-toastify';
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { GET_COMPANIES, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 import { useRouter } from "next/router";
-import {ImportDataProps} from "@/utils/data"
-import {SheetValue} from "@/utils/data"
+import { ImportDataProps } from "@/utils/data"
+import { SheetValue } from "@/utils/data"
 
 export default function FinancialPage() {
     const [showLoader, setShowLoader] = useState(false);
@@ -214,14 +214,13 @@ function ImportData(props: ImportDataProps) {
             for (let i = 1; i < rows.length; i++) {
                 const values = rows[i];
 
-                const date = new Date(); // Replace with your date
-                const formattedDate = formatDateAsYYYYMMDDHHMMSS(date);
+                const date = new Date();
 
                 quarters.push({
                     quarter: Number(Quarter),
                     year: Number(Year),
                     value: values[index].toString(),
-                    groupKey: `${formattedDate}-${i.toString()}`,
+                    groupKey: `${date.getTime()}`,
                 })
             }
 
