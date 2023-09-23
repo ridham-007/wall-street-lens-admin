@@ -1,9 +1,5 @@
 import React from 'react';
-
-export interface DropdownProps {
-    onChange: any;
-    year: string;
-}
+import {DropdownProps} from "@/utils/data"
 
 const YearDropdown = (props: DropdownProps) => {
     // Create an array of years, e.g., from 1900 to the current year

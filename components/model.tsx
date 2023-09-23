@@ -1,17 +1,5 @@
 import { useState } from "react";
-
-export interface ModalOnClose {
-  (reason?: string): void;
-}
-
-export interface Props {
-  title?: string;
-  showModal?: boolean;
-  children?: JSX.Element;
-  onClose: ModalOnClose;
-  handleOnSave: ModalOnClose;
-  confirmButton?: string;
-}
+import {Props} from "@/utils/data"
 
 /**
  * @note pass your actions as children

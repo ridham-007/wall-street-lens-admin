@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/router";
 import { GET_COMPANIES, GET_INDUSTRIES, GET_SUB_INDUSTRIES } from "@/utils/query";
+import {LayoutProps} from "@/utils/data"
 
 export enum LayoutPages {
   "financial_summary" = "financial_summary",
@@ -18,12 +19,6 @@ export enum LayoutPages {
   "settings" = "settings",
   "variable_details" = "variable_details",
   "management_chart" = "management_chart",
-}
-
-export interface LayoutProps {
-  title?: string;
-  page?: LayoutPages;
-  children?: JSX.Element;
 }
 
 const CHANGE_PASSWORD = gql`
@@ -220,7 +215,7 @@ export default function Layout(props: LayoutProps) {
                 onChange={handleOnChange}
               >
                 <option value="">Select a option</option>
-                {
+                                {
                   companies?.data?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
                     return <option key={ele?.id?.toString()} value={ele?.id?.toString()}>{ele.attributes.name}</option>;
                   })

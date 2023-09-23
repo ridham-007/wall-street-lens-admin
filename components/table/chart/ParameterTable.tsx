@@ -6,16 +6,10 @@ import Loader from "@/components/loader";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { ToastContainer, toast } from "react-toastify";
 import Multiselect from "multiselect-react-dropdown";
-import { DeleteChartProps } from "@/utils/data";
-import { VariablesArray } from "@/utils/data";
-import { AddUpdateParameterProps } from "@/utils/data"
-
-export interface TableProps {
-    data: any;
-    refetch: any;
-    company: any;
-    selectTerm: any;
-}
+import {DeleteChartProps} from "@/utils/data";
+import {VariablesArray} from "@/utils/data";
+import {AddUpdateParameterProps} from "@/utils/data"
+import {TableProps} from "@/utils/data"
 
 const ParameterTable = (props: TableProps) => {
     const [showDelete, setShowDelete] = useState(false);

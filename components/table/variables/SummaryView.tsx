@@ -1,18 +1,15 @@
-export interface TableProps {
-    contentString: string;
-    onClick?: any;
-}
+import {TableProps} from "@/utils/data"
 
 export default function SummaryView(props: TableProps){
     const {
         contentString,
     } = props;
 
-    const chunks = contentString.split(/(<Table>.*?<\/Table>)/gs).filter(chunk => {
+    const chunks = contentString?.split(/(<Table>.*?<\/Table>)/gs).filter(chunk => {
         return chunk.trim() !== ''
     });
     const elements: React.ReactNode[] = [];
-    chunks.forEach((chunk, index) => {
+    chunks?.forEach((chunk, index) => {
         if (chunk.startsWith('<Table>')) {
             const tableContent = chunk.replace('<Table>', '').replace('</Table>', '').split(';').map(cell => cell.trim());
             const result = tableContent.map(str => {

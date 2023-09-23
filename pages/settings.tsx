@@ -12,7 +12,8 @@ import { ToastContainer } from 'react-toastify';
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { GET_COMPANIES, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 import { useRouter } from "next/router";
-import { ImportDataProps } from "@/utils/data"
+import {ImportDataProps} from "@/utils/data"
+import {SheetValue} from "@/utils/data"
 
 export default function FinancialPage() {
     const [showLoader, setShowLoader] = useState(false);
@@ -153,30 +154,7 @@ export default function FinancialPage() {
         </Layout >
     );
 }
-export interface SheetValue {
-    company: string;
-    name: string;
-    quarterWiseTable: boolean;
-    summaryOnly: boolean;
-    variables: Variable[];
-    title: string;
-    description: string;
-}
 
-
-export interface Variable {
-    title: string;
-    category: string;
-    priority: string;
-    yoy: string;
-    quarters: Quarter[];
-}
-
-export interface Quarter {
-    quarter: number;
-    year: number;
-    value: string;
-}
 
 function ImportData(props: ImportDataProps) {
     const companies = useQuery(GET_COMPANIES);

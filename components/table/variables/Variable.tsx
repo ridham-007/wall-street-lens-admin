@@ -12,50 +12,7 @@ import SummaryView from "./SummaryView";
 import { AddUpdateParameterProps } from "@/utils/data";
 import { TraverseMap } from "@/utils/data";
 
-export interface TableProps {
-	termId: string;
-	selectedTerm: any;
-	year: string;
-	quarter: string;
-	setShowDelete: any;
-	setShowEdit: any;
-	setDeleteId: any;
-	refetch: boolean;
-	setEditId: any;
-	setRefetch: any;
-}
-
-export interface TableView {
-	headers: Header[];
-	rows: Row[];
-	quarterWiseTable: boolean;
-	description: string;
-	title: string;
-	quarterId: string;
-}
-
-export interface Header {
-	id: string;
-	name: string;
-	quarterWise: boolean;
-}
-
-export interface Row {
-	title: string;
-	cells: Cell[];
-}
-
-export interface Cell {
-	id: string;
-	value: string;
-	year: number;
-	quarter: number;
-	groupKey: string;
-	quarterId: string;
-	termId: string;
-	variableId: string;
-	highlightColor?: string;
-}
+import {TableProps, TableView, Row, Header} from "@/utils/data"
 
 export default function Variable({
 	termId,

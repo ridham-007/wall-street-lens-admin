@@ -5,14 +5,9 @@ import Loader from "@/components/loader";
 import { useMutation, useQuery } from "@apollo/client";
 import { ADD_COLUMN_FOR_KPI_TERM, ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID, GET_SUB_INDUSTRIES } from "@/utils/query";
 import { GET_COMPANIES } from "@/utils/query";
-import { AddUpdateTermProps } from "@/utils/data"
-import { DeleteTermProps } from "@/utils/data"
-
-export interface TableProps {
-    data: any;
-    company: any;
-    setRefetch: any;
-}
+import {AddUpdateTermProps} from "@/utils/data"
+import {DeleteTermProps} from "@/utils/data"
+import {TableProps} from "@/utils/data"
 
 const TermsTable = (props: TableProps) => {
     const companies = useQuery(GET_COMPANIES);
