@@ -481,6 +481,34 @@ const GET_SUB_INDUSTRIES = gql`
 }
 `;
 
+const ADD_ROW_FOR_QUARTER_WISE_TABLE = gql`
+  mutation addRowForQuarterWiseTable(
+    $quarterId: String!
+    $termId: String!
+    ) {
+    addRowForQuarterWiseTable(
+      quarterId: $quarterId
+      termId: $termId
+      ) 
+  }
+`;
+
+const DELTE_ROW_FOR_QUARTER_WIASE_TABLE = gql`
+  mutation deleteRowForQuarterWiseTableByGroup(
+    $quarterId: String!
+    $termId: String!
+    $groupKey: String!
+    ) {
+    deleteRowForQuarterWiseTableByGroup(
+      quarterId: $quarterId
+      termId: $termId
+      groupKey: $groupKey
+      ) {
+        success
+      }
+  }
+`;
+
 export {
   LOG_IN,
   ADD_FINANCIAL_SUMMARY_PARAMETER,
@@ -514,4 +542,6 @@ export {
   GET_COMPANIES,
   GET_INDUSTRIES,
   GET_SUB_INDUSTRIES,
+  DELTE_ROW_FOR_QUARTER_WIASE_TABLE,
+  ADD_ROW_FOR_QUARTER_WISE_TABLE
 }
