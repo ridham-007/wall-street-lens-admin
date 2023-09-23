@@ -13,16 +13,10 @@ import { useRouter } from "next/router";
 import YearDropdown from "@/components/year_dropdown/year_dropdown";
 import { Modal } from "@/components/model";
 import { ADD_QUARTER } from "@/utils/query";
-
-interface KpiTerm {
-  id: string;
-  name: string;
-  quarterWiseTable: boolean;
-  summaryOnly: boolean;
-  updatedAt: Date;
-  company: string;
-  __typename: string;
-}
+import { KpiTerm } from "@/utils/data";
+import {QuarterDataProps} from "@/utils/data"
+import {DeleteVariableProps} from "@/utils/data"
+import {EditQuarterProps} from "@/utils/data"
 
 export default function VariableDetails() {
   const [termId, setTermId] = useState("");
@@ -308,11 +302,7 @@ export default function VariableDetails() {
   );
 }
 
-interface QuarterDataProps {
-  onSuccess?: any;
-  onClose?: any;
-  data?: any;
-}
+
 
 function QuarterData(props: QuarterDataProps) {
   const [val, setVal] = useState({
@@ -381,11 +371,6 @@ function QuarterData(props: QuarterDataProps) {
   );
 }
 
-interface DeleteVariableProps {
-  onSuccess?: any;
-  onClose?: any;
-  id?: any;
-}
 
 function DeleteVariable(props: DeleteVariableProps) {
   const handleOnSave = () => {
@@ -406,13 +391,6 @@ function DeleteVariable(props: DeleteVariableProps) {
       </>
     </Modal>
   );
-}
-
-interface EditQuarterProps {
-  onClose?: any;
-  cellData?: any;
-  selectedColumn?: any;
-  onSuccess?: any;
 }
 
 function EditQuarter(props: EditQuarterProps) {

@@ -7,6 +7,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ParameterTable from "@/components/table/chart/ParameterTable";
 import Multiselect from "multiselect-react-dropdown";
+import {AddUpdateParameterProps} from "@/utils/data"
+import {KpiTerm} from "@/utils/data"
+import {VariablesArray} from "@/utils/data"
 import {
   ADD_UPDATE_TERM_CHART_MUTATION,
   GET_CHART_BY_KPI_TERM,
@@ -177,33 +180,6 @@ export default function FinancialPage() {
       </>
     </Layout>
   );
-}
-
-interface AddUpdateParameterProps {
-  onSuccess?: any;
-  onClose?: any;
-  selectedCompany?: any;
-  financialInitData?: any;
-  company: any;
-  refetch: any;
-  term:any;
-}
-
-interface KpiTerm {
-  title: ReactNode;
-  id: string;
-  name: string;
-  quarterWiseTable: boolean;
-  summaryOnly: boolean;
-  updatedAt: Date;
-  company: string;
-  __typename: string;
-}
-
-interface VariablesArray {
-  category: string;
-  title: string;
-  id: string;
 }
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {

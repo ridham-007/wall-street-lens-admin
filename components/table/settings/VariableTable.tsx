@@ -4,6 +4,9 @@ import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
 import { ADD_UPDATE_TERM_VERIABLE, DELETE_VERIABLE_BY_ID } from "@/utils/query";
 import { useMutation } from "@apollo/client";
+import {KpiTerm} from "@/utils/data"
+import {AddUpdateParameterProps} from "@/utils/data"
+import {DeleteVariableProps} from "@/utils/data"
 
 export interface TableProps {
     data: any;
@@ -11,16 +14,6 @@ export interface TableProps {
     termsData: any;
     term: any;
     setRefetch: any;
-}
-
-interface KpiTerm {
-    id: string;
-    name: string;
-    quarterWiseTable: boolean;
-    summaryOnly: boolean;
-    updatedAt: Date;
-    company: string;
-    __typename: string;
 }
 
 const VariableTable = (props: TableProps) => {
@@ -209,14 +202,6 @@ const VariableTable = (props: TableProps) => {
     </>
 }
 
-interface AddUpdateParameterProps {
-    onSuccess?: any;
-    onClose?: any;
-    data?: any;
-    termsData?: any;
-    selectedTerm?: any;
-}
-
 function AddUpdateVariable(props: AddUpdateParameterProps) {
     const [val, setVal] = useState({
         id: props?.data?.id,
@@ -351,12 +336,6 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
             </>
         </Modal>
     );
-}
-
-interface DeleteVariableProps {
-    onSuccess?: any;
-    onClose?: any;
-    id?: any;
 }
 
 function DeleteVariable(props: DeleteVariableProps) {

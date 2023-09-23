@@ -5,6 +5,7 @@ import Loader from "@/components/loader";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
 import SummaryView from "./SummaryView";
+import {AddUpdateParameterProps} from "@/utils/data"
 
 export interface TableProps {
 	termId: string;
@@ -331,13 +332,6 @@ export default function Variable({
 			</div>
 		</>
 	);
-}
-
-interface AddUpdateParameterProps {
-	onSave?: any;
-	onClose?: any;
-	cellData?: any;
-	selectedColumn?: any;
 }
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {

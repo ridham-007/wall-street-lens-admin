@@ -12,7 +12,8 @@ import { ToastContainer } from 'react-toastify';
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { GET_COMPANIES, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 import { useRouter } from "next/router";
-
+import {ImportDataProps} from "@/utils/data"
+ 
 export default function FinancialPage() {
     const [showLoader, setShowLoader] = useState(false);
     const [refetch, setRefetch] = useState(false);
@@ -150,13 +151,6 @@ export default function FinancialPage() {
         </Layout >
     );
 }
-
-interface ImportDataProps {
-    onSuccess?: any;
-    onClose?: any;
-    data?: any;
-}
-
 export interface SheetValue {
     company: string;
     name: string;

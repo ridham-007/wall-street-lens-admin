@@ -5,6 +5,8 @@ import Loader from "@/components/loader";
 import { useMutation, useQuery } from "@apollo/client";
 import { ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID, GET_SUB_INDUSTRIES } from "@/utils/query";
 import { GET_COMPANIES } from "@/utils/query";
+import {AddUpdateTermProps} from "@/utils/data"
+import {DeleteTermProps} from "@/utils/data"
 
 export interface TableProps {
     data: any;
@@ -181,12 +183,6 @@ const TermsTable = (props: TableProps) => {
     </>
 }
 
-interface AddUpdateTermProps {
-    onSuccess?: any;
-    onClose?: any;
-    data?: any;
-}
-
 function AddUpdateTerms(props: AddUpdateTermProps) {
     const [val, setVal] = useState({
         id: props?.data?.id,
@@ -275,12 +271,6 @@ function AddUpdateTerms(props: AddUpdateTermProps) {
             </>
         </Modal>
     );
-}
-
-interface DeleteTermProps {
-    onSuccess?: any;
-    onClose?: any;
-    id?: any;
 }
 
 function DeleteTerm(props: DeleteTermProps) {

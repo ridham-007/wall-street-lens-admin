@@ -6,6 +6,9 @@ import Loader from "@/components/loader";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { ToastContainer, toast } from "react-toastify";
 import Multiselect from "multiselect-react-dropdown";
+import {DeleteChartProps} from "@/utils/data";
+import {VariablesArray} from "@/utils/data";
+import {AddUpdateParameterProps} from "@/utils/data"
 
 export interface TableProps {
     data: any;
@@ -108,12 +111,6 @@ const ParameterTable = (props: TableProps) => {
     </>
 }
 
-interface DeleteChartProps {
-    onSuccess?: any;
-    onClose?: any;
-    id?: any;
-}
-
 function DeleteChart(props: DeleteChartProps) {
     const handleOnSave = () => {
         if (!props?.id) {
@@ -136,34 +133,6 @@ function DeleteChart(props: DeleteChartProps) {
             </>
         </Modal>
     );
-}
-
-interface AddUpdateParameterProps {
-    onSuccess?: any;
-    onClose?: any;
-    selectedCompany?: any;
-    financialInitData?: any;
-    company?: any;
-    refetch?: any;
-    currentData?: any;
-    selectTerm?: any;
-}
-
-interface KpiTerm {
-    title: ReactNode;
-    id: string;
-    name: string;
-    quarterWiseTable: boolean;
-    summaryOnly: boolean;
-    updatedAt: Date;
-    company: string;
-    __typename: string;
-}
-
-interface VariablesArray {
-    category: string;
-    title: string;
-    id: string;
 }
 
 function UpdateChart(props: AddUpdateParameterProps) {
