@@ -3,9 +3,9 @@ import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
+import { ADD_ROW_FOR_QUARTER_WISE_TABLE, GET_VIEW_FOR_TERM, UPDATE_MAPPED_VALUE } from "@/utils/query";
 import SummaryView from "./SummaryView";
-import {AddUpdateParameterProps} from "@/utils/data"
+import { AddUpdateParameterProps } from "@/utils/data"
 
 export interface TableProps {
 	termId: string;
@@ -54,6 +54,8 @@ export default function Variable({
 	setEditId,
 	setRefetch
 }: TableProps) {
+	const [addRow] = useMutation(ADD_ROW_FOR_QUARTER_WISE_TABLE);
+
 	const [getTermView, { data: termView, refetch: refetchTermView }] =
 		useLazyQuery(GET_VIEW_FOR_TERM, {
 			fetchPolicy: "network-only",
@@ -88,6 +90,22 @@ export default function Variable({
 	const checkValidId = (id: string) => {
 		return !!id && !id.startsWith("Dummy");
 	};
+
+	const onAdd = async (
+	) => {
+		const quarterId = termView?.getViewForTerm?.rows[0]?.cells[0]?.quarterId;
+		setShowLoader(true);
+		await addRow({
+			variables: {
+				quarterId: quarterId,
+				termId: selectedTerm?.id,
+			},
+		});
+		setShowLoader(false);
+		setShow(false);
+		refetchTermView();
+	};
+
 	const onSave = async (
 		id: string,
 		value: string,
@@ -164,10 +182,10 @@ export default function Variable({
 				}}
 				className="w-[calc((w-screen)- (w-1/5)) overflow-scroll"
 			>
-				{selectedTerm?.quarterWiseTable && (<button
+				{selectedTerm?.quarterWiseTable && termView && (<button
 					type="button"
-					className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]"
-					onClick={() => setShowQuarter(true)}
+					className="transform hover:scale-105 text-black mb-[10px] font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]"
+					onClick={() => onAdd()}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -189,7 +207,7 @@ export default function Variable({
 							d="M256 176v160M336 256H176"
 						/>
 					</svg>
-					<span>Add a Quarter</span>
+					<span>Add a Row</span>
 				</button>)}
 				{!selectedTerm?.summaryOnly && (
 					<table className="app-table w-full">
@@ -251,7 +269,6 @@ export default function Variable({
 											)}
 
 											{current.cells.map((cur, index) => {
-												console.log({ cur })
 												const selectedColumn = headers[index];
 												return (
 													<TD
