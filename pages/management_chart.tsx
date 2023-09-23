@@ -33,7 +33,9 @@ export default function FinancialPage() {
     const router = useRouter();
 
     useEffect(() => {
-        setCompany(router.query.company);
+        if (typeof router.query.company === 'string') {
+            setCompany(router.query.company);
+        }
     }, [router.query]);
 
     const [getTermsDetails, { data: termsData, refetch: refetchTerms }] =

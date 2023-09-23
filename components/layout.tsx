@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { useContext, useEffect, useState, useRef, use, SetStateAction } from "react";
+import { useContext, useEffect, useState, useRef, use, SetStateAction, JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal } from "react";
 import { UserContext } from "@/config/auth";
 import Link from "next/link";
 import { LoginService } from "@/utils/login";
@@ -173,7 +173,7 @@ export default function Layout(props: LayoutProps) {
     }
   }
 
-  let selectedSubIndustry = {};
+  let selectedSubIndustry;
 
   if (companies?.data?.getCompanies?.length && subIndustries?.data?.getSubIndustries?.length) {
     const selectedCompany = companies?.data?.getCompanies?.find((cur: { id: number; }) => cur.id === company);
@@ -221,8 +221,8 @@ export default function Layout(props: LayoutProps) {
               >
                 <option value="">Select a option</option>
                 {
-                  companies?.data?.getCompanies.map((ele) => {
-                    return <option key={ele.id} value={ele.id}>{ele.attributes.name}</option>;
+                  companies?.data?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
+                    return <option key={ele?.id?.toString()} value={ele?.id?.toString()}>{ele.attributes.name}</option>;
                   })
                 }
               </select>

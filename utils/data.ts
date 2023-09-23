@@ -67,5 +67,17 @@ export interface DeleteChartProps {
   id?: any;
 }
 
+export interface TraverseMap {
+  id?: string;
+  value?: string;
+  title?: string;
+  year?: number;
+  quarter?: number;
+  groupKey?: string;
+  quarterId?: string;
+  termId?: string;
+  variableId?: string;
+  columnIndex?: number;
+}
 
 

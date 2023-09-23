@@ -14,9 +14,9 @@ import YearDropdown from "@/components/year_dropdown/year_dropdown";
 import { Modal } from "@/components/model";
 import { ADD_QUARTER } from "@/utils/query";
 import { KpiTerm } from "@/utils/data";
-import {QuarterDataProps} from "@/utils/data"
-import {DeleteVariableProps} from "@/utils/data"
-import {EditQuarterProps} from "@/utils/data"
+import { QuarterDataProps } from "@/utils/data"
+import { DeleteVariableProps } from "@/utils/data"
+import { EditQuarterProps } from "@/utils/data"
 
 export default function VariableDetails() {
   const [termId, setTermId] = useState("");
@@ -114,7 +114,9 @@ export default function VariableDetails() {
   );
   const router = useRouter();
   useEffect(() => {
-    setCompany(router.query.company);
+    if (typeof router.query.company === 'string') {
+      setCompany(router.query.company);
+    }
   }, [router.query]);
 
   useEffect(() => {

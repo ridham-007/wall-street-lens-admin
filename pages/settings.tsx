@@ -24,7 +24,9 @@ export default function FinancialPage() {
     const router = useRouter();
 
     useEffect(() => {
-        setCompany(router.query.company)
+        if (typeof router.query.company === 'string') {
+            setCompany(router.query.company);
+        }
     }, [router.query])
 
     const [getTermsDetails, { data: termsData, refetch: refetchTerms }] = useLazyQuery(
@@ -197,7 +199,7 @@ function ImportData(props: ImportDataProps) {
         const result = [];
 
         for (let i = 1; i < data?.length; i++) {
-            const obj = {};
+            const obj: { [key: string]: any } = {}
             const quarters = [];
             for (let j = 0; j < attributes?.length; j++) {
                 if (!table) {
@@ -223,7 +225,7 @@ function ImportData(props: ImportDataProps) {
         return result;
     }
 
-    const getArrayofObject = (basicDetails: {}[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) => {
+    const getArrayofObject = (basicDetails: { [key: string]: any }[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) => {
         const {
             Quarter,
             Year,
@@ -396,7 +398,7 @@ function ImportData(props: ImportDataProps) {
                                         };
                                     }) => {
                                         return (
-                                            <option key={ele.attributes.slug} value={ele.id}>
+                                            <option key={ele.attributes.slug} value={ele?.id?.toString()}>
                                                 {ele.attributes.name}
                                             </option>
                                         );
