@@ -3,7 +3,7 @@ import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
 import { useMutation, useQuery } from "@apollo/client";
-import { ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID, GET_SUB_INDUSTRIES } from "@/utils/query";
+import { ADD_COLUMN_FOR_KPI_TERM, ADD_UPDATE_KPI_TERM, DELETE_KPI_BY_ID, GET_SUB_INDUSTRIES } from "@/utils/query";
 import { GET_COMPANIES } from "@/utils/query";
 import { AddUpdateTermProps } from "@/utils/data"
 import { DeleteTermProps } from "@/utils/data"
@@ -24,11 +24,13 @@ const TermsTable = (props: TableProps) => {
     const [deletePopup, setDeletePopup] = useState(false);
     const [deleteId, setDeleteId] = useState('');
     const [addOrUpdateKPIterm] = useMutation(ADD_UPDATE_KPI_TERM);
+    const [addColumnForKPIterm] = useMutation(ADD_COLUMN_FOR_KPI_TERM);
+
     const [deleteKPI] = useMutation(DELETE_KPI_BY_ID);
 
     const onAddUpdateKpiTerm = async (perameters: any) => {
         setShowLoader(true);
-        await addOrUpdateKPIterm({
+        const { data }: any = await addOrUpdateKPIterm({
             variables: {
                 kpiInfo: {
                     id: perameters?.id,
@@ -39,9 +41,19 @@ const TermsTable = (props: TableProps) => {
                 },
             }
         })
+        const termId = data?.addUpdateKpiTerm?.id ?? ''
+        if (!!termId && !perameters?.id) {
+            await addColumnForKPIterm({
+                variables: {
+                    termId: termId,
+                }
+            })
+        }
         setShowLoader(false);
         props.setRefetch(true);
     }
+
+
 
     const onDeleteKPI = async (id: any) => {
         await deleteKPI({
@@ -65,15 +77,6 @@ const TermsTable = (props: TableProps) => {
             document.removeEventListener("mousedown", checkIfClickedOutside)
         }
     }, [isOpenAction])
-    const toggleMenu = (id: string | number | ((prevState: string) => string) | null | undefined) => {
-        if (isOpenAction) {
-            setIsOpenAction('');
-        } else {
-            if (id) {
-                setIsOpenAction(id?.toString());
-            }
-        }
-    };
 
     const tableData = props?.data?.getKpiTermsByCompanyId;
 
