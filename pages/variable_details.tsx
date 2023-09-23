@@ -34,6 +34,7 @@ export default function VariableDetails() {
   const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING);
   const [showDelete, setShowDelete] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+
   const addDefaultMapping = async (id: any) => {
     await defaultMapping({
       variables: {
@@ -42,6 +43,7 @@ export default function VariableDetails() {
       },
     });
   };
+
   useEffect(() => {
     if (updateQuarter && addQuarterData?.addUpdateQuarter?.id) {
       addDefaultMapping(addQuarterData?.addUpdateQuarter?.id);
@@ -242,6 +244,7 @@ export default function VariableDetails() {
               <button
                 type="button"
                 className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg ml-3 py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]"
+              // onClick={ }
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

@@ -77,7 +77,6 @@ export default function FinancialPage() {
         getVariables();
     }, [termsData])
 
-
     const onAddUpdateParameter = async (sheetsData: any) => {
         setShowLoader(true);
         for (let i = 0; i < sheetsData?.length; i++) {

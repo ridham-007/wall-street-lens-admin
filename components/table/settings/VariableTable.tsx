@@ -2,12 +2,12 @@ import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
-import { ADD_UPDATE_TERM_VERIABLE, DELETE_VERIABLE_BY_ID } from "@/utils/query";
+import { ADD_UPDATE_TERM_VERIABLE, CREATE_DEFAULT_MAPPING, DELETE_VERIABLE_BY_ID } from "@/utils/query";
 import { useMutation } from "@apollo/client";
-import {KpiTerm} from "@/utils/data"
-import {AddUpdateParameterProps} from "@/utils/data"
-import {DeleteVariableProps} from "@/utils/data"
-import {TableProps} from "@/utils/data"
+import { KpiTerm } from "@/utils/data"
+import { AddUpdateParameterProps } from "@/utils/data"
+import { DeleteVariableProps } from "@/utils/data"
+import { TableProps } from "@/utils/data"
 
 const VariableTable = (props: TableProps) => {
     const [show, setShow] = useState(false);
@@ -19,11 +19,21 @@ const VariableTable = (props: TableProps) => {
 
     const [addOrUpdateVeriable] = useMutation(ADD_UPDATE_TERM_VERIABLE);
     const [deleteVariable] = useMutation(DELETE_VERIABLE_BY_ID);
+    const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING)
+
+    const addDefaultMapping = async (id: string, variableId: string) => {
+        await defaultMapping({
+            variables: {
+                termId: id,
+                variableId: variableId,
+            },
+        });
+    };
 
 
     const onAddUpdateQuarter = async (perameters: any) => {
         setShowLoader(true);
-        await addOrUpdateVeriable({
+        const { data }: any = await addOrUpdateVeriable({
             variables: {
                 variableInfo: {
                     id: perameters?.id,
@@ -34,7 +44,9 @@ const VariableTable = (props: TableProps) => {
                 },
                 termId: perameters?.term,
             }
-        })
+        });
+        const vaiableId = data?.addUpdateTermVariable?.id || '';
+        await addDefaultMapping(perameters?.term ?? "", vaiableId)
         setShowLoader(false);
         props.setRefetch(true);
     }
