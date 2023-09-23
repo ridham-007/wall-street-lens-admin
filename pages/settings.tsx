@@ -12,8 +12,8 @@ import { ToastContainer } from 'react-toastify';
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { GET_COMPANIES, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 import { useRouter } from "next/router";
-import {ImportDataProps} from "@/utils/data"
- 
+import { ImportDataProps } from "@/utils/data"
+
 export default function FinancialPage() {
     const [showLoader, setShowLoader] = useState(false);
     const [refetch, setRefetch] = useState(false);
@@ -229,9 +229,6 @@ function ImportData(props: ImportDataProps) {
             Year,
         } = basicDetails[0] || {};
         const keys = rows[0];
-        if (quarterWiseTable && !summaryOnly){
-            keys.push('VisibleToChart');
-        }
         const arrays = keys?.map((current, index) => {
             let quarters = [];
             for (let i = 1; i < rows.length; i++) {
@@ -243,7 +240,7 @@ function ImportData(props: ImportDataProps) {
                 quarters.push({
                     quarter: Number(Quarter),
                     year: Number(Year),
-                    value: current === "VisibleToChart" ? 'false' : values[index].toString(),
+                    value: values[index].toString(),
                     groupKey: `${formattedDate}-${i.toString()}`,
                 })
             }
@@ -253,7 +250,7 @@ function ImportData(props: ImportDataProps) {
                 quarters: quarters,
                 category: '',
                 yoy: '',
-                priority: (index+1).toString(),
+                priority: (index + 1).toString(),
             }
         })
 
@@ -261,24 +258,24 @@ function ImportData(props: ImportDataProps) {
     }
 
     function formatDateAsYYYYMMDDHHMMSS(date: Date): string {
-      const year = date.getFullYear().toString();
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      const day = date.getDate().toString().padStart(2, "0");
-      const hour = date.getHours().toString().padStart(2, "0");
-      const minute = date.getMinutes().toString().padStart(2, "0");
-      const second = date.getSeconds().toString().padStart(2, "0");
+        const year = date.getFullYear().toString();
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const day = date.getDate().toString().padStart(2, "0");
+        const hour = date.getHours().toString().padStart(2, "0");
+        const minute = date.getMinutes().toString().padStart(2, "0");
+        const second = date.getSeconds().toString().padStart(2, "0");
 
-      return `${year}${month}${day}${hour}${minute}${second}`;
+        return `${year}${month}${day}${hour}${minute}${second}`;
     }
-      
+
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target?.files?.[0];
         if (file) {
             setSelectedFileName(file.name);
-          } else {
+        } else {
             setSelectedFileName('');
-          }
+        }
         if (file) {
             const reader = new FileReader();
 
@@ -327,7 +324,7 @@ function ImportData(props: ImportDataProps) {
                     if (filteredTableData?.length > 1) {
                         basicDetails = convertDataToArrayOfObjects(filteredTableData[0].rows, true);
                         quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
-                         summaryOnly = basicDetails[0]?.SummaryOnly === 'Enable';
+                        summaryOnly = basicDetails[0]?.SummaryOnly === 'Enable';
                         if (quarterWiseTable || summaryOnly) {
                             arrayOfObjects = getArrayofObject(basicDetails, filteredTableData[1].rows, quarterWiseTable, summaryOnly)
                         } else {
@@ -370,58 +367,58 @@ function ImportData(props: ImportDataProps) {
     };
 
     return (
-      <Modal
-        showModal={true}
-        handleOnSave={handleOnSave}
-        title="Import Data from Excel sheet"
-        onClose={() => props.onClose && props.onClose()}
-      >
-        <>
-          <form className="form">
-            <div className="flex  gap-[20px]">
-              <div className="flex items-start">
-                <select
-                  id="quarter"
-                  name="company"
-                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  value={company}
-                  onChange={(event) => {
-                    setCompany(event.target.value);
-                  }}
-                >
-                  <option value="">Select a option</option>
-                  {companies?.data?.getCompanies.map(
-                    (ele: {
-                      id: readonly string[] | Key | null | undefined;
-                      attributes: {
-                        slug: Key | null | undefined;
-                        name: string
-                      };
-                    }) => {
-                      return (
-                        <option key={ele.attributes.slug} value={ele.id}>
-                          {ele.attributes.name}
-                        </option>
-                      );
-                    }
-                  )}
-                </select>
-              </div>
-              <div className="flex items-center flex-col">
-                
-                <input
-                  type="file"
-                  accept=".xlsx, .xls"
-                  onChange={handleFileUpload}
-                  disabled={!company}
-                  className=" text-white font-bold py-2 px-4 w-[150px] rounded-full"
-                />
-                <span> {selectedFileName}</span>
-              </div>
-            </div>
-          </form>
-          <ToastContainer />
-        </>
-      </Modal>
+        <Modal
+            showModal={true}
+            handleOnSave={handleOnSave}
+            title="Import Data from Excel sheet"
+            onClose={() => props.onClose && props.onClose()}
+        >
+            <>
+                <form className="form">
+                    <div className="flex  gap-[20px]">
+                        <div className="flex items-start">
+                            <select
+                                id="quarter"
+                                name="company"
+                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                value={company}
+                                onChange={(event) => {
+                                    setCompany(event.target.value);
+                                }}
+                            >
+                                <option value="">Select a option</option>
+                                {companies?.data?.getCompanies.map(
+                                    (ele: {
+                                        id: readonly string[] | Key | null | undefined;
+                                        attributes: {
+                                            slug: Key | null | undefined;
+                                            name: string
+                                        };
+                                    }) => {
+                                        return (
+                                            <option key={ele.attributes.slug} value={ele.id}>
+                                                {ele.attributes.name}
+                                            </option>
+                                        );
+                                    }
+                                )}
+                            </select>
+                        </div>
+                        <div className="flex items-center flex-col">
+
+                            <input
+                                type="file"
+                                accept=".xlsx, .xls"
+                                onChange={handleFileUpload}
+                                disabled={!company}
+                                className=" text-white font-bold py-2 px-4 w-[150px] rounded-full"
+                            />
+                            <span> {selectedFileName}</span>
+                        </div>
+                    </div>
+                </form>
+                <ToastContainer />
+            </>
+        </Modal>
     );
 }
