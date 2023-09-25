@@ -148,7 +148,7 @@ export default function VariableDetails() {
   useEffect(() => {
     getTermsDetails();
   }, [company]);
- 
+
   const handleShowDelete = (identifier: any) => {
     setShowDelete(true);
     setDeleteId(identifier);
