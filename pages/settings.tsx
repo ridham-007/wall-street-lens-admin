@@ -50,7 +50,7 @@ export default function FinancialPage() {
     );
 
     useEffect(() => {
-        if (!!company) {
+        if (!!company?.length) {
             getTermsDetails();
             getVariables();
         }
@@ -65,7 +65,9 @@ export default function FinancialPage() {
     }, [refetch])
 
     useEffect(() => {
-        getTermsDetails();
+        if (!!company?.length) {
+            getTermsDetails();
+        }
     }, [company])
 
     useEffect(() => {
@@ -202,7 +204,7 @@ function ImportData(props: ImportDataProps) {
         return result;
     }
 
-    const getArrayofObject = async (basicDetails: { [key: string]: any }[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) =>  {
+    const getArrayofObject = async (basicDetails: { [key: string]: any }[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) => {
         const {
             Quarter,
             Year,
@@ -210,9 +212,9 @@ function ImportData(props: ImportDataProps) {
         const keys = rows[0];
         const timeStamp: Array<string> = [];
         for (let i = 0; i < rows.length; i++) {
-          const date = new Date();
-          await new Promise((resolve, reject) => setTimeout(resolve, 10));
-          timeStamp.push(date.getTime().toString());
+            const date = new Date();
+            await new Promise((resolve, reject) => setTimeout(resolve, 10));
+            timeStamp.push(date.getTime().toString());
         }
 
         const arrays = keys?.map((current, index) => {

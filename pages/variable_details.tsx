@@ -28,9 +28,8 @@ export default function VariableDetails() {
   const [quarter, setQuarter] = useState("1");
   const [year, setYear] = useState("2023");
   const [showQuarter, setShowQuarter] = useState(false);
-  const [addQuarter, { data: addQuarterData }] = useMutation(ADD_QUARTER);
+  const [addQuarter] = useMutation(ADD_QUARTER);
   const [deleteQuarter] = useMutation(DELTE_QUARTER);
-  const [updateQuarter, setUpdateQuater] = useState(false);
   const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING);
   const [showDelete, setShowDelete] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -42,6 +41,7 @@ export default function VariableDetails() {
         quarterId: id,
       },
     });
+    setRefetch(true);
   };
 
   const handleOnAddQuarter = async (val: {
@@ -51,8 +51,7 @@ export default function VariableDetails() {
     year: any;
   }) => {
     setShowLoader(true);
-    setUpdateQuater(true);
-    await addQuarter({
+    const { data } = await addQuarter({
       variables: {
         variableInfo: {
           ...(val.id && { id: val.id }),
@@ -62,8 +61,11 @@ export default function VariableDetails() {
         termId: termId,
       },
     });
+    const quarterId = data?.addUpdateQuarter?.id;
+    if (!selectedTerm?.quarterWiseTable && quarterId) {
+      await addDefaultMapping(quarterId);
+    }
     setShowLoader(false);
-    setRefetch(true);
   };
 
   const handleOnUpdateQuarter = async (val: {
@@ -95,6 +97,7 @@ export default function VariableDetails() {
           quarterId: deleteId,
         },
       });
+      setDeleteId('');
       setRefetch(true);
     }
   };
@@ -113,17 +116,6 @@ export default function VariableDetails() {
     (cur: { id: string }) => cur.id === termId
   );
 
-  useEffect(() => {
-    if (
-      !(selectedTerm?.quarterWiseTable) &&
-      updateQuarter &&
-      addQuarterData?.addUpdateQuarter?.id
-    ) {
-      addDefaultMapping(addQuarterData?.addUpdateQuarter?.id);
-    }
-    setUpdateQuater(false);
-  }, [addQuarterData]);
-
   const router = useRouter();
   useEffect(() => {
     if (typeof router.query.company === 'string') {
@@ -132,7 +124,7 @@ export default function VariableDetails() {
   }, [router.query]);
 
   useEffect(() => {
-    if (company) {
+    if (!!company?.length) {
       getTermsDetails();
     }
   }, []);

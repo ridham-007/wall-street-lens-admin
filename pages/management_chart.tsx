@@ -75,7 +75,9 @@ export default function FinancialPage() {
     }, [termsData]);
 
     useEffect(() => {
-        getTermsDetails();
+        if (!!company?.length) {
+            getTermsDetails();
+        }
     }, [company]);
 
     const ref = useRef<HTMLInputElement | null>(null);
@@ -208,7 +210,9 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     );
 
     useEffect(() => {
-        getTermsDetails();
+        if (!!props.company?.length) {
+            getTermsDetails();
+        }
     }, [props.company]);
 
     const [getVariables, { data: termsVaribles }] = useLazyQuery(

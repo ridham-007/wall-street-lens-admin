@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { useContext, useEffect, useState, useRef, use, SetStateAction, JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal } from "react";
 import { UserContext } from "@/config/auth";
 import Link from "next/link";
@@ -8,8 +8,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/router";
-import { GET_COMPANIES, GET_INDUSTRIES, GET_SUB_INDUSTRIES } from "@/utils/query";
-import {LayoutProps} from "@/utils/data"
+import { GET_COMPANIES, GET_SUB_INDUSTRIES } from "@/utils/query";
+import { LayoutProps } from "@/utils/data"
 
 export enum LayoutPages {
   "financial_summary" = "financial_summary",
@@ -44,8 +44,16 @@ const CHANGE_PASSWORD = gql`
 
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
-  const companies = useQuery(GET_COMPANIES);
-  const subIndustries = useQuery(GET_SUB_INDUSTRIES);
+
+  const [getCompanies, { data: companies }] =
+    useLazyQuery(GET_COMPANIES, {
+      fetchPolicy: 'network-only',
+    });
+
+  const [getSubIndustries, { data: subIndustries }] =
+    useLazyQuery(GET_SUB_INDUSTRIES, {
+      fetchPolicy: 'network-only',
+    });
 
   const [isOpenAction, setIsOpenAction] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
@@ -56,7 +64,12 @@ export default function Layout(props: LayoutProps) {
   const [company, setCompany] = useState(0);
   const router = useRouter();
 
-  const [updatePassword, { data, error, loading }] = useMutation(
+  useEffect(() => {
+    getCompanies();
+    getSubIndustries();
+  }, [])
+
+  const [updatePassword, { data }] = useMutation(
     CHANGE_PASSWORD,
     {
       variables: {
@@ -75,7 +88,6 @@ export default function Layout(props: LayoutProps) {
         type: "error",
       });
       LoginService.deleteUser();
-      // window.location.href = "/login";
     } else if (data?.changePassword?.code === 300) {
       toast("Entered password is wrong!", {
         hideProgressBar: false,
@@ -87,8 +99,6 @@ export default function Layout(props: LayoutProps) {
 
   useEffect(() => {
     const checkIfClickedOutside = (e: { target: any }) => {
-      // If the menu is open and the clicked target is not within the menu,
-      // then close the menu
       if (
         isOpenAction === true &&
         ref.current &&
@@ -101,7 +111,6 @@ export default function Layout(props: LayoutProps) {
     document.addEventListener("mousedown", checkIfClickedOutside);
 
     return () => {
-      // Cleanup the event listener
       document.removeEventListener("mousedown", checkIfClickedOutside);
     };
   }, [isOpenAction]);
@@ -118,7 +127,7 @@ export default function Layout(props: LayoutProps) {
   });
 
   useEffect(() => {
-    setCompany(companies?.data?.getCompanies[0]?.id)
+    setCompany(companies?.getCompanies[0]?.id)
   }, [companies])
 
   const logout = () => {
@@ -155,12 +164,6 @@ export default function Layout(props: LayoutProps) {
 
   const handleOnChange = (event: { target: { value: SetStateAction<string>; name: string; }; }) => {
     switch (event.target.name) {
-      case 'industry':
-        setCompany(0);
-        break;
-      case 'subindustry':
-        setCompany(0);
-        break;
       case 'company':
         setCompany(Number(event.target.value));
         break;
@@ -170,10 +173,10 @@ export default function Layout(props: LayoutProps) {
 
   let selectedSubIndustry;
 
-  if (companies?.data?.getCompanies?.length && subIndustries?.data?.getSubIndustries?.length) {
-    const selectedCompany = companies?.data?.getCompanies?.find((cur: { id: number; }) => cur.id === company);
+  if (companies?.getCompanies?.length && subIndustries?.getSubIndustries?.length) {
+    const selectedCompany = companies?.getCompanies?.find((cur: { id: number; }) => cur.id === company);
     const subId = selectedCompany?.attributes?.subIndustries[0]?.id;
-    selectedSubIndustry = subIndustries?.data?.getSubIndustries?.find((cur: { id: any; }) => cur.id === subId)
+    selectedSubIndustry = subIndustries?.getSubIndustries?.find((cur: { id: any; }) => cur.id === subId)
   }
 
   const industryName = selectedSubIndustry?.attributes?.industry?.name;
@@ -215,8 +218,8 @@ export default function Layout(props: LayoutProps) {
                 onChange={handleOnChange}
               >
                 <option value="">Select a option</option>
-                                {
-                  companies?.data?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
+                {
+                  companies?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
                     return <option key={ele?.id?.toString()} value={ele?.id?.toString()}>{ele.attributes.name}</option>;
                   })
                 }
