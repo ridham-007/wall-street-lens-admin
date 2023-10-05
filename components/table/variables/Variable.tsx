@@ -29,7 +29,7 @@ export default function Variable({
 }: TableProps) {
 	const [addRow] = useMutation(ADD_ROW_FOR_QUARTER_WISE_TABLE);
 	const [termData, setTermData] = useState<Record<string, any>>({});
-
+	const [showLoader, setShowLoader] = useState(false);
 	const [getTermView, { data: termView, refetch: refetchTermView, error }] =
 		useLazyQuery(GET_VIEW_FOR_TERM, {
 			fetchPolicy: "network-only",
@@ -43,10 +43,12 @@ export default function Variable({
 		});
 
 	useEffect(() => {
+		setShowLoader(true);
 		getTermView();
 	}, [termId]);
 
 	useEffect(() => {
+		setShowLoader(false);
 		const { quarterId }: { quarterId: string } =
 			termView?.getViewForTerm || { quarterId: '' };
 		setQuarterId(quarterId)
@@ -68,7 +70,7 @@ export default function Variable({
 
 	const [show, setShow] = useState(false);
 	const [cellData, setCellData] = useState<TraverseMap>();
-	const [showLoader, setShowLoader] = useState(false);
+
 
 	const [updateValue] = useMutation(UPDATE_MAPPED_VALUE);
 	const { headers = [], rows = [], quarterId }: { headers: Header[]; rows: Row[]; quarterId: string } =
@@ -120,12 +122,12 @@ export default function Variable({
 				}),
 			},
 		});
-		setShowLoader(false);
 		setShow(false);
 		refetchTermView();
 	};
 
 	useEffect(() => {
+		setShowLoader(true);
 		getTermView();
 	}, []);
 

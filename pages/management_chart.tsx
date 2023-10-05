@@ -133,8 +133,9 @@ export default function FinancialPage() {
                     </div>
                     <button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]  ${!term?.length && 'pointer-events-none opacity-70'}`}
                         onClick={() => setAddUpdateParameter(true)}
+                        disabled={!term?.length}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

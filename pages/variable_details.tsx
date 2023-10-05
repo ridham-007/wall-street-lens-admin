@@ -126,6 +126,7 @@ export default function VariableDetails() {
   useEffect(() => {
     if (!!company?.length) {
       getTermsDetails();
+      setShowLoader(true);
     }
   }, []);
 
@@ -135,6 +136,7 @@ export default function VariableDetails() {
     } else {
       setTermId("");
     }
+    setShowLoader(false);
   }, [termsData]);
 
   useEffect(() => {
@@ -146,7 +148,7 @@ export default function VariableDetails() {
     setDeleteId(identifier);
   };
   return (
-    <Layout title="Financial Summary" page={LayoutPages.variable_details}>
+    <Layout title="Variable Details" page={LayoutPages.variable_details}>
       <>
         {showLoader && <Loader />}
         <div className="flex justify-between gap-[20px]">
@@ -219,8 +221,9 @@ export default function VariableDetails() {
 
             <button
               type="button"
-              className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]"
+              className={`bg-blue-500 hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ml-auto h-[50px]  ${!termId?.length && 'pointer-events-none opacity-70'}`}
               onClick={() => setShowQuarter(true)}
+              disabled={!termId?.length}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +267,7 @@ export default function VariableDetails() {
             )}
           </div>
         </div>
-        {!!termId && (
+        {!!termId?.length && (
           <Variable
             termId={termId}
             year={year}

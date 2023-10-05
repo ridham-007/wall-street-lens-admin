@@ -33,7 +33,7 @@ export default function LoginPage() {
       }
       LoginService.saveUser({ email, password });
       LoginService.saveToken(res?.data?.signIn?.accessToken)
-      window.location.href = "/financial_summary";
+      window.location.href = "/settings";
     }).catch((error: any) => {
       toast('Invalid Email or password', { hideProgressBar: false, autoClose: 7000, type: 'error' });
     })
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 type="email"
                 name="email"
                 id="email"
-                placeholder="Email Address"
+                placeholder="User Name"
                 className="w-full p-2 border rounded"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

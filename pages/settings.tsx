@@ -99,7 +99,7 @@ export default function FinancialPage() {
         setActiveTab(tabName);
     };
     return (
-        <Layout title="Financial Summary" page={LayoutPages.settings}>
+        <Layout title="Settings" page={LayoutPages.settings}>
             <>
                 {showLoader && (<Loader />)}
                 <div className="flex pr-4 gap-4">

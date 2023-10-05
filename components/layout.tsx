@@ -9,7 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/router";
 import { GET_COMPANIES, GET_SUB_INDUSTRIES } from "@/utils/query";
-import { LayoutProps } from "@/utils/data"
+import { LayoutProps } from "@/utils/data";
+import Loader from "./loader";
 
 export enum LayoutPages {
   "financial_summary" = "financial_summary",
@@ -44,6 +45,7 @@ const CHANGE_PASSWORD = gql`
 
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
+  const [showLoader, setShowLoader] = useState(false);
 
   const [getCompanies, { data: companies }] =
     useLazyQuery(GET_COMPANIES, {
@@ -65,6 +67,7 @@ export default function Layout(props: LayoutProps) {
   const router = useRouter();
 
   useEffect(() => {
+    setShowLoader(true);
     getCompanies();
     getSubIndustries();
   }, [])
@@ -127,6 +130,7 @@ export default function Layout(props: LayoutProps) {
   });
 
   useEffect(() => {
+    setShowLoader(false);
     setCompany(companies?.getCompanies[0]?.id)
   }, [companies])
 
@@ -184,6 +188,7 @@ export default function Layout(props: LayoutProps) {
 
   return (
     <>
+      {showLoader && (<Loader />)}
       <Head>
         {props.title ? (
           <title>{`${props.title} | Admin | Wall Street Lens`}</title>
@@ -239,7 +244,7 @@ export default function Layout(props: LayoutProps) {
                 htmlFor="title"
                 className="text-sm mr-[10px] font-bold text-gray-700"
               >
-                SubIdustry:
+                SubIndustry:
               </label>
               <div className="text-sm">{subIndustryName}</div>
             </div>)}
@@ -289,44 +294,6 @@ export default function Layout(props: LayoutProps) {
                   aria-orientation="vertical"
                   aria-labelledby="options-menu"
                 >
-                  <div
-                    className="block h-[60px] items-center flex px-4 py-2 text-md bg-slate-200 text-gray-700 "
-                    role="menuitem"
-                  >
-                    {user && (
-                      <div>
-                        <b>
-                          {user?.role === "admin" ? "Admin" : user?.firstName}
-                        </b>
-                      </div>
-                    )}
-                  </div>
-                  <a
-                    onClick={() => {
-                      setIsChangePassword(true);
-                      setIsOpenAction(false);
-                    }}
-                    className="block h-[60px] px-4 py-2 items-center flex text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
-                    role="menuitem"
-                  >
-                    <svg
-                      className="w-7 h-7 mt-2 mr-2"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        opacity="0.4"
-                        d="M19.7906 4.22007C16.8306 1.27007 12.0306 1.27007 9.09063 4.22007C7.02063 6.27007 6.40063 9.22007 7.20063 11.8201L2.50063 16.5201C2.17063 16.8601 1.94063 17.5301 2.01063 18.0101L2.31063 20.1901C2.42063 20.9101 3.09063 21.5901 3.81063 21.6901L5.99063 21.9901C6.47063 22.0601 7.14063 21.8401 7.48063 21.4901L8.30063 20.6701C8.50063 20.4801 8.50063 20.1601 8.30063 19.9601L6.36063 18.0201C6.07063 17.7301 6.07063 17.2501 6.36063 16.9601C6.65063 16.6701 7.13063 16.6701 7.42063 16.9601L9.37063 18.9101C9.56063 19.1001 9.88063 19.1001 10.0706 18.9101L12.1906 16.8001C14.7806 17.6101 17.7306 16.9801 19.7906 14.9301C22.7406 11.9801 22.7406 7.17007 19.7906 4.22007ZM14.5006 12.0001C13.1206 12.0001 12.0006 10.8801 12.0006 9.50007C12.0006 8.12007 13.1206 7.00007 14.5006 7.00007C15.8806 7.00007 17.0006 8.12007 17.0006 9.50007C17.0006 10.8801 15.8806 12.0001 14.5006 12.0001Z"
-                        fill="#292D32"
-                      />
-                      <path
-                        d="M14.5 12C15.8807 12 17 10.8807 17 9.5C17 8.11929 15.8807 7 14.5 7C13.1193 7 12 8.11929 12 9.5C12 10.8807 13.1193 12 14.5 12Z"
-                        fill="#292D32"
-                      />
-                    </svg>{" "}
-                    Change Password
-                  </a>
                   <a
                     onClick={() => {
                       logout();
