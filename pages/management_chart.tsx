@@ -110,7 +110,7 @@ export default function FinancialPage() {
                             htmlFor="quarter"
                             className="text-sm  text-gray-700 mr-[20px]"
                         >
-                            KPIs Term:
+                            Tab:
                         </label>
                         <select
                             id="quarter"

@@ -105,7 +105,8 @@ export default function Variable({
 		groupKey: string,
 		quarterId: string,
 		termId: string,
-		variableId: string
+		variableId: string,
+		selectedOption: string,
 	) => {
 		setShowLoader(true);
 		await updateValue({
@@ -114,6 +115,7 @@ export default function Variable({
 					...(checkValidId(id) && { id }),
 					value: value,
 					groupKey: groupKey,
+					highlightColor: selectedOption || '',
 				},
 				...(!checkValidId(id) && {
 					quarterId: quarterId,
@@ -210,7 +212,7 @@ export default function Variable({
 							<THR>
 								<>
 									{!selectedTerm?.quarterWiseTable ? (
-										<TH>KPI Variable</TH>
+										<TH>Tab Variable</TH>
 									) : (
 										<TH>Year</TH>
 									)}
@@ -291,6 +293,7 @@ export default function Variable({
 																termId: cur.termId,
 																variableId: cur.variableId,
 																columnIndex: index,
+																highlightColor: cur.highlightColor,
 															});
 														}}
 														key={cur.id}
@@ -377,6 +380,7 @@ export default function Variable({
 						onSave={onSave}
 						cellData={cellData}
 						selectedColumn={selectedColumn}
+						selectedTerm={selectedTerm}
 					/>
 				)}
 			</div>
@@ -385,7 +389,9 @@ export default function Variable({
 }
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
+	console.log(props.cellData)
 	const [val, setVal] = useState<string>(props.cellData?.value.toString());
+	const [selectedOption, setSelectedOption] = useState(props.cellData?.highlightColor);
 	const handleOnSave = async () => {
 		if (!!props.onSave) {
 			props.onSave(
@@ -394,7 +400,8 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 				props.cellData.groupKey,
 				props?.cellData?.quarterId,
 				props?.cellData?.termId,
-				props?.cellData?.variableId
+				props?.cellData?.variableId,
+				selectedOption
 			);
 		}
 	};
@@ -406,7 +413,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 				: e.target.value;
 		setVal(value);
 	};
-
+	console.log(props.selectedTerm)
 	return (
 		<Modal
 			showModal={true}
@@ -472,7 +479,40 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 								className="w-[calc(50vw)] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
 							/>
 						)}
-					</div>
+						</div>
+						{(!props.selectedTerm?.quarterWiseTable && props.selectedColumn?.name !== "VisibleToChart") && (<div><div className="flex items-center gap-[20px] mt-[20px]">
+							<label
+								htmlFor="value"
+								className="text-lg font-bold text-gray-700"
+							>
+								Cell Background:
+							</label>
+						</div>
+							<div className="mt-5">
+								<label className="mr-3">
+									<input
+										type="radio"
+										name="options"
+										value="red"
+										checked={selectedOption === "red"}
+										onChange={() => { setSelectedOption('red') }}
+										className="m-1"
+									/>
+									Red
+								</label>
+
+								<label>
+									<input
+										type="radio"
+										name="options"
+										value="green"
+										checked={selectedOption === "green"}
+										onChange={() => { setSelectedOption('green') }}
+										className="m-1"
+									/>
+									Green
+								</label>
+							</div></div>)}
 				</form>
 			</>
 		</Modal>

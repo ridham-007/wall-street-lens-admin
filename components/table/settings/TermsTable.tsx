@@ -117,7 +117,7 @@ const TermsTable = (props: TableProps) => {
                         d="M256 176v160M336 256H176"
                     />
                 </svg>
-                <span>Add a Term</span>
+                <span>Add a Tab</span>
             </button>
         </div>
         <div style={{
@@ -212,7 +212,7 @@ function AddUpdateTerms(props: AddUpdateTermProps) {
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title={`Add a Term: ${props?.data?.kpiTerm?.company || ''}`}
+            title={`Add a Tab: ${props?.data?.kpiTerm?.company || ''}`}
             onClose={() => props.onClose && props.onClose()}
         >
             <>
@@ -287,7 +287,7 @@ function DeleteTerm(props: DeleteTermProps) {
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Delete a Term"
+            title="Delete a Tab"
             onClose={() => props.onClose && props.onClose()}
             confirmButton="Delete"
         >

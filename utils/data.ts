@@ -174,6 +174,7 @@ export interface TraverseMap {
   termId?: string;
   variableId?: string;
   columnIndex?: number;
+  highlightColor?: string;
 }
 
 

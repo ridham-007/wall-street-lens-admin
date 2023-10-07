@@ -138,9 +138,9 @@ export default function FinancialPage() {
                         onClick={() => handleTabClick('Variables')}
                     />
                     <TabButton
-                        label="KPI Terms"
+                        label="Tabs"
                         activeTab={activeTab}
-                        onClick={() => handleTabClick('KPI Terms')}
+                        onClick={() => handleTabClick('Tabs')}
                     />
                 </div>
                 {activeTab === 'Variables' ? <VariableTable term={term} data={termsVaribles} setTerm={setTerm} setRefetch={setRefetch} termsData={termsData} /> : <TermsTable data={termsData} company={company} setRefetch={setRefetch} />}

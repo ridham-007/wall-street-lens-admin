@@ -58,7 +58,7 @@ const ParameterTable = (props: TableProps) => {
                             <TH>NAME</TH>
                             <TH>TYPE</TH>
                             <TH>VISIBLE</TH>
-                            <TH>TERM</TH>
+                            <TH>TAB</TH>
                             <TH >Action</TH>
                         </>
                     </THR>

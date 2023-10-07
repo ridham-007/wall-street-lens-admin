@@ -158,7 +158,7 @@ export default function VariableDetails() {
                 htmlFor="quarter"
                 className="text-sm font-bold text-gray-700"
               >
-                KPIs Term:
+                Tab:
               </label>
               <select
                 id="quarter"

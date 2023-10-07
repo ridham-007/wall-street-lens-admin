@@ -115,7 +115,7 @@ const VariableTable = (props: TableProps) => {
             </div>
             <div className="flex flex-col mb-[20px]">
                 <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
-                    KPIs Term:
+                    Tab:
                 </label>
                 <select
                     id="quarter"
@@ -145,7 +145,7 @@ const VariableTable = (props: TableProps) => {
                     <THR>
                         <>
                             <TH>Name</TH>
-                            <TH>Terms name</TH>
+                            <TH>Tab name</TH>
                             {!selectedTerm?.quarterWiseTable && (
                                 <>
                                     <TH>Priority</TH>
@@ -282,7 +282,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                         </div>)}
                         <div className="flex flex-col mb-[20px]">
                             <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
-                                KPIs Term:
+                                Tab:
                             </label>
                             <select
                                 id="quarter"
