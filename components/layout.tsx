@@ -23,23 +23,8 @@ export enum LayoutPages {
 }
 
 const CHANGE_PASSWORD = gql`
-  mutation ChangePassword(
-    $id: String!
-    $oldPassword: String!
-    $newPassword: String
-  ) {
-    changePassword(
-      id: $id
-      oldPassword: $oldPassword
-      newPassword: $newPassword
-    ) {
-      code
-      success
-      message
-      data {
-        updated
-      }
-    }
+  mutation ChangePassword($password: String!) {
+    updatePasswordByUserId(password: $password)
   }
 `;
 
@@ -76,27 +61,19 @@ export default function Layout(props: LayoutProps) {
     CHANGE_PASSWORD,
     {
       variables: {
-        id: LoginService.getUser()?._id,
-        oldPassword,
-        newPassword,
+        password: newPassword,
       },
     }
   );
 
   useEffect(() => {
-    if (data?.changePassword?.code === 200) {
+    if (!!data) {
       toast("Password updated successfully!", {
         hideProgressBar: false,
-        autoClose: 7000,
-        type: "error",
+        autoClose: 2000,
+        type: "success",
       });
-      LoginService.deleteUser();
-    } else if (data?.changePassword?.code === 300) {
-      toast("Entered password is wrong!", {
-        hideProgressBar: false,
-        autoClose: 7000,
-        type: "error",
-      });
+      setIsChangePassword(false);
     }
   }, [data]);
 
@@ -294,11 +271,20 @@ export default function Layout(props: LayoutProps) {
                   aria-orientation="vertical"
                   aria-labelledby="options-menu"
                 >
+                  <div
+                    onClick={() => {
+                      setIsChangePassword(true);
+                      setIsOpenAction(false);
+                    }}
+                    className="flex h-[60px] px-4 py-2 items-center text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+                  >
+                    Change Password
+                  </div>
                   <a
                     onClick={() => {
                       logout();
                     }}
-                    className="block h-[60px] px-4 py-2 items-center flex text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+                    className="flex h-[60px] px-4 py-2 items-center text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
                     role="menuitem"
                   >
                     <svg
@@ -444,14 +430,6 @@ export default function Layout(props: LayoutProps) {
                   </button>
                 </div>
                 <div className="relative p-6 flex flex-col">
-                  <input
-                    type="password"
-                    placeholder="Enter Old Password"
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                  />
-
                   <input
                     type="password"
                     placeholder="Enter New Password"
