@@ -476,7 +476,7 @@ function EditQuarter(props: EditQuarterProps) {
               Red
             </label>
 
-            <label>
+            <label className="mr-3">
               <input
                 type="radio"
                 name="options"
@@ -486,6 +486,17 @@ function EditQuarter(props: EditQuarterProps) {
                 className="m-1"
               />
               Green
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="options"
+                value="none"
+                checked={selectedOption === "none"}
+                onChange={handleOptionChange}
+                className="m-1"
+              />
+              None
             </label>
           </div>
         </form>

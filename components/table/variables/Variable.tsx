@@ -501,7 +501,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 									Red
 								</label>
 
-								<label>
+							<label className="mr-3">
 									<input
 										type="radio"
 										name="options"
@@ -512,6 +512,17 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 									/>
 									Green
 								</label>
+							<label>
+								<input
+									type="radio"
+									name="options"
+									value="green"
+									checked={selectedOption === "none"}
+									onChange={() => { setSelectedOption('none') }}
+									className="m-1"
+								/>
+								None
+							</label>
 							</div></div>)}
 				</form>
 			</>
