@@ -99,10 +99,10 @@ export default function FinancialPage() {
         setActiveTab(tabName);
     };
     return (
-        <Layout title="Settings" page={LayoutPages.settings}>
-            <>
-                {showLoader && (<Loader />)}
-                {/* <div className="flex pr-4 gap-4">
+      <Layout title="Veriables" page={LayoutPages.variables}>
+        <>
+          {showLoader && <Loader />}
+          {/* <div className="flex pr-4 gap-4">
                     <button
                         type="button"
                         className="bg-blue-500 ml-auto hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -131,7 +131,7 @@ export default function FinancialPage() {
                         <span>Import Data</span>
                     </button>
                 </div> */}
-                {/* <div className="flex mb-4 mt-4">
+          {/* <div className="flex mb-4 mt-4">
                     <TabButton
                         label="Variables"
                         activeTab={activeTab}
@@ -143,16 +143,31 @@ export default function FinancialPage() {
                         onClick={() => handleTabClick('Tabs')}
                     />
                 </div> */}
-                {activeTab === 'Variables' ? <VariableTable term={term} data={termsVaribles} setTerm={setTerm} setRefetch={setRefetch} termsData={termsData} /> : <TermsTable data={termsData} company={company} setRefetch={setRefetch} />}
-                {showImport && (
-                    <ImportData
-                        onSuccess={onAddUpdateParameter}
-                        onClose={() => { setShowImport(false) }}
-                    ></ImportData>
-                )}
-
-            </>
-        </Layout >
+          {activeTab === "Variables" ? (
+            <VariableTable
+              term={term}
+              data={termsVaribles}
+              setTerm={setTerm}
+              setRefetch={setRefetch}
+              termsData={termsData}
+            />
+          ) : (
+            <TermsTable
+              data={termsData}
+              company={company}
+              setRefetch={setRefetch}
+            />
+          )}
+          {showImport && (
+            <ImportData
+              onSuccess={onAddUpdateParameter}
+              onClose={() => {
+                setShowImport(false);
+              }}
+            ></ImportData>
+          )}
+        </>
+      </Layout>
     );
 }
 
