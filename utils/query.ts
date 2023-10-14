@@ -521,6 +521,17 @@ const ADD_COLUMN_FOR_KPI_TERM = gql`
   }
 `;
 
+const ADD_UPDATE_MASTER_VERIABLE = gql`mutation addUpdateMasterVariable(
+  $variableInfo:AddUpdateMasterVariable!
+  ){
+  addUpdateMasterVariable(
+    variableInfo: $variableInfo
+  ){
+    id
+    title
+  }
+}`;
+
 export {
   LOG_IN,
   ADD_FINANCIAL_SUMMARY_PARAMETER,
@@ -556,5 +567,6 @@ export {
   GET_SUB_INDUSTRIES,
   DELTE_ROW_FOR_QUARTER_WIASE_TABLE,
   ADD_ROW_FOR_QUARTER_WISE_TABLE,
-  ADD_COLUMN_FOR_KPI_TERM
+  ADD_COLUMN_FOR_KPI_TERM,
+  ADD_UPDATE_MASTER_VERIABLE
 }
