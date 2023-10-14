@@ -345,11 +345,10 @@ export default function Layout(props: LayoutProps) {
             <div className="flex-1 py-4 space-y-1  divide-y divide-gray-200 dark:divide-gray-700">
               <Link href={`/variables?company=${company}`}>
                 <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.variables
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.variables
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -368,13 +367,12 @@ export default function Layout(props: LayoutProps) {
                   Variables
                 </button>
               </Link>
-              <Link href={`/settings?company=${company}`}>
+              <Link href={`/tabs?company=${company}`}>
                 <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.tabs
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.tabs
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -395,11 +393,10 @@ export default function Layout(props: LayoutProps) {
               </Link>
               <Link href={`/variable_details?company=${company}`}>
                 <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.variable_details
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.variable_details
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -415,16 +412,15 @@ export default function Layout(props: LayoutProps) {
                       d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  Tabs Quarters
+                  Tab Quarters
                 </button>
               </Link>
               <Link href={`/management_chart?company=${company}`}>
                 <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.management_chart
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.management_chart
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -445,11 +441,10 @@ export default function Layout(props: LayoutProps) {
               </Link>
               <Link href={`/settings?company=${company}`}>
                 <button
-                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${
-                    props?.page === LayoutPages.settings
-                      ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
-                      : "bg-slate-50 text-black"
-                  }`}
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.settings
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

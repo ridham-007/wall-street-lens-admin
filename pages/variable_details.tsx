@@ -153,7 +153,7 @@ export default function VariableDetails() {
         {showLoader && <Loader />}
         <div className="flex justify-between gap-[20px]">
           <div className="flex  gap-[20px] ">
-            <div className="flex flex-col mb-[20px]">
+            <div className="flex flex-row gap-4 items-center">
               <label
                 htmlFor="quarter"
                 className="text-sm font-bold text-gray-700"

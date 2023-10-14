@@ -113,7 +113,7 @@ const VariableTable = (props: TableProps) => {
                     <span>Add a Variable</span>
                 </button>
             </div>
-            <div className="flex flex-col mb-[20px]">
+            <div className="flex flex-row gap-4 items-center">
                 <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
                     Tab:
                 </label>
@@ -240,7 +240,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Add a Veriable"
+            title="Add a Variable"
             onClose={() => props.onClose && props.onClose()}
         >
             <>

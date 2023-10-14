@@ -1,9 +1,7 @@
-import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import Loader from "@/components/loader";
 import VariableTable from "@/components/table/settings/VariableTable";
-import TermsTable from "@/components/table/settings/TermsTable";
-import { TabButton } from "@/components/TabButton";
 import { Modal } from "@/components/model";
 import * as XLSX from 'xlsx';
 import { toast } from "react-toastify";
@@ -94,15 +92,11 @@ export default function FinancialPage() {
         setRefetch(true);
     };
 
-    const [activeTab, setActiveTab] = useState('Variables');
-    const handleTabClick = (tabName: string) => {
-        setActiveTab(tabName);
-    };
     return (
         <Layout title="Settings" page={LayoutPages.settings}>
             <>
                 {showLoader && (<Loader />)}
-                {/* <div className="flex pr-4 gap-4">
+                <div className="flex pr-4 gap-4">
                     <button
                         type="button"
                         className="bg-blue-500 ml-auto hover:bg-blue-600 transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -130,27 +124,14 @@ export default function FinancialPage() {
                         </svg>
                         <span>Import Data</span>
                     </button>
-                </div> */}
-                {/* <div className="flex mb-4 mt-4">
-                    <TabButton
-                        label="Variables"
-                        activeTab={activeTab}
-                        onClick={() => handleTabClick('Variables')}
-                    />
-                    <TabButton
-                        label="Tabs"
-                        activeTab={activeTab}
-                        onClick={() => handleTabClick('Tabs')}
-                    />
-                </div> */}
-                {activeTab === 'Variables' ? <VariableTable term={term} data={termsVaribles} setTerm={setTerm} setRefetch={setRefetch} termsData={termsData} /> : <TermsTable data={termsData} company={company} setRefetch={setRefetch} />}
+                </div>
+                <VariableTable term={term} data={termsVaribles} setTerm={setTerm} setRefetch={setRefetch} termsData={termsData} />
                 {showImport && (
                     <ImportData
                         onSuccess={onAddUpdateParameter}
                         onClose={() => { setShowImport(false) }}
                     ></ImportData>
                 )}
-
             </>
         </Layout >
     );
@@ -354,62 +335,62 @@ function ImportData(props: ImportDataProps) {
     };
 
     return (
-      <Modal
-        showModal={true}
-        handleOnSave={handleOnSave}
-        title="Import Data from Excel sheet"
-        onClose={() => props.onClose && props.onClose()}
-      >
-        <>
-          <form className="form">
-            <div className="flex  gap-[20px]">
-              <div className="flex items-start">
-                <select
-                  id="quarter"
-                  name="company"
-                  className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  value={company}
-                  onChange={(event) => {
-                    setCompany(event.target.value);
-                  }}
-                >
-                  <option value="">Select a option</option>
-                  <option value="TESLA">Tesla</option>
+        <Modal
+            showModal={true}
+            handleOnSave={handleOnSave}
+            title="Import Data from Excel sheet"
+            onClose={() => props.onClose && props.onClose()}
+        >
+            <>
+                <form className="form">
+                    <div className="flex  gap-[20px]">
+                        <div className="flex items-start">
+                            <select
+                                id="quarter"
+                                name="company"
+                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                value={company}
+                                onChange={(event) => {
+                                    setCompany(event.target.value);
+                                }}
+                            >
+                                <option value="">Select a option</option>
+                                <option value="TESLA">Tesla</option>
 
-                  {companies?.data?.getCompanies.map(
-                    (ele: {
-                      id: readonly string[] | Key | null | undefined;
-                      attributes: {
-                        slug: Key | null | undefined;
-                        name: string;
-                      };
-                    }) => {
-                      return (
-                        <option
-                          key={ele.attributes.slug}
-                          value={ele?.id?.toString()}
-                        >
-                          {ele.attributes.name}
-                        </option>
-                      );
-                    }
-                  )}
-                </select>
-              </div>
-              <div className="flex items-center flex-col">
-                <input
-                  type="file"
-                  accept=".xlsx, .xls"
-                  onChange={handleFileUpload}
-                  disabled={!company}
-                  className=" text-white font-bold py-2 px-4 w-[150px] rounded-full"
-                />
-                <span> {selectedFileName}</span>
-              </div>
-            </div>
-          </form>
-          <ToastContainer />
-        </>
-      </Modal>
+                                {companies?.data?.getCompanies.map(
+                                    (ele: {
+                                        id: readonly string[] | Key | null | undefined;
+                                        attributes: {
+                                            slug: Key | null | undefined;
+                                            name: string;
+                                        };
+                                    }) => {
+                                        return (
+                                            <option
+                                                key={ele.attributes.slug}
+                                                value={ele?.id?.toString()}
+                                            >
+                                                {ele.attributes.name}
+                                            </option>
+                                        );
+                                    }
+                                )}
+                            </select>
+                        </div>
+                        <div className="flex items-center flex-col">
+                            <input
+                                type="file"
+                                accept=".xlsx, .xls"
+                                onChange={handleFileUpload}
+                                disabled={!company}
+                                className=" text-white font-bold py-2 px-4 w-[150px] rounded-full"
+                            />
+                            <span> {selectedFileName}</span>
+                        </div>
+                    </div>
+                </form>
+                <ToastContainer />
+            </>
+        </Modal>
     );
 }

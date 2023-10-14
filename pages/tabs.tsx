@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
-import VariableTable from "@/components/table/settings/VariableTable";
+import TermsTable from "@/components/table/settings/TermsTable";
 import 'react-toastify/dist/ReactToastify.css';
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
 
-export default function FinancialPage() {
+
+export default function Tabs() {
     const [refetch, setRefetch] = useState(false);
     const [company, setCompany] = useState('');
     const [term, setTerm] = useState('');
@@ -68,16 +69,8 @@ export default function FinancialPage() {
     }, [termsData])
 
     return (
-        <Layout title="Veriables" page={LayoutPages.variables}>
-            <>
-                <VariableTable
-                    term={term}
-                    data={termsVaribles}
-                    setTerm={setTerm}
-                    setRefetch={setRefetch}
-                    termsData={termsData}
-                />
-            </>
-        </Layout>
+        <Layout title="Tabs" page={LayoutPages.tabs}>
+            <TermsTable data={termsData} company={company} setRefetch={setRefetch} />
+        </Layout >
     );
 }
