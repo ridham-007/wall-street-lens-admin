@@ -2,7 +2,7 @@ import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
-import { ADD_UPDATE_TERM_VERIABLE, ADD_UPDATE_MASTER_VERIABLE, DELETE_VERIABLE_BY_ID } from "@/utils/query";
+import { ADD_UPDATE_MASTER_VERIABLE, DELETE_VERIABLE_BY_ID } from "@/utils/query";
 import { useMutation } from "@apollo/client";
 import { KpiTerm } from "@/utils/data"
 import { AddUpdateParameterProps } from "@/utils/data"
@@ -59,68 +59,11 @@ const VariableTable = (props: TableProps) => {
             document.removeEventListener("mousedown", checkIfClickedOutside)
         }
     }, [isOpenAction])
-
-    const tableData = props?.data?.getVariablesByKpiTerm;
-    const selectedTerm = props?.termsData?.getKpiTermsByCompanyId?.find((cur: { id: any; }) => cur.id === props.term);
+    console.log({ props })
+    const tableData = props?.data;
 
     return <>
         {showLoader && (<Loader />)}
-        <div className="flex items-center gap-[20px] justify-between">
-            <div
-                className="w-full flex justify-start mb-[20px]"
-            >
-                <button
-                    type="button"
-                    className="bg-blue-500 hover:bg-blue-600 my-[20px]transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onClick={() => setShow(true)}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="ionicon w-7 h-7"
-                        viewBox="0 0 512 512"
-                    >
-                        <path
-                            d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="32"
-                        />
-                        <path
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="32"
-                            d="M256 176v160M336 256H176"
-                        />
-                    </svg>
-                    <span>Add a Variable</span>
-                </button>
-            </div>
-            <div className="flex flex-row gap-4 items-center">
-                <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
-                    Tab:
-                </label>
-                <select
-                    id="quarter"
-                    name="company"
-                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    value={props.term}
-                    onChange={(event) => {
-                        props?.setTerm(event.target?.value);
-                    }}
-                >
-                    <option value="">All</option>
-                    {(props?.termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
-                        return (
-                            <option key={cur.id} value={cur?.id}>
-                                {cur?.name}
-                            </option>
-                        );
-                    })}
-                </select>
-            </div>
-        </div>
         <div style={{
             maxHeight: 'calc(100vh - 200px)'
         }} className="w-[calc((w-screen)-(w-1/5)) overflow-scroll">
@@ -129,30 +72,22 @@ const VariableTable = (props: TableProps) => {
                     <THR>
                         <>
                             <TH>Name</TH>
-                            <TH>Tab name</TH>
-                            {!selectedTerm?.quarterWiseTable && (
-                                <>
-                                    <TH>Priority</TH>
-                                    <TH>Category</TH>
-                                    <TH>YoY</TH>
-                                </>)}
+                            <TH>Company</TH>
+                            <TH>Industry</TH>
+                            <TH>Sub Insdustry</TH>
                             <TH >Action</TH>
                         </>
                     </THR>
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { id: string | number | ((prevState: string) => string) | null | undefined; title: string | JSX.Element | undefined; kpiTerm: { name: string | JSX.Element | undefined; }; priority: any; category: string | JSX.Element | undefined; yoy: string | JSX.Element | undefined; }) => {
+                    {tableData?.map((current: { id: { toString: () => Key | null | undefined; }; masterVariable: { title: string | JSX.Element | undefined; }; company: any; industry: any; subIndustry: any; }) => {
                         return <TDR key={current?.id?.toString()}>
                             <>
-                                <TD>{current?.title}</TD>
-                                <TD>{current?.kpiTerm?.name}</TD>
-                                {!selectedTerm?.quarterWiseTable && (
-                                    <>
-                                        <TD>{current?.priority || ''}</TD>
-                                        <TD>{current?.category}</TD>
-                                        <TD>{current?.yoy}</TD>
-                                    </>)}
+                                <TD>{current?.masterVariable?.title}</TD>
+                                <TD>{current?.company || ''}</TD>  
+                                <TD>{current?.industry || ''}</TD>
+                                <TD>{current?.subIndustry || ''}</TD>                                    
                                 <TD style="text-center" key={uniqueId}>
                                     <>
                                         <div

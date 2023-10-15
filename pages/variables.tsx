@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useLazyQuery } from "@apollo/client";
 import { GET_MAPPING_VIEW, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
+import AccordionItem from "@/components/Accordian";
 
 export default function FinancialPage() {
     const [refetch, setRefetch] = useState(false);
@@ -72,16 +73,20 @@ export default function FinancialPage() {
         getVariables();
     }, [termsData])
 
+    const getContent = (data: any) => {
+        return <VariableTable
+            data={data}
+        />
+    }
+
+    console.log({ masterVariables })
+
     return (
         <Layout title="Veriables" page={LayoutPages.variables}>
             <>
-                <VariableTable
-                    term={term}
-                    data={termsVaribles}
-                    setTerm={setTerm}
-                    setRefetch={setRefetch}
-                    termsData={termsData}
-                />
+                {masterVariables?.getMappingView?.map((cur: { masterVariable: { title: string; }; mapping: any; }) => {
+                    return <AccordionItem title={cur?.masterVariable?.title} content={getContent(cur?.mapping)}/>
+                })}
             </>
         </Layout>
     );
