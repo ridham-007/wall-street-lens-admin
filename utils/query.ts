@@ -360,8 +360,8 @@ const GET_VARIABLE_MAPPING_BY_COMPANY = gql`query getVariableMappingByCompany(
   }
 }`;
 
-const GET_MAPPING_VIEW = gql`query getMappingView() {
-    getMappingView() {
+const GET_MAPPING_VIEW = gql`query getMappingView {
+    getMappingView {
       masterVariable {
         id
         title

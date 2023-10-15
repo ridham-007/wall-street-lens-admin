@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import VariableTable from "@/components/table/variables/VariableTable";
 import 'react-toastify/dist/ReactToastify.css';
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
+import { useLazyQuery } from "@apollo/client";
+import { GET_MAPPING_VIEW, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
 
 export default function FinancialPage() {
@@ -37,11 +37,16 @@ export default function FinancialPage() {
         }
     );
 
+    const [getVariablesMapping, { data: masterVariables, refetch: refetchMasterVariables }] = useLazyQuery(
+        GET_MAPPING_VIEW,
+    );
+
     useEffect(() => {
         if (!!company?.length) {
             getTermsDetails();
             getVariables();
         }
+        getVariablesMapping();
     }, [])
 
     useEffect(() => {
