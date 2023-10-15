@@ -360,6 +360,47 @@ const GET_VARIABLE_MAPPING_BY_COMPANY = gql`query getVariableMappingByCompany(
   }
 }`;
 
+const GET_MAPPING_VIEW = gql`query getMappingView() {
+    getMappingView() {
+      masterVariable {
+        id
+        title
+      }
+      mapping {
+        id
+        company
+        industry
+        subIndustry
+        masterVariable {
+          id
+          title
+        }
+      }
+  }
+}`;
+
+const DELETE_MASTER_VERIABLE = gql`mutation deleteMasterVariableById(
+  $variableId:String!
+  ){
+  deleteMasterVariableById(
+    variableId: $variableId
+  ){
+    id
+    title
+  }
+}`;
+
+const DELETE_VALUE_BY_MAPPING_ID = gql`mutation deleteValueByMappingId(
+  $mappingId:String!
+  ){
+  deleteValueByMappingId(
+    mappingId: $mappingId
+  ){
+    id
+    title
+  }
+}`;
+
 export {
   LOG_IN,
   PROCCESS_BULK_UPLOAD,
@@ -384,5 +425,8 @@ export {
   ADD_ROW_FOR_QUARTER_WISE_TABLE,
   ADD_COLUMN_FOR_KPI_TERM,
   ADD_UPDATE_MASTER_VERIABLE,
-  GET_VARIABLE_MAPPING_BY_COMPANY
+  GET_VARIABLE_MAPPING_BY_COMPANY,
+  GET_MAPPING_VIEW,
+  DELETE_MASTER_VERIABLE,
+  DELETE_VALUE_BY_MAPPING_ID,
 }
