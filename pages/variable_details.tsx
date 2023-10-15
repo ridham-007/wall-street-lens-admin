@@ -1,6 +1,6 @@
 import { SetStateAction, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
-import Variable from "@/components/table/variables/Variable";
+import Variable from "@/components/table/variables__details/Variable";
 import Loader from "@/components/loader";
 import "react-toastify/dist/ReactToastify.css";
 import {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
-import VariableTable from "@/components/table/settings/VariableTable";
+import VariableTable from "@/components/table/variables/VariableTable";
 import 'react-toastify/dist/ReactToastify.css';
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";

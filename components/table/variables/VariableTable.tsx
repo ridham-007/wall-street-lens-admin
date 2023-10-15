@@ -2,12 +2,11 @@ import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
-import { ADD_UPDATE_TERM_VERIABLE, CREATE_DEFAULT_MAPPING, DELETE_VERIABLE_BY_ID, GET_VARIABLE_MAPPING_BY_COMPANY } from "@/utils/query";
-import { useMutation, useLazyQuery } from "@apollo/client";
+import { ADD_UPDATE_TERM_VERIABLE, ADD_UPDATE_MASTER_VERIABLE, DELETE_VERIABLE_BY_ID } from "@/utils/query";
+import { useMutation } from "@apollo/client";
 import { KpiTerm } from "@/utils/data"
 import { AddUpdateParameterProps } from "@/utils/data"
 import { DeleteVariableProps } from "@/utils/data"
-import { useRouter } from "next/router";
 import { TableProps } from "@/utils/data"
 
 const VariableTable = (props: TableProps) => {
@@ -15,41 +14,23 @@ const VariableTable = (props: TableProps) => {
     const [uniqueId, setUniqueId] = useState('');
     const [showLoader, setShowLoader] = useState(false);
     const [currentData, setCurrentData] = useState({});
-    const [company, setCompany] = useState('');
     const [deletePopup, setDeletePopup] = useState(false);
     const [deleteId, setDeleteId] = useState('');
-    const router = useRouter();
 
-    const [addOrUpdateVeriable] = useMutation(ADD_UPDATE_TERM_VERIABLE);
+    const [addUpdateMasterVariable] = useMutation(ADD_UPDATE_MASTER_VERIABLE);
     const [deleteVariable] = useMutation(DELETE_VERIABLE_BY_ID);
-    const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING)
-
-    const addDefaultMapping = async (id: string, variableId: string) => {
-        await defaultMapping({
-            variables: {
-                termId: id,
-                variableId: variableId,
-            },
-        });
-    };
-
 
     const onAddUpdateQuarter = async (perameters: any) => {
         setShowLoader(true);
-        const { data }: any = await addOrUpdateVeriable({
+        await addUpdateMasterVariable({
             variables: {
                 variableInfo: {
                     id: perameters?.id,
                     title: perameters?.name,
-                    category: perameters?.category || '-',
-                    priority: perameters?.priority,
-                    yoy: perameters?.YoY || '-',
                 },
-                termId: perameters?.term,
             }
         });
-        const vaiableId = data?.addUpdateTermVariable?.id || '';
-        await addDefaultMapping(perameters?.term ?? "", vaiableId)
+
         setShowLoader(false);
         props.setRefetch(true);
     }
@@ -113,7 +94,7 @@ const VariableTable = (props: TableProps) => {
                             d="M256 176v160M336 256H176"
                         />
                     </svg>
-                    <span>Add a Relation</span>
+                    <span>Add a Variable</span>
                 </button>
             </div>
             <div className="flex flex-row gap-4 items-center">
@@ -129,7 +110,7 @@ const VariableTable = (props: TableProps) => {
                         props?.setTerm(event.target?.value);
                     }}
                 >
-                    <option value="">Select a option</option>
+                    <option value="">All</option>
                     {(props?.termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
                         return (
                             <option key={cur.id} value={cur?.id}>
@@ -181,7 +162,6 @@ const VariableTable = (props: TableProps) => {
                                                 className=" inline-flex items-center text-sm font-medium text-gray-700 border-none bg-transparent hover:bg-white"
                                                 onClick={() => { setShow(true); setUniqueId(Math.random.toString()); setCurrentData(current) }}
 
-
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px"><path fill="#c94f60" d="M42.583,9.067l-3.651-3.65c-0.555-0.556-1.459-0.556-2.015,0l-1.718,1.72l5.664,5.664l1.72-1.718	C43.139,10.526,43.139,9.625,42.583,9.067" /><path fill="#f0f0f0" d="M6.905,35.43L5,43l7.571-1.906l0.794-6.567L6.905,35.43z" /><path fill="#edbe00" d="M36.032,17.632l-23.46,23.461l-5.665-5.665l23.46-23.461L36.032,17.632z" /><linearGradient id="YoPixpDbHWOyk~b005eF1a" x1="35.612" x2="35.612" y1="7.494" y2="17.921" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#dedede" /><stop offset="1" stop-color="#d6d6d6" /></linearGradient><path fill="url(#YoPixpDbHWOyk~b005eF1a)" d="M30.363,11.968l4.832-4.834l5.668,5.664l-4.832,4.834L30.363,11.968z" /><path fill="#787878" d="M5.965,39.172L5,43l3.827-0.965L5.965,39.172z" /></svg>
 
@@ -211,45 +191,13 @@ const VariableTable = (props: TableProps) => {
 }
 
 function AddUpdateVariable(props: AddUpdateParameterProps) {
-
-    const [company, setCompany] = useState('');
-    const router = useRouter();
-
     const [val, setVal] = useState({
         id: props?.data?.id,
         name: props?.data?.title,
-        term: props?.data?.kpiTerm?.id,
-        category: props?.data?.category,
-        priority: props?.data?.priority,
-        YoY: props?.data?.yoy,
     })
 
-    useEffect(() => {
-        if (typeof router.query.company === 'string') {
-            setCompany(router.query.company);
-        }
-    }, [router.query])
-
-    const [getVariableMappingByCompany, { data: variableData, refetch: refetchVariable }] = useLazyQuery(
-        GET_VARIABLE_MAPPING_BY_COMPANY,
-        {
-            fetchPolicy: 'network-only',
-            variables: {
-                companyId: company,
-            },
-        }
-    );
-
-    useEffect(() => {
-        if (!!company?.length) {
-            getVariableMappingByCompany();
-        }
-    }, [])
-
-    console.log("ddddd", variableData)
-
     const handleOnSave = () => {
-        if (!val.name || !val.term) {
+        if (!val.name) {
             // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
             return;
         }
@@ -271,57 +219,29 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Add a Relation"
+            title="Add a Variable"
             onClose={() => props.onClose && props.onClose()}
         >
             <>
                 <form className="form w-100">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col mb-[20px]">
-                            <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
-                                KPI Terms:
-                            </label>
-                            <select
-                                id="quarter"
-                                name="term"
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                value={val.term}
-                                onChange={handleOnChange}
-                                disabled={!!props?.data?.id}
+                    <div className="grid grid-cols-1 gap-4">
+                        <div className="flex flex-col">
+                            <label
+                                htmlFor="Name"
+                                className="text-sm font-medium text-gray-700"
                             >
-                                <option value="">Select a option</option>
-                                {(props?.termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
-                                    return (
-                                        <option key={cur.id} value={cur?.id}>
-                                            {cur?.name}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
-                        <div className="flex flex-col mb-[20px]">
-                            <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
-                                Variables:
+                                Name
                             </label>
-                            <select
-                                id="quarter"
-                                name="term"
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                value={val.term}
+                            <input
+                                type="text"
+                                id="Name"
+                                name="name"
+                                value={val.name}
                                 onChange={handleOnChange}
-                                disabled={!!props?.data?.id}
-                            >
-                                <option value="">Select a option</option>
-                                {variableData?.map((cur: KpiTerm) => {
-                                    return (
-                                        <option key={cur.id} value={cur?.id}>
-                                            {cur?.name}
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                                required
+                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
+                            />
                         </div>
-
                     </div>
                 </form>
             </>
