@@ -15,10 +15,8 @@ const VariableTable = (props: TableProps) => {
     const [uniqueId, setUniqueId] = useState('');
     const [showLoader, setShowLoader] = useState(false);
     const [currentData, setCurrentData] = useState({});
-    const [company, setCompany] = useState('');
     const [deletePopup, setDeletePopup] = useState(false);
     const [deleteId, setDeleteId] = useState('');
-    const router = useRouter();
 
     const [addOrUpdateVeriable] = useMutation(ADD_UPDATE_TERM_VERIABLE);
     const [deleteVariable] = useMutation(DELETE_VERIABLE_BY_ID);
