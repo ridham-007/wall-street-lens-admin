@@ -509,3 +509,28 @@ function AddVariable(props: AddUpdateParameterProps) {
     </Modal>
   );
 }
+
+function DeleteVariable(props: DeleteVariableProps) {
+  const handleOnSave = () => {
+      if (!props?.id) {
+          // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+          return;
+      }
+      props.onSuccess && props.onSuccess(props?.id)
+      props.onClose && props.onClose()
+  };
+
+  return (
+      <Modal
+          showModal={true}
+          handleOnSave={handleOnSave}
+          title="Delete a Veriable"
+          onClose={() => props.onClose && props.onClose()}
+          confirmButton="Delete"
+      >
+          <>
+              <div>Are you sure you want to delete?</div>
+          </>
+      </Modal>
+  );
+}
