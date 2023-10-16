@@ -2,16 +2,18 @@ import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
-import { ADD_UPDATE_TERM_VERIABLE, CREATE_DEFAULT_MAPPING, DELETE_VERIABLE_BY_ID, GET_VARIABLE_MAPPING_BY_COMPANY } from "@/utils/query";
+import { ADD_UPDATE_TERM_VERIABLE, CREATE_DEFAULT_MAPPING, DELETE_VERIABLE_BY_ID, GET_VARIABLE_MAPPING_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { KpiTerm } from "@/utils/data"
 import { AddUpdateParameterProps } from "@/utils/data"
 import { DeleteVariableProps } from "@/utils/data"
 import { useRouter } from "next/router";
 import { TableProps } from "@/utils/data"
+import Multiselect from "multiselect-react-dropdown";
 
 const VariableTable = (props: TableProps) => {
     const [show, setShow] = useState(false);
+    const [relation, setRelation] = useState(false);
     const [uniqueId, setUniqueId] = useState('');
     const [showLoader, setShowLoader] = useState(false);
     const [currentData, setCurrentData] = useState({});
@@ -89,7 +91,7 @@ const VariableTable = (props: TableProps) => {
                 <button
                     type="button"
                     className="bg-blue-500 hover:bg-blue-600 my-[20px]transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onClick={() => setShow(true)}
+                    onClick={() => setRelation(true)}
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -200,6 +202,7 @@ const VariableTable = (props: TableProps) => {
                 </tbody>
             </table>
         </div >
+        {relation && (<AddRelationsModal termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setRelation(false); }} onSuccess={onAddUpdateQuarter} />)}
         {show && (<AddUpdateVariable termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setShow(false); setCurrentData({}); setDeleteId('') }} onSuccess={onAddUpdateQuarter} />)}
         {deletePopup && <DeleteVariable id={deleteId} onSuccess={onDeleteVeriable} onClose={() => {
             setDeleteId('');
@@ -208,18 +211,15 @@ const VariableTable = (props: TableProps) => {
     </>
 }
 
-function AddUpdateVariable(props: AddUpdateParameterProps) {
+function AddRelationsModal(props: AddUpdateParameterProps) {
 
     const [company, setCompany] = useState('');
     const router = useRouter();
+    const [selectedVariablesArr, setselectedVariablesArr] = useState<any[]>([]);
+
 
     const [val, setVal] = useState({
-        id: props?.data?.id,
-        name: props?.data?.title,
-        term: props?.data?.kpiTerm?.id,
-        category: props?.data?.category,
-        priority: props?.data?.priority,
-        YoY: props?.data?.yoy,
+        term: '',
     })
 
     useEffect(() => {
@@ -233,7 +233,17 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
         {
             fetchPolicy: 'network-only',
             variables: {
-                companyId: company,
+                company,
+            },
+        }
+    );
+
+    const [getVariables, { data: termsVaribles }] = useLazyQuery(
+        GET_VARIBALES_KPI_TERM,
+        {
+            fetchPolicy: 'network-only',
+            variables: {
+                termId: val.term || "",
             },
         }
     );
@@ -242,12 +252,25 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
         if (!!company?.length) {
             getVariableMappingByCompany();
         }
-    }, [])
+    }, [company])
 
-    console.log("ddddd", variableData)
+    useEffect(() => {
+        getVariables();
+    }, [val.term])
+
+    useEffect(() => {
+        const selectedOptions = termsVaribles?.getVariablesByKpiTerm?.map(cur => {
+            return {
+                key: cur?.masterVariable?.title,
+                cat: cur?.masterVariable?.title,
+                id: cur?.masterVariable?.id
+            };
+        });
+        setselectedVariablesArr(selectedOptions);
+    }, [termsVaribles])
 
     const handleOnSave = () => {
-        if (!val.name || !val.term) {
+        if (!val.term) {
             // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
             return;
         }
@@ -265,6 +288,43 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
         }));
     };
 
+    let updatedOptions: { cat: string; key: string }[] = [];
+
+    if (variableData?.getVariableMappingByCompany) {
+        const originalData = variableData?.getVariableMappingByCompany;
+        const groupedOptions: Record<
+            string,
+            { cat: string; key: string; id: string }[]
+        > = {};
+
+        // Iterate over the original data and group options by the "title" field
+        originalData.forEach((item: { masterVariable: { title: any; id: any; }; }) => {
+            const { title, id } = item?.masterVariable;
+
+            if (title) {
+                if (!groupedOptions[title]) {
+                    groupedOptions[title] = [];
+                }
+
+                groupedOptions[title].push({ cat: title, key: title, id });
+            }
+        });
+
+        // Flatten the grouped options into a single array
+        updatedOptions = Object.values(groupedOptions).reduce(
+            (accumulator, categoryOptions) => [...accumulator, ...categoryOptions],
+            []
+        );
+    }
+
+    // Handler function to update selectedVariablesArr
+    const handleSelect = (selectedList: any[]) => {
+        setselectedVariablesArr(selectedList);
+    };
+
+    const OnRemoveChip = (selectedList: any[]) => {
+        setselectedVariablesArr(selectedList);
+    };
     return (
         <Modal
             showModal={true}
@@ -274,7 +334,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
         >
             <>
                 <form className="form w-100">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-4 w-[700px] h-[300px]">
                         <div className="flex flex-col mb-[20px]">
                             <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
                                 KPI Terms:
@@ -297,9 +357,92 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 })}
                             </select>
                         </div>
+                            <div className="flex flex-col mt-5 w-full]">
+                                <label
+                                    htmlFor="variables_array"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    Variables
+                                </label>
+                                <Multiselect
+                                    id="variables_array"
+                                    displayValue="key"
+                                    placeholder="Select options"
+                                    onKeyPressFn={function noRefCheck() { }}
+                                    onRemove={OnRemoveChip}
+                                    onSearch={function noRefCheck() { }}
+                                    onSelect={handleSelect}
+                                    options={updatedOptions}
+                                    selectedValues={selectedVariablesArr}
+                                    showCheckbox
+                                    className="mt-1 w-full"
+                                />
+                            </div>
+                    </div>
+                </form>
+            </>
+        </Modal>
+    );
+}
+
+function AddUpdateVariable(props: AddUpdateParameterProps) {
+    const [val, setVal] = useState({
+        id: props?.data?.id,
+        term: props?.data?.kpiTerm?.id,
+        category: props?.data?.category,
+        priority: props?.data?.priority,
+        YoY: props?.data?.yoy,
+    })
+
+    const handleOnSave = () => {
+        if (!val.term) {
+            // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+            return;
+        }
+        props.onSuccess && props.onSuccess(val)
+        props.onClose && props.onClose()
+    };
+
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
+        const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+        const name = e.target.name;
+
+        setVal((prevVal) => ({
+            ...prevVal,
+            [name]: value
+        }));
+    };
+
+    return (
+        <Modal
+            showModal={true}
+            handleOnSave={handleOnSave}
+            title="Update a Variable settings"
+            onClose={() => props.onClose && props.onClose()}
+        >
+            <>
+                <form className="form w-100">
+                    <div className="grid grid-cols-2 gap-4">
+                        {!props.selectedTerm?.quarterWiseTable && (<div className="flex flex-col">
+                            <label
+                                htmlFor="Category"
+                                className="text-sm font-medium text-gray-700"
+                            >
+                                Category
+                            </label>
+                            <input
+                                type="text"
+                                id="Category"
+                                name="category"
+                                value={val.category}
+                                onChange={handleOnChange}
+                                required
+                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
+                        </div>)}
                         <div className="flex flex-col mb-[20px]">
                             <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
-                                Variables:
+                                Tab:
                             </label>
                             <select
                                 id="quarter"
@@ -310,7 +453,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 disabled={!!props?.data?.id}
                             >
                                 <option value="">Select a option</option>
-                                {variableData?.map((cur: KpiTerm) => {
+                                {(props?.termsData?.getKpiTermsByCompanyId ?? []).map((cur: KpiTerm) => {
                                     return (
                                         <option key={cur.id} value={cur?.id}>
                                             {cur?.name}
@@ -319,7 +462,40 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
                                 })}
                             </select>
                         </div>
-
+                        {!props.selectedTerm?.quarterWiseTable && (<><div className="flex flex-col">
+                            <label
+                                htmlFor="YoY"
+                                className="text-sm font-medium text-gray-700"
+                            >
+                                YoY
+                            </label>
+                            <input
+                                type="text"
+                                id="YoY"
+                                name="YoY"
+                                value={val.YoY}
+                                onChange={handleOnChange}
+                                required
+                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
+                        </div>
+                            <div className="flex flex-col">
+                                <label
+                                    htmlFor="priority"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    Priority
+                                </label>
+                                <input
+                                    type="number"
+                                    id="priority"
+                                    name="priority"
+                                    value={val.priority}
+                                    onChange={handleOnChange}
+                                    required
+                                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                />
+                            </div></>)}
                     </div>
                 </form>
             </>

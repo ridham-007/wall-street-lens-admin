@@ -59,9 +59,7 @@ const VariableTable = (props: TableProps) => {
             document.removeEventListener("mousedown", checkIfClickedOutside)
         }
     }, [isOpenAction])
-    console.log({ props })
     const tableData = props?.data;
-
     return <>
         {showLoader && (<Loader />)}
         <div style={{
@@ -85,9 +83,9 @@ const VariableTable = (props: TableProps) => {
                         return <TDR key={current?.id?.toString()}>
                             <>
                                 <TD>{current?.masterVariable?.title}</TD>
-                                <TD>{current?.company || ''}</TD>  
-                                <TD>{current?.industry || ''}</TD>
-                                <TD>{current?.subIndustry || ''}</TD>                                    
+                                <TD>{props?.companies?.find((cur: { id: any; }) => cur?.id?.toString() === current?.company)?.attributes?.name || ''}</TD>  
+                                <TD>{props?.industries?.find((cur: { id: any; }) => cur?.id?.toString() === current?.industry)?.attributes?.name || ''}</TD>
+                                <TD>{props?.subIndustries?.find((cur: { id: any; }) => cur?.id?.toString() === current?.subIndustry)?.attributes?.name || ''}</TD>                                    
                                 <TD style="text-center" key={uniqueId}>
                                     <>
                                         <div

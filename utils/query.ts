@@ -70,6 +70,7 @@ const GET_VARIBALES_KPI_TERM = gql`query getVariablesByKpiTerm(
       id
       masterVariable {
         title
+        id
       }
       category
       priority
@@ -345,7 +346,7 @@ const ADD_UPDATE_MASTER_VERIABLE = gql`mutation addUpdateMasterVariable(
 }`;
 
 const GET_VARIABLE_MAPPING_BY_COMPANY = gql`query getVariableMappingByCompany(
-  $company: company
+  $company: String!
 ) {
     getVariableMappingByCompany(
       company: $company  
@@ -356,6 +357,7 @@ const GET_VARIABLE_MAPPING_BY_COMPANY = gql`query getVariableMappingByCompany(
       subIndustry
       masterVariable {
         title
+        id
       }
   }
 }`;

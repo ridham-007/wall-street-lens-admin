@@ -104,6 +104,9 @@ export interface TableProps {
   setDeleteId?: any;
   setEditId?: any;
   setQuarterId?: any;
+  companies?: any;
+  industries?: any;
+  subIndustries?: any;
 }
 export interface TableView {
   headers: Header[];
