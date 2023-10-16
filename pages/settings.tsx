@@ -355,7 +355,6 @@ function ImportData(props: ImportDataProps) {
                                 }}
                             >
                                 <option value="">Select a option</option>
-                                <option value="TESLA">Tesla</option>
 
                                 {companies?.data?.getCompanies.map(
                                     (ele: {

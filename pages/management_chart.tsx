@@ -17,12 +17,6 @@ import {
 
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
-const selectedCompany = [
-    {
-        id: 1,
-        name: "TESLA",
-    },
-];
 
 export default function FinancialPage() {
     const [addUpdateParameter, setAddUpdateParameter] = useState(false);
@@ -176,7 +170,6 @@ export default function FinancialPage() {
                         onClose={() => {
                             setAddUpdateParameter(false);
                         }}
-                        selectedCompany={selectedCompany}
                         company={company}
                         refetch={setRefetch}
                         term={term}
