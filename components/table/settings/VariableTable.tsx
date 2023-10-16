@@ -114,7 +114,6 @@ const VariableTable = (props: TableProps) => {
     }, [isOpenAction])
 
     const tableData = props?.data?.getVariablesByKpiTerm;
-    console.log({ tableData })
     const selectedTerm = props?.termsData?.getKpiTermsByCompanyId?.find((cur: { id: any; }) => cur.id === props.term);
 
     return <>

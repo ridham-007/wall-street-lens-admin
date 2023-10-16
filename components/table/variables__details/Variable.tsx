@@ -413,7 +413,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 				: e.target.value;
 		setVal(value);
 	};
-	console.log(props.selectedTerm)
 	return (
 		<Modal
 			showModal={true}

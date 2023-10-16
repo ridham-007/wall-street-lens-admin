@@ -318,7 +318,6 @@ export default function FinancialPage() {
 }
 
 function AddUpdateMasterVariable(props: AddUpdateMasterVariableProps) {
-  console.log(props)
   const [val, setVal] = useState({
     id: props?.data,
     name: '',
