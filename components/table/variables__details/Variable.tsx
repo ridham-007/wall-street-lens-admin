@@ -225,6 +225,7 @@ export default function Variable({
 														<span
 															className="px-2 cursor-pointer"
 															onClick={() => {
+																
 																handleShowDelete(current.id);
 															}}
 														>
