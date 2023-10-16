@@ -59,7 +59,6 @@ export default function Layout(props: LayoutProps) {
 
   const [isOpenAction, setIsOpenAction] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
-  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [reEnterPassword, setReEnterPassword] = useState("");
   const ref = useRef<HTMLInputElement | null>(null);
