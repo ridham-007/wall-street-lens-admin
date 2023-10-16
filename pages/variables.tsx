@@ -21,18 +21,17 @@ import {
   GET_VARIBALES_KPI_TERM,
 } from "@/utils/query";
 import { useRouter } from "next/router";
-import { DeleteVariableProps } from "@/utils/data";
 import AccordionItem from "@/components/Accordian";
 import { AddUpdateParameterProps } from "@/utils/data";
 import { Modal } from "@/components/model";
 
 export default function FinancialPage() {
-    const [show, setShow] = useState(false);
-    const [industry, setIndustry] = useState('all');
-    const [subIndustry, setSubIndustry] = useState('all');
-    const [company, setCompany] = useState('all');
-    const [filterData, setFilterData] = useState([]);
-    const [showDelete, setShowDelete] = useState(false);
+  const [show, setShow] = useState(false);
+  const [industry, setIndustry] = useState('all');
+  const [subIndustry, setSubIndustry] = useState('all');
+  const [company, setCompany] = useState('all');
+  const [filterData, setFilterData] = useState([]);
+  const [showAdd, setShowAdd] = useState(false);
 
   const router = useRouter();
 
@@ -40,58 +39,16 @@ export default function FinancialPage() {
     fetchPolicy: "network-only",
   });
 
-    const [getIndustries, { data: industries }] = useLazyQuery(GET_INDUSTRIES, {
-        fetchPolicy: "network-only",
-    });
+  const [getIndustries, { data: industries }] = useLazyQuery(GET_INDUSTRIES, {
+    fetchPolicy: "network-only",
+  });
 
-    const [getSubIndustries, { data: subIndustries }] = useLazyQuery(
-        GET_SUB_INDUSTRIES,
-        {
-            fetchPolicy: "network-only",
-        }
-    );
-
-    useEffect(() => {
-        getCompanies();
-        getIndustries();
-        getSubIndustries();
-    }, []);
-
-    const [addUpdateMasterVariable] = useMutation(ADD_UPDATE_MASTER_VERIABLE);
-    const [getVariablesMapping, { data: masterVariables, refetch: refetchMasterVariables }] = useLazyQuery(
-        GET_MAPPING_VIEW,
-    );
-
-    useEffect(() => {
-        const filteredData = masterVariables?.getMappingView?.map((item: { mapping: any[]; }) => {
-            const validMappings = item?.mapping?.filter((mappingItem: { company: string; industry: string; subIndustry: string; }) => {
-                return (
-                    (mappingItem.company === company || company === 'all') &&
-                    (mappingItem.industry === industry || industry === 'all') &&
-                    (mappingItem.subIndustry === subIndustry || subIndustry === 'all')
-                );
-            }) || [];
-
-            return {
-                ...item,
-                mapping: validMappings,
-                showFilter: validMappings?.length > 0 || (item?.mapping?.length === 0 && company === 'all' && industry === 'all' && subIndustry === 'all')
-            };
-        }).filter((item: { mapping: string | any[]; showFilter: boolean }) => item.showFilter);
-        setFilterData(filteredData);
-    }, [company, industry, subIndustry, masterVariables])
-
-    const onAddUpdateQuarter = async (perameters: any) => {
-        await addUpdateMasterVariable({
-            variables: {
-                variableInfo: {
-                    id: perameters?.id,
-                    title: perameters?.name,
-                },
-            }
-        });
-        refetchMasterVariables();
+  const [getSubIndustries, { data: subIndustries }] = useLazyQuery(
+    GET_SUB_INDUSTRIES,
+    {
+      fetchPolicy: "network-only",
     }
+  );
 
   useEffect(() => {
     getCompanies();
@@ -99,130 +56,174 @@ export default function FinancialPage() {
     getSubIndustries();
   }, []);
 
-    useEffect(() => {
-        getVariablesMapping();
-    }, []);
+  const [addUpdateMasterVariable] = useMutation(ADD_UPDATE_MASTER_VERIABLE);
+  const [getVariablesMapping, { data: masterVariables, refetch: refetchMasterVariables }] = useLazyQuery(
+    GET_MAPPING_VIEW,
+  );
 
-    const getContent = (data: any) => {
-        return <VariableTable
-            data={data}
-            companies={companies?.getCompanies || []}
-            industries={industries?.getIndustries || []}
-            subIndustries={subIndustries?.getSubIndustries || []}
-        />
-    }
-    return (
-        <Layout title="Veriables" page={LayoutPages.variables}>
-            <>
-                <div className="flex items-center gap-[20px] justify-between">
-                    <div
-                        className="w-full flex justify-start mb-[20px] gap-[10px]"
-                    >
-                        <div className="flex flex-col items-start">
-                            <label
-                                htmlFor="quarter"
-                                className="text-sm font-bold text-gray-700 text-left"
-                            >
-                                Industries:
-                            </label>
-                            <select
-                                id="quarter"
-                                name="term"
-                                className="w-[200px] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                value={industry}
-                                onChange={(event) => {
-                                    setIndustry(event.target?.value);
-                                }}
-                            >
-                                <option value="all">ALL</option>
-                                {(industries?.getIndustries ?? []).map(
-                                    (cur: { id: string; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
-                                        return (
-                                            <option key={cur.id} value={cur?.id}>
-                                                {cur?.attributes?.name}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
-                        </div>
+  useEffect(() => {
+    const filteredData = masterVariables?.getMappingView?.map((item: { mapping: any[]; }) => {
+      const validMappings = item?.mapping?.filter((mappingItem: { company: string; industry: string; subIndustry: string; }) => {
+        return (
+          (mappingItem.company === company || company === 'all') &&
+          (mappingItem.industry === industry || industry === 'all') &&
+          (mappingItem.subIndustry === subIndustry || subIndustry === 'all')
+        );
+      }) || [];
 
-                        <div className="flex flex-col items-start">
-                            <label
-                                htmlFor="quarter"
-                                className="text-sm font-bold text-gray-700"
-                            >
-                                Company:
-                            </label>
-                            <select
-                                id="quarter"
-                                name="term"
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-[200px]"
-                                value={company}
-                                onChange={(event) => {
-                                    setCompany(event.target?.value);
-                                }}
-                            >
-                                <option value="all">ALL</option>
-                                {(companies?.getCompanies ?? []).map(
-                                    (cur: { id: string; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
-                                        return (
-                                            <option key={cur.id} value={cur?.id}>
-                                                {cur?.attributes?.name}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-[20px] justify-between">
-                    <div
-                        className="w-full flex justify-start mb-[20px]"
-                    >
-                        <button
-                            type="button"
-                            className="bg-blue-500 hover:bg-blue-600 my-[20px]transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            onClick={() => setShow(true)}
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="ionicon w-7 h-7"
-                                viewBox="0 0 512 512"
-                            >
-                                <path
-                                    d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="32"
-                                />
-                                <path
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="32"
-                                    d="M256 176v160M336 256H176"
-                                />
-                            </svg>
-                            <span>Add a Variable</span>
-                        </button>
-                    </div>
-                </div>
-                {filterData?.map((cur: {
-                    id: string; masterVariable: { title: string; }; mapping: any; 
-}) => {
-                    return <AccordionItem 
-                        key={cur.id}
-                        title={cur?.masterVariable?.title} 
-                        content={getContent(cur?.mapping)}
-                    />
-                })}
-                {show && (<AddUpdateVariable onClose={() => { setShow(false); }} onSuccess={onAddUpdateQuarter} />)}
-            </>
-        </Layout>
-    );
+      return {
+        ...item,
+        mapping: validMappings,
+        showFilter: validMappings?.length > 0 || (item?.mapping?.length === 0 && company === 'all' && industry === 'all' && subIndustry === 'all')
+      };
+    }).filter((item: { mapping: string | any[]; showFilter: boolean }) => item.showFilter);
+    setFilterData(filteredData);
+  }, [company, industry, subIndustry, masterVariables])
+
+  const onAddUpdateQuarter = async (perameters: any) => {
+    await addUpdateMasterVariable({
+      variables: {
+        variableInfo: {
+          id: perameters?.id,
+          title: perameters?.name,
+        },
+      }
+    });
+    refetchMasterVariables();
+  }
+
+  useEffect(() => {
+    getCompanies();
+    getIndustries();
+    getSubIndustries();
+  }, []);
+
+  useEffect(() => {
+    getVariablesMapping();
+  }, []);
+
+  const getContent = (data: any) => {
+    return <VariableTable
+      data={data}
+      companies={companies?.getCompanies || []}
+      industries={industries?.getIndustries || []}
+      subIndustries={subIndustries?.getSubIndustries || []}
+    />
+  }
+  return (
+    <Layout title="Veriables" page={LayoutPages.variables}>
+      <>
+        <div className="flex items-center gap-[20px] justify-between">
+          <div
+            className="w-full flex justify-start mb-[20px] gap-[10px]"
+          >
+            <div className="flex flex-col items-start">
+              <label
+                htmlFor="quarter"
+                className="text-sm font-bold text-gray-700 text-left"
+              >
+                Industries:
+              </label>
+              <select
+                id="quarter"
+                name="term"
+                className="w-[200px] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={industry}
+                onChange={(event) => {
+                  setIndustry(event.target?.value);
+                }}
+              >
+                <option value="all">ALL</option>
+                {(industries?.getIndustries ?? []).map(
+                  (cur: { id: string; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
+                    return (
+                      <option key={cur.id} value={cur?.id}>
+                        {cur?.attributes?.name}
+                      </option>
+                    );
+                  }
+                )}
+              </select>
+            </div>
+
+            <div className="flex flex-col items-start">
+              <label
+                htmlFor="quarter"
+                className="text-sm font-bold text-gray-700"
+              >
+                Company:
+              </label>
+              <select
+                id="quarter"
+                name="term"
+                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-[200px]"
+                value={company}
+                onChange={(event) => {
+                  setCompany(event.target?.value);
+                }}
+              >
+                <option value="all">ALL</option>
+                {(companies?.getCompanies ?? []).map(
+                  (cur: { id: string; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
+                    return (
+                      <option key={cur.id} value={cur?.id}>
+                        {cur?.attributes?.name}
+                      </option>
+                    );
+                  }
+                )}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-[20px] justify-between">
+          <div
+            className="w-full flex justify-start mb-[20px]"
+          >
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-600 my-[20px]transform hover:scale-105 text-white font-medium rounded-lg py-3 px-3 inline-flex items-center space-x-2 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => setShow(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="ionicon w-7 h-7"
+                viewBox="0 0 512 512"
+              >
+                <path
+                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="32"
+                />
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="32"
+                  d="M256 176v160M336 256H176"
+                />
+              </svg>
+              <span>Add a Variable</span>
+            </button>
+          </div>
+        </div>
+        {filterData?.map((cur: {
+          id: string; masterVariable: { title: string; }; mapping: any;
+        }) => {
+          return <AccordionItem
+            key={cur.id}
+            title={cur?.masterVariable?.title}
+            content={getContent(cur?.mapping)}
+            onAdd={() => { setShowAdd(true) }}
+          />
+        })}
+        {show && (<AddUpdateVariable onClose={() => { setShow(false); }} onSuccess={onAddUpdateQuarter} />)}
+        {showAdd && (<AddVariable onClose={() => { setShowAdd(false); }} onSuccess={onAddUpdateQuarter} />)}
+      </>
+    </Layout>
+  );
 }
 
 function AddUpdateVariable(props: AddUpdateParameterProps) {
@@ -285,7 +286,32 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
   );
 }
 
-function DeleteVariable(props: DeleteVariableProps) {
+function AddVariable(props: AddUpdateParameterProps) {
+  const [industry, setIndustry] = useState("all");
+  const [subIndustry, setSubIndustry] = useState("all");
+  const [company, setCompany] = useState("all");
+
+  const [getCompanies, { data: companies }] = useLazyQuery(GET_COMPANIES, {
+    fetchPolicy: "network-only",
+  });
+
+  const [getIndustries, { data: industries }] = useLazyQuery(GET_INDUSTRIES, {
+    fetchPolicy: "network-only",
+  });
+
+  const [getSubIndustries, { data: subIndustries }] = useLazyQuery(
+    GET_SUB_INDUSTRIES,
+    {
+      fetchPolicy: "network-only",
+    }
+  );
+
+  useEffect(() => {
+    getCompanies();
+    getIndustries();
+    getSubIndustries();
+  }, []);
+
   const handleOnSave = () => {
     props.onSuccess && props.onSuccess();
     props.onClose && props.onClose();
@@ -295,12 +321,146 @@ function DeleteVariable(props: DeleteVariableProps) {
     <Modal
       showModal={true}
       handleOnSave={handleOnSave}
-      title="Delete a Variable"
+      title="Add a Relation"
       onClose={() => props.onClose && props.onClose()}
-      confirmButton="Delete"
     >
       <>
-        <div>Are you sure you want to delete?</div>
+        <form className="form w-100">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-[20px] justify-between">
+                <div className="w-full flex justify-start mb-[20px] gap-[10px]">
+                  <div className="flex flex-col items-start">
+                    <label
+                      htmlFor="quarter"
+                      className="text-sm font-bold text-gray-700 text-left"
+                    >
+                      Industries:
+                    </label>
+                    <select
+                      id="quarter"
+                      name="term"
+                      className="w-[200px] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      value={industry}
+                      onChange={(event) => {
+                        setIndustry(event.target?.value);
+                      }}
+                    >
+                      <option value="all">ALL</option>
+                      {(industries?.getIndustries ?? []).map(
+                        (cur: {
+                          id: string;
+                          attributes: {
+                            name:
+                            | string
+                            | number
+                            | boolean
+                            | ReactElement<any, string | JSXElementConstructor<any>>
+                            | ReactFragment
+                            | ReactPortal
+                            | null
+                            | undefined;
+                          };
+                        }) => {
+                          return (
+                            <option key={cur.id} value={cur?.id}>
+                              {cur?.attributes?.name}
+                            </option>
+                          );
+                        }
+                      )}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col items-start">
+                    <label
+                      htmlFor="quarter"
+                      className="text-sm font-bold text-gray-700"
+                    >
+                      Sub Industries:
+                    </label>
+                    <select
+                      id="quarter"
+                      name="term"
+                      className="w-[200px] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      value={subIndustry}
+                      onChange={(event) => {
+                        setSubIndustry(event.target?.value);
+                      }}
+                    >
+                      <option value="all">ALL</option>
+
+                      {(subIndustries?.getSubIndustries ?? []).map(
+                        (cur: {
+                          id: string;
+                          attributes: {
+                            name:
+                            | string
+                            | number
+                            | boolean
+                            | ReactElement<any, string | JSXElementConstructor<any>>
+                            | ReactFragment
+                            | ReactPortal
+                            | null
+                            | undefined;
+                          };
+                        }) => {
+                          return (
+                            <option key={cur.id} value={cur?.id}>
+                              {cur?.attributes?.name}
+                            </option>
+                          );
+                        }
+                      )}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col items-start">
+                    <label
+                      htmlFor="quarter"
+                      className="text-sm font-bold text-gray-700"
+                    >
+                      Company:
+                    </label>
+                    <select
+                      id="quarter"
+                      name="term"
+                      className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-[200px]"
+                      value={company}
+                      onChange={(event) => {
+                        setCompany(event.target?.value);
+                      }}
+                    >
+                      <option value="all">ALL</option>
+                      {(companies?.getCompanies ?? []).map(
+                        (cur: {
+                          id: string;
+                          attributes: {
+                            name:
+                            | string
+                            | number
+                            | boolean
+                            | ReactElement<any, string | JSXElementConstructor<any>>
+                            | ReactFragment
+                            | ReactPortal
+                            | null
+                            | undefined;
+                          };
+                        }) => {
+                          return (
+                            <option key={cur.id} value={cur?.id}>
+                              {cur?.attributes?.name}
+                            </option>
+                          );
+                        }
+                      )}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
       </>
     </Modal>
   );
