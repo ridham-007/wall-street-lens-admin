@@ -24,7 +24,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
     return (
         <div className="border rounded mb-2">
             <div className="flex items-center justify-between bg-gray-200 p-2">
-                <button className="flex items-center" onClick={handleToggle}>
+                <button className="flex items-center w-[100%]" onClick={handleToggle}>
                     <div className="w-6 h-6 mr-2">
                         {isOpen ? (
                             <svg
