@@ -177,7 +177,7 @@ function AddVariable(props: AddUpdateParameterProps) {
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Edit Relation"
+            title="Edit a Relation"
             onClose={() => props.onClose && props.onClose()}
         >
             <>
@@ -316,7 +316,7 @@ function DeleteVariable(props: DeleteVariableProps) {
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Delete a Veriable"
+            title="Delete a Relation"
             onClose={() => props.onClose && props.onClose()}
             confirmButton="Delete"
         >

@@ -366,7 +366,7 @@ function AddRelationsModal(props: AddUpdateParameterProps) {
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Add a Relation"
+            title="Add a Variable Relation with Tab"
             onClose={() => props.onClose && props.onClose()}
         >
             <>
@@ -418,6 +418,7 @@ function AddRelationsModal(props: AddUpdateParameterProps) {
                             </div>
                     </div>
                 </form>
+                <div className="w-full fixed text-left text-red-500">Note: To remove the relation with tab use the Data Table&apos;s delete action.</div>
             </>
         </Modal>
     );

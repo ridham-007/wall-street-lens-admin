@@ -103,6 +103,8 @@ export interface Props {
   onClose: ModalOnClose;
   handleOnSave: ModalOnClose;
   confirmButton?: string;
+  showNote?: boolean;
+  message?: any;
 }
 export interface TableProps {
   data?: any;
