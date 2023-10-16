@@ -228,10 +228,10 @@ function UpdateChart(props: AddUpdateParameterProps) {
         }));
     };
 
-    const selectedStates = props?.currentData?.termVariables?.map((cur: { title: any; id: any; }) => {
+    const selectedStates = props?.currentData?.termVariables?.map((cur: { masterVariable: { title: any; }; id: any; }) => {
         return {
-            cat: cur?.title,
-            key: cur?.title,
+            cat: cur?.masterVariable?.title,
+            key: cur?.masterVariable?.title,
             id: cur?.id
         }
     })
@@ -245,7 +245,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
         const groupedOptions: Record<string, { cat: string; key: string, id: string }[]> = {};
 
         originalData.forEach((item: VariablesArray) => {
-            const { category, title, id } = item;
+            const { masterVariable: {title} = {}, id } = item;
 
             if (title) {
                 if (!groupedOptions[title]) {

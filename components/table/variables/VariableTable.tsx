@@ -4,7 +4,6 @@ import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
 import { ADD_UPDATE_MASTER_VERIABLE, DELETE_VERIABLE_BY_ID } from "@/utils/query";
 import { useMutation } from "@apollo/client";
-import { KpiTerm } from "@/utils/data"
 import { AddUpdateParameterProps } from "@/utils/data"
 import { DeleteVariableProps } from "@/utils/data"
 import { TableProps } from "@/utils/data"
@@ -130,9 +129,9 @@ const VariableTable = (props: TableProps) => {
 }
 
 function AddVariable(props: AddUpdateParameterProps) {
-    const [industry, setIndustry] = useState("all");
-    const [subIndustry, setSubIndustry] = useState("all");
-    const [company, setCompany] = useState("all");
+    const [industry, setIndustry] = useState("");
+    const [subIndustry, setSubIndustry] = useState("");
+    const [company, setCompany] = useState("");
 
     const [getCompanies, { data: companies }] = useLazyQuery(GET_COMPANIES, {
         fetchPolicy: "network-only",
@@ -189,7 +188,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                                                 setIndustry(event.target?.value);
                                             }}
                                         >
-                                            <option value="all">ALL</option>
+                                            <option value="">Select a option</option>
                                             {(industries?.getIndustries ?? []).map(
                                                 (cur: {
                                                     id: string;
@@ -231,7 +230,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                                                 setSubIndustry(event.target?.value);
                                             }}
                                         >
-                                            <option value="all">ALL</option>
+                                            <option value="">Select a option</option>
 
                                             {(subIndustries?.getSubIndustries ?? []).map(
                                                 (cur: {
@@ -274,7 +273,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                                                 setCompany(event.target?.value);
                                             }}
                                         >
-                                            <option value="all">ALL</option>
+                                            <option value="">Select a option</option>
                                             {(companies?.getCompanies ?? []).map(
                                                 (cur: {
                                                     id: string;
@@ -299,7 +298,11 @@ function AddVariable(props: AddUpdateParameterProps) {
                                             )}
                                         </select>
                                     </div>
+                                    
                                 </div>
+                            </div>
+                            <div className="mt-[25px] text-red-600">
+                                Note: Editing a relation will remove the association of variables with that company followed by it&apos;s cell values.
                             </div>
                         </div>
                     </div>

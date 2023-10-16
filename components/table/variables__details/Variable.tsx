@@ -390,7 +390,6 @@ export default function Variable({
 }
 
 function AddUpdateParaMeter(props: AddUpdateParameterProps) {
-	console.log(props.cellData)
 	const [val, setVal] = useState<string>(props.cellData?.value.toString());
 	const [selectedOption, setSelectedOption] = useState(props.cellData?.highlightColor);
 	const handleOnSave = async () => {

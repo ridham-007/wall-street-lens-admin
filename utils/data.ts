@@ -62,6 +62,7 @@ export interface VariablesArray {
   category: string;
   title: string;
   id: string;
+  masterVariable?: any;
 }
 export interface DeleteChartProps {
   onSuccess?: any;

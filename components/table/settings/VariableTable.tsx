@@ -80,6 +80,7 @@ const VariableTable = (props: TableProps) => {
     }, [isOpenAction])
 
     const tableData = props?.data?.getVariablesByKpiTerm;
+    console.log({ tableData })
     const selectedTerm = props?.termsData?.getKpiTermsByCompanyId?.find((cur: { id: any; }) => cur.id === props.term);
 
     return <>
@@ -161,10 +162,10 @@ const VariableTable = (props: TableProps) => {
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { id: string | number | ((prevState: string) => string) | null | undefined; title: string | JSX.Element | undefined; kpiTerm: { name: string | JSX.Element | undefined; }; priority: any; category: string | JSX.Element | undefined; yoy: string | JSX.Element | undefined; }) => {
+                    {tableData?.map((current: { id: { toString: () => Key | null | undefined; }; masterVariable: { title: string | JSX.Element | undefined; }; kpiTerm: { name: string | JSX.Element | undefined; }; priority: any; category: string | JSX.Element | undefined; yoy: string | JSX.Element | undefined; }) => {
                         return <TDR key={current?.id?.toString()}>
                             <>
-                                <TD>{current?.title}</TD>
+                                <TD>{current?.masterVariable?.title}</TD>
                                 <TD>{current?.kpiTerm?.name}</TD>
                                 {!selectedTerm?.quarterWiseTable && (
                                     <>
@@ -216,6 +217,7 @@ function AddRelationsModal(props: AddUpdateParameterProps) {
     const [company, setCompany] = useState('');
     const router = useRouter();
     const [selectedVariablesArr, setselectedVariablesArr] = useState<any[]>([]);
+    const [initSelectedValues, setInitSelectedValues] = useState<any[]>([]);
 
 
     const [val, setVal] = useState({
@@ -267,6 +269,7 @@ function AddRelationsModal(props: AddUpdateParameterProps) {
             };
         });
         setselectedVariablesArr(selectedOptions);
+        setInitSelectedValues(selectedOptions)
     }, [termsVaribles])
 
     const handleOnSave = () => {
@@ -373,9 +376,10 @@ function AddRelationsModal(props: AddUpdateParameterProps) {
                                     onSearch={function noRefCheck() { }}
                                     onSelect={handleSelect}
                                     options={updatedOptions}
-                                    selectedValues={selectedVariablesArr}
+                                    selectedValues={initSelectedValues}
                                     showCheckbox
                                     className="mt-1 w-full"
+                                    disablePreSelectedValues
                                 />
                             </div>
                     </div>

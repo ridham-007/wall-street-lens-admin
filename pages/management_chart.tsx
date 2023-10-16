@@ -303,7 +303,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
         // Iterate over the original data and group options by the "title" field
         originalData.forEach((item: VariablesArray) => {
-            const { category, title, id } = item;
+            const { masterVariable: {title} = {}, id } = item;
 
             if (title) {
                 if (!groupedOptions[title]) {
@@ -329,7 +329,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
     const OnRemoveChip = (selectedList: any[]) => {
         setselectedVariablesArr(selectedList);
     };
-
     const selectTerm = termsData?.getKpiTermsByCompanyId?.find((cur: any) => cur?.id === val.term)
 
     return (
