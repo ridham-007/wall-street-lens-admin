@@ -411,6 +411,24 @@ const DELETE_VALUE_BY_MAPPING_ID = gql`mutation deleteValueByMappingId(
   }
 }`;
 
+const ADD_BULK_TERM_VARIABLE = gql`mutation addBulkTermVariable(
+  $variableInfo: AddBulkTermVariables!
+  ){
+  addBulkTermVariable(
+    variableInfo: $variableInfo
+  ){
+    id
+  }
+}`;
+
+const CREATE_DEFAULT_MAPPING_IN_BULK = gql`mutation createDefaultMappingInBulk(
+  $mappingInfo: CreateDefaultMapping!
+  ){
+  createDefaultMappingInBulk(
+    mappingInfo: $mappingInfo
+  )
+}`;
+
 export {
   LOG_IN,
   PROCCESS_BULK_UPLOAD,
@@ -439,4 +457,6 @@ export {
   GET_MAPPING_VIEW,
   DELETE_MASTER_VERIABLE,
   DELETE_VALUE_BY_MAPPING_ID,
+  ADD_BULK_TERM_VARIABLE,
+  CREATE_DEFAULT_MAPPING_IN_BULK,
 }
