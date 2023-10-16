@@ -119,7 +119,7 @@ export default function FinancialPage() {
                             >
                                 <option value="all">ALL</option>
 
-                                {(industries?.getSubIndustries ?? []).map(
+                                {(subIndustries?.getSubIndustries ?? []).map(
                                     (cur: { id: string; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
                                         return (
                                             <option key={cur.id} value={cur?.id}>
@@ -148,7 +148,7 @@ export default function FinancialPage() {
                                 }}
                             >
                                 <option value="all">ALL</option>
-                                {(industries?.getCompanies ?? []).map(
+                                {(companies?.getCompanies ?? []).map(
                                     (cur: { id: string; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
                                         return (
                                             <option key={cur.id} value={cur?.id}>
