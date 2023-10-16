@@ -208,9 +208,9 @@ export default function FinancialPage() {
                 id="quarter"
                 name="term"
                 className="w-[200px] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={industry}
+                value={subIndustry}
                 onChange={(event) => {
-                  setIndustry(event.target?.value);
+                  setSubIndustry(event.target?.value);
                 }}
               >
                 <option value="all">ALL</option>
