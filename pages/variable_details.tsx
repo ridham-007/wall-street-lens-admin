@@ -273,7 +273,7 @@ export default function VariableDetails() {
             year={year}
             quarter={quarter}
             selectedTerm={selectedTerm}
-            setShowDelete={setShowDelete}
+            setShowDelete ={setShowDelete}
             setShowEdit={setShowEdit}
             setDeleteId={setDeleteId}
             refetch={refetch}

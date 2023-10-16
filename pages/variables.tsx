@@ -33,7 +33,8 @@ export default function FinancialPage() {
     const [company, setCompany] = useState('all');
     const [filterData, setFilterData] = useState([]);
     const [showDelete, setShowDelete] = useState(false);
-
+    const [deleteId, setDeleteId] = useState("");
+  
   const router = useRouter();
 
   const [getCompanies, { data: companies }] = useLazyQuery(GET_COMPANIES, {
@@ -111,6 +112,16 @@ export default function FinancialPage() {
             subIndustries={subIndustries?.getSubIndustries || []}
         />
     }
+
+    const handleShowDelete = (identifier: any) => {
+
+        setShowDelete(true);
+        setDeleteId(identifier);
+       console.log(filterData[2].masterVariable.id,"gggggggg")
+       
+      };
+
+
     return (
         <Layout title="Veriables" page={LayoutPages.variables}>
             <>
@@ -211,15 +222,20 @@ export default function FinancialPage() {
                     </div>
                 </div>
                 {filterData?.map((cur: {
-                    id: string; masterVariable: { title: string; }; mapping: any; 
+                     masterVariable: { title: string; id: string;}; mapping: any; 
 }) => {
                     return <AccordionItem 
                         key={cur.id}
                         title={cur?.masterVariable?.title} 
                         content={getContent(cur?.mapping)}
+                        onDelete={() => { handleShowDelete(cur.masterVariable.id) }}
+                        onEdit={() => {setShow(true)}}
                     />
+                    
                 })}
-                {show && (<AddUpdateVariable onClose={() => { setShow(false); }} onSuccess={onAddUpdateQuarter} />)}
+                
+                {show && (<AddUpdateVariable onClose={() => { setShow(false) }} onSuccess={onAddUpdateQuarter} />)}
+                {showDelete && (<DeleteVariable onClose={() => {setShowDelete(false); setDeleteId('');}}/> )}
             </>
         </Layout>
     );
