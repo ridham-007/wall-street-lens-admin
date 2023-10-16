@@ -436,6 +436,17 @@ const CREATE_DEFAULT_MAPPING_IN_BULK = gql`mutation createDefaultMappingInBulk(
   )
 }`;
 
+const DELETE_VARIABLE_MAPPINGS_BY_COMPANY = gql`mutation deleteVariableMappingsByCompany(
+  $mappingId: String!
+  ){
+  deleteVariableMappingsByCompany(
+     mappingId: $mappingId
+  ){
+    success
+  }
+}`;
+
+
 export {
   LOG_IN,
   PROCCESS_BULK_UPLOAD,
@@ -467,4 +478,5 @@ export {
   ADD_UPDATE_VARIABLE_MAPPING,
   ADD_BULK_TERM_VARIABLE,
   CREATE_DEFAULT_MAPPING_IN_BULK,
+  DELETE_VARIABLE_MAPPINGS_BY_COMPANY,
 }

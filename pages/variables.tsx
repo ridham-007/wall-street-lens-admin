@@ -25,6 +25,9 @@ import AccordionItem from "@/components/Accordian";
 import { AddRelationProps, AddUpdateMasterVariableProps, AddUpdateParameterProps, DeleteVariableProps } from "@/utils/data";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 
 export default function FinancialPage() {
@@ -91,6 +94,7 @@ export default function FinancialPage() {
   }, [company, industry, subIndustry, masterVariables])
 
   const onAddUpdateMasterVariable = async (perameters: any) => {
+    setShowLoader(true);
     await addUpdateMasterVariable({
       variables: {
         variableInfo: {
@@ -102,10 +106,12 @@ export default function FinancialPage() {
     refetchMasterVariables();
     setOnEdit(false)
     setVariableId('')
+    setShowLoader(false);
   }
 
   const onAddRelation = async (perameters: any) => {
-    console.log(perameters);
+    setShowLoader(true);
+
     await addUpdateVariableMapping({
       variables: {
         mappingInfo: {
@@ -118,6 +124,7 @@ export default function FinancialPage() {
     });
     setVariableId('')
     refetchMasterVariables();
+    setShowLoader(false);
 
   }
 
@@ -137,15 +144,13 @@ export default function FinancialPage() {
       companies={companies?.getCompanies || []}
       industries={industries?.getIndustries || []}
       subIndustries={subIndustries?.getSubIndustries || []}
+      refetchMasterVariables={refetchMasterVariables}
     />
   }
 
   const handleShowDelete = (identifier: any) => {
-
     setShowDelete(true);
     setDeleteId(identifier);
-    console.log(filterData[2].masterVariable.id, "gggggggg")
-
   };
 
   const onDeleteVariable = async (id: any) => {
@@ -399,6 +404,10 @@ function AddRelation(props: AddRelationProps) {
   }, []);
 
   const handleOnSave = () => {
+    if (!industry && !subIndustry && !company) {
+      toast('At least one of the three field shoul be selected.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      return;
+    }
     props.onSuccess && props.onSuccess({ industry, subIndustry, company, id: props?.data });
     props.onClose && props.onClose();
   };
@@ -411,6 +420,7 @@ function AddRelation(props: AddRelationProps) {
       onClose={() => props.onClose && props.onClose()}
     >
       <>
+        <ToastContainer/>
         <form className="form w-100">
           <div className="grid grid-cols-1 gap-4">
             <div className="flex flex-col">

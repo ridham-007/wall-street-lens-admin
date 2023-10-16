@@ -127,6 +127,7 @@ export interface TableProps {
   companies?: any;
   industries?: any;
   subIndustries?: any;
+  refetchMasterVariables?: any;
 }
 export interface TableView {
   headers: Header[];
@@ -203,5 +204,6 @@ export interface DeleteVariableProps {
   onSuccess?: any;
   onClose?: any;
   id?: any;
+  data?: any;
 }
 
