@@ -395,8 +395,7 @@ const DELETE_MASTER_VERIABLE = gql`mutation deleteMasterVariableById(
   deleteMasterVariableById(
     variableId: $variableId
   ){
-    id
-    title
+    success
   }
 }`;
 
@@ -410,6 +409,15 @@ const DELETE_VALUE_BY_MAPPING_ID = gql`mutation deleteValueByMappingId(
     title
   }
 }`;
+
+const ADD_UPDATE_VARIABLE_MAPPING = gql`mutation addUpdateVariableMapping($mappingInfo: AddUpdateMappingVariable!, $masterVariableId: String){
+  addUpdateVariableMapping(mappingInfo: $mappingInfo, masterVariableId: $masterVariableId){
+    id
+    company
+    industry
+    subIndustry
+  }
+}`
 
 export {
   LOG_IN,
@@ -439,4 +447,5 @@ export {
   GET_MAPPING_VIEW,
   DELETE_MASTER_VERIABLE,
   DELETE_VALUE_BY_MAPPING_ID,
+  ADD_UPDATE_VARIABLE_MAPPING
 }

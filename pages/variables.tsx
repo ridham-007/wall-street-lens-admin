@@ -17,11 +17,15 @@ import {
   GET_INDUSTRIES,
   GET_MAPPING_VIEW,
   GET_SUB_INDUSTRIES,
+  DELETE_MASTER_VERIABLE,
+  ADD_UPDATE_VARIABLE_MAPPING
 } from "@/utils/query";
 import { useRouter } from "next/router";
 import AccordionItem from "@/components/Accordian";
-import { AddUpdateParameterProps } from "@/utils/data";
+import { AddRelationProps, AddUpdateMasterVariableProps, AddUpdateParameterProps, DeleteVariableProps } from "@/utils/data";
 import { Modal } from "@/components/model";
+import Loader from "@/components/loader";
+
 
 export default function FinancialPage() {
   const [show, setShow] = useState(false);
@@ -31,7 +35,10 @@ export default function FinancialPage() {
   const [filterData, setFilterData] = useState([]);
   const [showDelete, setShowDelete] = useState(false);
   const [deleteId, setDeleteId] = useState("");
+  const [showLoader, setShowLoader] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [onEdit, setOnEdit] = useState(false);
+  const [varibleId, setVariableId] = useState('');
 
   const router = useRouter();
 
@@ -57,9 +64,12 @@ export default function FinancialPage() {
   }, []);
 
   const [addUpdateMasterVariable] = useMutation(ADD_UPDATE_MASTER_VERIABLE);
+  const [addUpdateVariableMapping] = useMutation(ADD_UPDATE_VARIABLE_MAPPING);
   const [getVariablesMapping, { data: masterVariables, refetch: refetchMasterVariables }] = useLazyQuery(
     GET_MAPPING_VIEW,
   );
+  const [deleteMasterVaribale] = useMutation(DELETE_MASTER_VERIABLE);
+
 
   useEffect(() => {
     const filteredData = masterVariables?.getMappingView?.map((item: { mapping: any[]; }) => {
@@ -80,7 +90,7 @@ export default function FinancialPage() {
     setFilterData(filteredData);
   }, [company, industry, subIndustry, masterVariables])
 
-  const onAddUpdateQuarter = async (perameters: any) => {
+  const onAddUpdateMasterVariable = async (perameters: any) => {
     await addUpdateMasterVariable({
       variables: {
         variableInfo: {
@@ -90,6 +100,25 @@ export default function FinancialPage() {
       }
     });
     refetchMasterVariables();
+    setOnEdit(false)
+    setVariableId('')
+  }
+
+  const onAddRelation = async (perameters: any) => {
+    console.log(perameters);
+    await addUpdateVariableMapping({
+      variables: {
+        mappingInfo: {
+          company: perameters?.company,
+          industry: perameters?.industry,
+          subIndustry: perameters?.subIndustry
+        },
+        masterVariableId: perameters?.id
+      }
+    });
+    setVariableId('')
+    refetchMasterVariables();
+
   }
 
   useEffect(() => {
@@ -119,10 +148,22 @@ export default function FinancialPage() {
 
   };
 
+  const onDeleteVariable = async (id: any) => {
+    setShowLoader(true);
+    await deleteMasterVaribale({
+      variables: {
+        variableId: id,
+      }
+    })
+    setShowLoader(false);
+    refetchMasterVariables();
+  }
 
   return (
     <Layout title="Veriables" page={LayoutPages.variables}>
       <>
+        {showLoader && (<Loader />)}
+
         <div className="flex items-center gap-[20px] justify-between">
           <div
             className="w-full flex justify-start mb-[20px] gap-[10px]"
@@ -256,24 +297,25 @@ export default function FinancialPage() {
             title={cur?.masterVariable?.title}
             content={getContent(cur?.mapping)}
             onDelete={() => { handleShowDelete(cur.masterVariable.id) }}
-            onEdit={() => { setShow(true) }}
-            onAdd={() => { setShowAdd(true) }}
+            onEdit={() => { setShow(true), setOnEdit(true), setVariableId(cur.masterVariable.id) }}
+            onAdd={() => { setShowAdd(true), setVariableId(cur.masterVariable.id) }}
           />
 
         })}
 
-        {show && (<AddUpdateVariable onClose={() => { setShow(false) }} onSuccess={onAddUpdateQuarter} />)}
-        {showDelete && (<DeleteVariable onClose={() => { setShowDelete(false); setDeleteId(''); }} />)}
-        {showAdd && (<AddVariable onClose={() => { setShowAdd(false); }} onSuccess={onAddUpdateQuarter} />)}
+        {show && (<AddUpdateMasterVariable onClose={() => { setShow(false), setOnEdit(false), setVariableId('') }} onSuccess={onAddUpdateMasterVariable} onEdit={onEdit} data={varibleId} />)}
+        {showDelete && (<DeleteVariable id={deleteId} onClose={() => { setShowDelete(false); setDeleteId(''); }} onSuccess={onDeleteVariable} />)}
+        {showAdd && (<AddRelation onClose={() => { setShowAdd(false); setVariableId('') }} onSuccess={onAddRelation} data={varibleId} />)}
       </>
     </Layout>
   );
 }
 
-function AddUpdateVariable(props: AddUpdateParameterProps) {
+function AddUpdateMasterVariable(props: AddUpdateMasterVariableProps) {
+  console.log(props)
   const [val, setVal] = useState({
-    id: props?.data?.id,
-    name: props?.data?.title,
+    id: props?.data,
+    name: '',
   });
 
   const handleOnSave = () => {
@@ -300,7 +342,7 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
     <Modal
       showModal={true}
       handleOnSave={handleOnSave}
-      title="Add a Variable"
+      title={props.onEdit === true ? 'Edit a variable' : 'Add a Variable'}
       onClose={() => props.onClose && props.onClose()}
     >
       <>
@@ -330,10 +372,10 @@ function AddUpdateVariable(props: AddUpdateParameterProps) {
   );
 }
 
-function AddVariable(props: AddUpdateParameterProps) {
-  const [industry, setIndustry] = useState("all");
-  const [subIndustry, setSubIndustry] = useState("all");
-  const [company, setCompany] = useState("all");
+function AddRelation(props: AddRelationProps) {
+  const [industry, setIndustry] = useState("");
+  const [subIndustry, setSubIndustry] = useState("");
+  const [company, setCompany] = useState("");
 
   const [getCompanies, { data: companies }] = useLazyQuery(GET_COMPANIES, {
     fetchPolicy: "network-only",
@@ -357,7 +399,7 @@ function AddVariable(props: AddUpdateParameterProps) {
   }, []);
 
   const handleOnSave = () => {
-    props.onSuccess && props.onSuccess();
+    props.onSuccess && props.onSuccess({ industry, subIndustry, company, id: props?.data });
     props.onClose && props.onClose();
   };
 
@@ -390,7 +432,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                         setIndustry(event.target?.value);
                       }}
                     >
-                      <option value="all">ALL</option>
+                      <option value="">Select a option</option>
                       {(industries?.getIndustries ?? []).map(
                         (cur: {
                           id: string;
@@ -432,8 +474,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                         setSubIndustry(event.target?.value);
                       }}
                     >
-                      <option value="all">ALL</option>
-
+                      <option value="">Select a option</option>
                       {(subIndustries?.getSubIndustries ?? []).map(
                         (cur: {
                           id: string;
@@ -475,7 +516,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                         setCompany(event.target?.value);
                       }}
                     >
-                      <option value="all">ALL</option>
+                      <option value="">Select a option</option>
                       {(companies?.getCompanies ?? []).map(
                         (cur: {
                           id: string;
@@ -512,25 +553,25 @@ function AddVariable(props: AddUpdateParameterProps) {
 
 function DeleteVariable(props: DeleteVariableProps) {
   const handleOnSave = () => {
-      if (!props?.id) {
-          // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-          return;
-      }
-      props.onSuccess && props.onSuccess(props?.id)
-      props.onClose && props.onClose()
+    if (!props?.id) {
+      // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });?
+      return;
+    }
+    props.onSuccess && props.onSuccess(props?.id)
+    props.onClose && props.onClose()
   };
 
   return (
-      <Modal
-          showModal={true}
-          handleOnSave={handleOnSave}
-          title="Delete a Veriable"
-          onClose={() => props.onClose && props.onClose()}
-          confirmButton="Delete"
-      >
-          <>
-              <div>Are you sure you want to delete?</div>
-          </>
-      </Modal>
+    <Modal
+      showModal={true}
+      handleOnSave={handleOnSave}
+      title="Delete a Veriable"
+      onClose={() => props.onClose && props.onClose()}
+      confirmButton="Delete"
+    >
+      <>
+        <div>Are you sure you want to delete?</div>
+      </>
+    </Modal>
   );
 }

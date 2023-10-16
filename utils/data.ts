@@ -57,7 +57,26 @@ export interface AddUpdateParameterProps {
   term?: any;
   currentData?: any;
   selectTerm?: any;
+  onEdit?: boolean;
 }
+
+export interface AddUpdateMasterVariableProps {
+  onSuccess?: any;
+  onClose?: any;
+  onSave?: any;
+  refetch?: any;
+  data?: any;
+  onEdit?: boolean;
+}
+
+export interface AddRelationProps {
+  onSuccess?: any;
+  onClose?: any;
+  onSave?: any;
+  refetch?: any;
+  data?: any;
+}
+
 export interface VariablesArray {
   category: string;
   title: string;
@@ -180,5 +199,9 @@ export interface TraverseMap {
   columnIndex?: number;
   highlightColor?: string;
 }
-
+export interface DeleteVariableProps {
+  onSuccess?: any;
+  onClose?: any;
+  id?: any;
+}
 
