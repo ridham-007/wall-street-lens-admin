@@ -374,7 +374,7 @@ function AddRelationsModal(props: AddUpdateParameterProps) {
                     <div className="flex flex-col gap-4 w-[700px] h-[300px]">
                         <div className="flex flex-col mb-[20px]">
                             <label htmlFor="quarter" className="text-sm font-bold text-gray-700">
-                                KPI Terms:
+                                Tabs:
                             </label>
                             <select
                                 id="quarter"
