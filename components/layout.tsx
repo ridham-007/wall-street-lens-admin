@@ -340,7 +340,7 @@ export default function Layout(props: LayoutProps) {
         </div>
 
         <div className="flex flex-row overflow-auto" style={{ height: "90%" }}>
-          <div className="w-1/6  border-r border-gray-200 pb-5">
+          <div className="w-1/6  border-r border-gray-200 pb-5 min-w-[185px]" >
             <div className="flex-1 py-4 space-y-1  divide-y divide-gray-200 dark:divide-gray-700">
               <Link href={`/variables?company=${company}`}>
                 <button
@@ -350,6 +350,7 @@ export default function Layout(props: LayoutProps) {
                     }`}
                 >
                   <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                     className="mr-4 w-6 min-w-[22px] h-6"
                     width="25.000000pt" height="25.000000pt" viewBox="0 0 64.000000 64.000000"
                     preserveAspectRatio="xMidYMid meet">
 
@@ -375,7 +376,7 @@ export default function Layout(props: LayoutProps) {
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 128.000000 128.000000"
                     preserveAspectRatio="xMidYMid meet"
-                    className="w-6 h-6 mr-4">
+                    className="w-5 h-6 min-w-[22px] mr-4">
 
                     <g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)"
                       fill="#000000" stroke="currentColor">
@@ -399,7 +400,7 @@ export default function Layout(props: LayoutProps) {
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="w-6 h-6 mr-4"
+                    className="w-6 h-6 min-w-[22px] mr-4"
                   >
                     <path
                       strokeLinecap="round"
@@ -423,7 +424,7 @@ export default function Layout(props: LayoutProps) {
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="w-6 h-6 mr-4"
+                    className="w-6 h-6 min-w-[22px] mr-4"
                   >
                     <path
                       strokeLinecap="round"
@@ -447,7 +448,7 @@ export default function Layout(props: LayoutProps) {
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="mr-4 w-6 h-6"
+                    className="mr-4 w-6 min-w-[22px] h-6"
                   >
                     <path
                       strokeLinecap="round"
