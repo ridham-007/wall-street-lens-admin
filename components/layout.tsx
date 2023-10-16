@@ -209,7 +209,7 @@ export default function Layout(props: LayoutProps) {
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Wall Street Lens
           </h1>
-          <div className="mr-auto flex gap-[15px]">
+         {props?.page !== LayoutPages.variables &&( <div className="mr-auto flex gap-[15px]">
             <div className="flex gap-[20px] mr-[10px] items-center">
               <select
                 id="quarter"
@@ -248,7 +248,7 @@ export default function Layout(props: LayoutProps) {
                 <div className="text-sm">{subIndustryName}</div>
               </div>
             )}
-          </div>
+          </div>)}
           <div className="flex align-right items-center">
             <button onClick={handleOpen}>
               <svg
