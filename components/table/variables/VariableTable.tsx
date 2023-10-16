@@ -8,6 +8,12 @@ import { KpiTerm } from "@/utils/data"
 import { AddUpdateParameterProps } from "@/utils/data"
 import { DeleteVariableProps } from "@/utils/data"
 import { TableProps } from "@/utils/data"
+import { useLazyQuery } from "@apollo/client";
+import {
+    GET_COMPANIES,
+    GET_INDUSTRIES,
+    GET_SUB_INDUSTRIES,
+} from "@/utils/query";
 
 const VariableTable = (props: TableProps) => {
     const [show, setShow] = useState(false);
@@ -83,9 +89,9 @@ const VariableTable = (props: TableProps) => {
                         return <TDR key={current?.id?.toString()}>
                             <>
                                 <TD>{current?.masterVariable?.title}</TD>
-                                <TD>{props?.companies?.find((cur: { id: any; }) => cur?.id?.toString() === current?.company)?.attributes?.name || ''}</TD>  
+                                <TD>{props?.companies?.find((cur: { id: any; }) => cur?.id?.toString() === current?.company)?.attributes?.name || ''}</TD>
                                 <TD>{props?.industries?.find((cur: { id: any; }) => cur?.id?.toString() === current?.industry)?.attributes?.name || ''}</TD>
-                                <TD>{props?.subIndustries?.find((cur: { id: any; }) => cur?.id?.toString() === current?.subIndustry)?.attributes?.name || ''}</TD>                                    
+                                <TD>{props?.subIndustries?.find((cur: { id: any; }) => cur?.id?.toString() === current?.subIndustry)?.attributes?.name || ''}</TD>
                                 <TD style="text-center" key={uniqueId}>
                                     <>
                                         <div
@@ -115,7 +121,7 @@ const VariableTable = (props: TableProps) => {
                 </tbody>
             </table>
         </div >
-        {show && (<AddUpdateVariable termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setShow(false); setCurrentData({}); setDeleteId('') }} onSuccess={onAddUpdateQuarter} />)}
+        {show && (<AddVariable termsData={props.termsData} data={currentData} onClose={() => { setShow(false); setCurrentData({}); setDeleteId('') }} onSuccess={onAddUpdateQuarter} />)}
         {deletePopup && <DeleteVariable id={deleteId} onSuccess={onDeleteVeriable} onClose={() => {
             setDeleteId('');
             setDeletePopup(false);
@@ -123,57 +129,178 @@ const VariableTable = (props: TableProps) => {
     </>
 }
 
-function AddUpdateVariable(props: AddUpdateParameterProps) {
-    const [val, setVal] = useState({
-        id: props?.data?.id,
-        name: props?.data?.title,
-    })
+function AddVariable(props: AddUpdateParameterProps) {
+    const [industry, setIndustry] = useState("all");
+    const [subIndustry, setSubIndustry] = useState("all");
+    const [company, setCompany] = useState("all");
+
+    const [getCompanies, { data: companies }] = useLazyQuery(GET_COMPANIES, {
+        fetchPolicy: "network-only",
+    });
+
+    const [getIndustries, { data: industries }] = useLazyQuery(GET_INDUSTRIES, {
+        fetchPolicy: "network-only",
+    });
+
+    const [getSubIndustries, { data: subIndustries }] = useLazyQuery(
+        GET_SUB_INDUSTRIES,
+        {
+            fetchPolicy: "network-only",
+        }
+    );
+
+    useEffect(() => {
+        getCompanies();
+        getIndustries();
+        getSubIndustries();
+    }, []);
 
     const handleOnSave = () => {
-        if (!val.name) {
-            // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-            return;
-        }
-        props.onSuccess && props.onSuccess(val)
-        props.onClose && props.onClose()
-    };
-
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
-        const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-        const name = e.target.name;
-
-        setVal((prevVal) => ({
-            ...prevVal,
-            [name]: value
-        }));
+        props.onSuccess && props.onSuccess();
+        props.onClose && props.onClose();
     };
 
     return (
         <Modal
             showModal={true}
             handleOnSave={handleOnSave}
-            title="Add a Variable"
+            title="Edit Relation"
             onClose={() => props.onClose && props.onClose()}
         >
             <>
                 <form className="form w-100">
                     <div className="grid grid-cols-1 gap-4">
                         <div className="flex flex-col">
-                            <label
-                                htmlFor="Name"
-                                className="text-sm font-medium text-gray-700"
-                            >
-                                Name
-                            </label>
-                            <input
-                                type="text"
-                                id="Name"
-                                name="name"
-                                value={val.name}
-                                onChange={handleOnChange}
-                                required
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-full"
-                            />
+                            <div className="flex items-center gap-[20px] justify-between">
+                                <div className="w-full flex justify-start mb-[20px] gap-[10px]">
+                                    <div className="flex flex-col items-start">
+                                        <label
+                                            htmlFor="quarter"
+                                            className="text-sm font-bold text-gray-700 text-left"
+                                        >
+                                            Industries:
+                                        </label>
+                                        <select
+                                            id="quarter"
+                                            name="term"
+                                            className="w-[200px] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                            value={industry}
+                                            onChange={(event) => {
+                                                setIndustry(event.target?.value);
+                                            }}
+                                        >
+                                            <option value="all">ALL</option>
+                                            {(industries?.getIndustries ?? []).map(
+                                                (cur: {
+                                                    id: string;
+                                                    attributes: {
+                                                        name:
+                                                        | string
+                                                        | number
+                                                        | boolean
+                                                        | ReactElement<any, string | JSXElementConstructor<any>>
+                                                        | ReactFragment
+                                                        | ReactPortal
+                                                        | null
+                                                        | undefined;
+                                                    };
+                                                }) => {
+                                                    return (
+                                                        <option key={cur.id} value={cur?.id}>
+                                                            {cur?.attributes?.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
+                                    </div>
+
+                                    <div className="flex flex-col items-start">
+                                        <label
+                                            htmlFor="quarter"
+                                            className="text-sm font-bold text-gray-700"
+                                        >
+                                            Sub Industries:
+                                        </label>
+                                        <select
+                                            id="quarter"
+                                            name="term"
+                                            className="w-[200px] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                            value={subIndustry}
+                                            onChange={(event) => {
+                                                setSubIndustry(event.target?.value);
+                                            }}
+                                        >
+                                            <option value="all">ALL</option>
+
+                                            {(subIndustries?.getSubIndustries ?? []).map(
+                                                (cur: {
+                                                    id: string;
+                                                    attributes: {
+                                                        name:
+                                                        | string
+                                                        | number
+                                                        | boolean
+                                                        | ReactElement<any, string | JSXElementConstructor<any>>
+                                                        | ReactFragment
+                                                        | ReactPortal
+                                                        | null
+                                                        | undefined;
+                                                    };
+                                                }) => {
+                                                    return (
+                                                        <option key={cur.id} value={cur?.id}>
+                                                            {cur?.attributes?.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
+                                    </div>
+
+                                    <div className="flex flex-col items-start">
+                                        <label
+                                            htmlFor="quarter"
+                                            className="text-sm font-bold text-gray-700"
+                                        >
+                                            Company:
+                                        </label>
+                                        <select
+                                            id="quarter"
+                                            name="term"
+                                            className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none w-[200px]"
+                                            value={company}
+                                            onChange={(event) => {
+                                                setCompany(event.target?.value);
+                                            }}
+                                        >
+                                            <option value="all">ALL</option>
+                                            {(companies?.getCompanies ?? []).map(
+                                                (cur: {
+                                                    id: string;
+                                                    attributes: {
+                                                        name:
+                                                        | string
+                                                        | number
+                                                        | boolean
+                                                        | ReactElement<any, string | JSXElementConstructor<any>>
+                                                        | ReactFragment
+                                                        | ReactPortal
+                                                        | null
+                                                        | undefined;
+                                                    };
+                                                }) => {
+                                                    return (
+                                                        <option key={cur.id} value={cur?.id}>
+                                                            {cur?.attributes?.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
