@@ -196,7 +196,7 @@ const VariableTable = (props: TableProps) => {
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { id: { toString: () => Key | null | undefined; }; masterVariable: { title: string | JSX.Element | undefined; }; kpiTerm: { name: string | JSX.Element | undefined; }; priority: any; category: string | JSX.Element | undefined; yoy: string | JSX.Element | undefined; }) => {
+                    {tableData?.map((current: { id: { toString: () => string; }; masterVariable: { title: string | JSX.Element | undefined; }; kpiTerm: { name: string | JSX.Element | undefined; }; priority: any; category: string | JSX.Element | undefined; yoy: string | JSX.Element | undefined; }) => {
                         return <TDR key={current?.id?.toString()}>
                             <>
                                 <TD>{current?.masterVariable?.title}</TD>
@@ -295,7 +295,7 @@ function AddRelationsModal(props: AddUpdateParameterProps) {
     }, [val.term])
 
     useEffect(() => {
-        const selectedOptions = termsVaribles?.getVariablesByKpiTerm?.map(cur => {
+        const selectedOptions = termsVaribles?.getVariablesByKpiTerm?.map((cur: { masterVariable: { title: any; id: any; }; }) => {
             return {
                 key: cur?.masterVariable?.title,
                 cat: cur?.masterVariable?.title,

@@ -295,6 +295,7 @@ export default function FinancialPage() {
           </div>
         </div>
         {filterData?.map((cur: {
+          id: Key | null | undefined;
           masterVariable: { title: string; id: string; }; mapping: any;
         }) => {
           return <AccordionItem

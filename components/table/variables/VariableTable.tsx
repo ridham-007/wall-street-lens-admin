@@ -91,7 +91,7 @@ const VariableTable = (props: TableProps) => {
                 </thead>
 
                 <tbody className="w-full">
-                    {tableData?.map((current: { id: { toString: () => Key | null | undefined; }; masterVariable: { title: string | JSX.Element | undefined; }; company: any; industry: any; subIndustry: any; }) => {
+                    {tableData?.map((current: { id: { toString: () => string; }; masterVariable: { title: string | JSX.Element | undefined; }; company: any; industry: any; subIndustry: any; }) => {
                         return <TDR key={current?.id?.toString()}>
                             <>
                                 <TD>{current?.masterVariable?.title}</TD>
@@ -208,16 +208,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                                                 (cur: {
                                                     id: string;
                                                     attributes: {
-                                                        name:
-                                                        | string
-                                                        | number
-                                                        | boolean
-                                                        | ReactElement<any, string | JSXElementConstructor<any>>
-                                                        | ReactFragment
-                                                        | ReactPortal
-                                                        | null
-                                                        | undefined;
-                                                    };
+                                                        name:string };
                                                 }) => {
                                                     return (
                                                         <option key={cur.id} value={cur?.id}>
@@ -251,15 +242,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                                                 (cur: {
                                                     id: string;
                                                     attributes: {
-                                                        name:
-                                                        | string
-                                                        | number
-                                                        | boolean
-                                                        | ReactElement<any, string | JSXElementConstructor<any>>
-                                                        | ReactFragment
-                                                        | ReactPortal
-                                                        | null
-                                                        | undefined;
+                                                        name: string;
                                                     };
                                                 }) => {
                                                     return (
@@ -293,15 +276,7 @@ function AddVariable(props: AddUpdateParameterProps) {
                                                 (cur: {
                                                     id: string;
                                                     attributes: {
-                                                        name:
-                                                        | string
-                                                        | number
-                                                        | boolean
-                                                        | ReactElement<any, string | JSXElementConstructor<any>>
-                                                        | ReactFragment
-                                                        | ReactPortal
-                                                        | null
-                                                        | undefined;
+                                                        name: string;
                                                     };
                                                 }) => {
                                                     return (
