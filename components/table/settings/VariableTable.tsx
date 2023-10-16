@@ -2,7 +2,7 @@ import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
-import { ADD_UPDATE_TERM_VERIABLE, CREATE_DEFAULT_MAPPING, DELETE_VERIABLE_BY_ID, GET_VARIABLE_MAPPING_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
+import { ADD_BULK_TERM_VARIABLE, ADD_UPDATE_TERM_VERIABLE, CREATE_DEFAULT_MAPPING, CREATE_DEFAULT_MAPPING_IN_BULK, DELETE_VERIABLE_BY_ID, GET_VARIABLE_MAPPING_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { KpiTerm } from "@/utils/data"
 import { AddUpdateParameterProps } from "@/utils/data"
@@ -22,7 +22,9 @@ const VariableTable = (props: TableProps) => {
 
     const [addOrUpdateVeriable] = useMutation(ADD_UPDATE_TERM_VERIABLE);
     const [deleteVariable] = useMutation(DELETE_VERIABLE_BY_ID);
-    const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING)
+    const [defaultMapping] = useMutation(CREATE_DEFAULT_MAPPING);
+    const [bulkTermVariable] = useMutation(ADD_BULK_TERM_VARIABLE);
+    const [bulkMapping] = useMutation(CREATE_DEFAULT_MAPPING_IN_BULK);
 
     const addDefaultMapping = async (id: string, variableId: string) => {
         await defaultMapping({
@@ -32,6 +34,38 @@ const VariableTable = (props: TableProps) => {
             },
         });
     };
+
+    const createBulkMapping = async (id: string, variableIds: string) => {
+        await bulkMapping({
+            variables: {
+                mappingInfo:{
+                    termId: id,
+                    variableId: variableIds,
+                }
+            },
+        });
+    };
+
+
+    const addBulkTermVariable = async (id: string, variableIds: string) => {
+        return await bulkTermVariable({
+            variables: {
+                variableInfo:{
+                    termId: id,
+                    masterVariableIds: variableIds,
+                }
+            },
+        });
+    };
+
+    const onAddRelations = async (val: any) => {
+        setShowLoader(true);
+        const {data}:any = await addBulkTermVariable(val?.term, val?.masterVariableIds);
+        const mapIds = data?.addBulkTermVariable?.map((cur: { id: any; }) => cur?.id);
+        await createBulkMapping(val?.term, mapIds);
+        setShowLoader(false);
+        props.setRefetch(true);
+    }
 
 
     const onAddUpdateQuarter = async (perameters: any) => {
@@ -203,7 +237,7 @@ const VariableTable = (props: TableProps) => {
                 </tbody>
             </table>
         </div >
-        {relation && (<AddRelationsModal termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setRelation(false); }} onSuccess={onAddUpdateQuarter} />)}
+        {relation && (<AddRelationsModal termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setRelation(false); }} onSuccess={onAddRelations} />)}
         {show && (<AddUpdateVariable termsData={props.termsData} data={currentData} selectedTerm={selectedTerm} onClose={() => { setShow(false); setCurrentData({}); setDeleteId('') }} onSuccess={onAddUpdateQuarter} />)}
         {deletePopup && <DeleteVariable id={deleteId} onSuccess={onDeleteVeriable} onClose={() => {
             setDeleteId('');
@@ -277,7 +311,8 @@ function AddRelationsModal(props: AddUpdateParameterProps) {
             // toast('Title is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
             return;
         }
-        props.onSuccess && props.onSuccess(val)
+        const newlyAdded = selectedVariablesArr?.filter(item => !initSelectedValues?.includes(item))?.map(cur => cur?.id);
+        props.onSuccess && props.onSuccess({ ...val, masterVariableIds: newlyAdded })
         props.onClose && props.onClose()
     };
 

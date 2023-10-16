@@ -418,6 +418,23 @@ const ADD_UPDATE_VARIABLE_MAPPING = gql`mutation addUpdateVariableMapping($mappi
     subIndustry
   }
 }`
+const ADD_BULK_TERM_VARIABLE = gql`mutation addBulkTermVariable(
+  $variableInfo: AddBulkTermVariables!
+  ){
+  addBulkTermVariable(
+    variableInfo: $variableInfo
+  ){
+    id
+  }
+}`;
+
+const CREATE_DEFAULT_MAPPING_IN_BULK = gql`mutation createDefaultMappingInBulk(
+  $mappingInfo: CreateDefaultMapping!
+  ){
+  createDefaultMappingInBulk(
+    mappingInfo: $mappingInfo
+  )
+}`;
 
 export {
   LOG_IN,
@@ -447,5 +464,7 @@ export {
   GET_MAPPING_VIEW,
   DELETE_MASTER_VERIABLE,
   DELETE_VALUE_BY_MAPPING_ID,
-  ADD_UPDATE_VARIABLE_MAPPING
+  ADD_UPDATE_VARIABLE_MAPPING,
+  ADD_BULK_TERM_VARIABLE,
+  CREATE_DEFAULT_MAPPING_IN_BULK,
 }
