@@ -9,7 +9,7 @@ import {
 	UPDATE_MAPPED_VALUE,
 } from "@/utils/query";
 import SummaryView from "./SummaryView";
-import { AddUpdateParameterProps } from "@/utils/data";
+import { AddUpdateParameterProps, AddUpdateColorParameterProps } from "@/utils/data";
 import { TraverseMap } from "@/utils/data";
 
 import { TableProps, TableView, Row, Header } from "@/utils/data"
@@ -69,6 +69,7 @@ export default function Variable({
 	}, [year, quarter, refetch]);
 
 	const [show, setShow] = useState(false);
+	const [showColor, setShowColor] = useState(false);
 	const [cellData, setCellData] = useState<TraverseMap>();
 
 
@@ -96,6 +97,7 @@ export default function Variable({
 		});
 		setShowLoader(false);
 		setShow(false);
+		setShowColor(false)
 		refetchTermView();
 	};
 
@@ -125,6 +127,7 @@ export default function Variable({
 			},
 		});
 		setShow(false);
+		setShowColor(false)
 		refetchTermView();
 	};
 
@@ -137,7 +140,7 @@ export default function Variable({
 		setShowDelete(true);
 		setDeleteId(identifier);
 	};
-
+	console.log(cellData, "sssssssss")
 	const handleShowEdit = (current: any) => {
 		const nameParts = current.name?.split("-"); // Splitting the name into parts
 
@@ -225,7 +228,7 @@ export default function Variable({
 														<span
 															className="px-2 cursor-pointer"
 															onClick={() => {
-																
+
 																handleShowDelete(current.id);
 															}}
 														>
@@ -269,10 +272,17 @@ export default function Variable({
 									<TDR key={index}>
 										<>
 											{!selectedTerm?.quarterWiseTable ? (
-												<TD>{current.title ?? ""}</TD>
+												<TD style="cursor-pointer"
+													onClick={() => {
+														setShowColor(true);
+														setCellData({ title: current.title })
+													}}>
+													{current.title ?? ""}
+												</TD>
 											) : (
 												<TD>{year}</TD>
 											)}
+
 
 											{current.cells.map((cur, index) => {
 												const selectedColumn = headers[index];
@@ -384,6 +394,15 @@ export default function Variable({
 						selectedTerm={selectedTerm}
 					/>
 				)}
+				{showColor && (
+					<AddUpdateColorParaMeter
+						onClose={() => { setShowColor(false); setCellData(null); }}
+						onSave={onSave}
+						cellData={cellData}
+						selectedColumn={selectedColumn}
+						selectedTerm={selectedTerm}
+					/>
+				)}
 			</div>
 		</>
 	);
@@ -456,7 +475,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 								/>
 							</div>
 						)}
-						{val.length < 30 &&
+						{val?.length < 30 &&
 							props.selectedColumn?.name !== "VisibleToChart" && (
 								<input
 									type="text"
@@ -468,7 +487,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 									className="w-full mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
 								/>
 							)}
-						{val.length >= 31 && (
+						{val?.length >= 31 && (
 							<textarea
 								id="value"
 								name="value"
@@ -478,39 +497,39 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 								className="w-[calc(50vw)] mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
 							/>
 						)}
-						</div>
-						{(!props.selectedTerm?.quarterWiseTable && props.selectedColumn?.name !== "VisibleToChart") && (<div><div className="flex items-center gap-[20px] mt-[20px]">
-							<label
-								htmlFor="value"
-								className="text-lg font-bold text-gray-700"
-							>
-								Cell Background:
+					</div>
+					{(!props.selectedTerm?.quarterWiseTable && props.selectedColumn?.name !== "VisibleToChart") && (<div><div className="flex items-center gap-[20px] mt-[20px]">
+						<label
+							htmlFor="value"
+							className="text-lg font-bold text-gray-700"
+						>
+							Cell Background:
+						</label>
+					</div>
+						<div className="mt-5">
+							<label className="mr-3">
+								<input
+									type="radio"
+									name="options"
+									value="red"
+									checked={selectedOption === "red"}
+									onChange={() => { setSelectedOption('red') }}
+									className="m-1"
+								/>
+								Red
 							</label>
-						</div>
-							<div className="mt-5">
-								<label className="mr-3">
-									<input
-										type="radio"
-										name="options"
-										value="red"
-										checked={selectedOption === "red"}
-										onChange={() => { setSelectedOption('red') }}
-										className="m-1"
-									/>
-									Red
-								</label>
 
 							<label className="mr-3">
-									<input
-										type="radio"
-										name="options"
-										value="green"
-										checked={selectedOption === "green"}
-										onChange={() => { setSelectedOption('green') }}
-										className="m-1"
-									/>
-									Green
-								</label>
+								<input
+									type="radio"
+									name="options"
+									value="green"
+									checked={selectedOption === "green"}
+									onChange={() => { setSelectedOption('green') }}
+									className="m-1"
+								/>
+								Green
+							</label>
 							<label>
 								<input
 									type="radio"
@@ -522,7 +541,84 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 								/>
 								None
 							</label>
-							</div></div>)}
+						</div></div>)}
+				</form>
+			</>
+		</Modal>
+	);
+}
+function AddUpdateColorParaMeter(props: AddUpdateColorParameterProps) {
+
+	const [selectedOption, setSelectedOption] = useState(props.cellData?.highlightColor);
+	const handleOnSave = async () => {
+		if (!!props.onSave) {
+			props.onSave(
+				props.cellData.id,
+				props.cellData.groupKey,
+				props?.cellData?.quarterId,
+				props?.cellData?.termId,
+				props?.cellData?.variableId,
+				selectedOption
+			);
+		}
+	};
+
+
+	return (
+		<Modal
+			showModal={true}
+			handleOnSave={handleOnSave}
+			title={props.cellData?.title}
+			onClose={() => props.onClose && props.onClose()}
+		>
+			<>
+				<form className="form w-100">
+
+					{(!props.selectedTerm?.quarterWiseTable && props.selectedColumn?.name !== "VisibleToChart") && (<div><div className="flex items-center gap-[20px] mt-[20px]">
+						<label
+							htmlFor="value"
+							className="text-lg font-bold text-gray-700"
+						>
+							Cell Background:
+						</label>
+					</div>
+						<div className="mt-5">
+							<label className="mr-3">
+								<input
+									type="radio"
+									name="options"
+									value="red"
+									checked={selectedOption === "red"}
+									onChange={() => { setSelectedOption('red') }}
+									className="m-1"
+								/>
+								Red
+							</label>
+
+							<label className="mr-3">
+								<input
+									type="radio"
+									name="options"
+									value="green"
+									checked={selectedOption === "green"}
+									onChange={() => { setSelectedOption('green') }}
+									className="m-1"
+								/>
+								Green
+							</label>
+							<label>
+								<input
+									type="radio"
+									name="options"
+									value="green"
+									checked={selectedOption === "none"}
+									onChange={() => { setSelectedOption('none') }}
+									className="m-1"
+								/>
+								None
+							</label>
+						</div></div>)}
+
 				</form>
 			</>
 		</Modal>

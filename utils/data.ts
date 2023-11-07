@@ -60,6 +60,25 @@ export interface AddUpdateParameterProps {
   onEdit?: boolean;
 }
 
+export interface AddUpdateColorParameterProps {
+  onSuccess?: any;
+  onClose?: any;
+  data?: any;
+  termsData?: any;
+  selectedTerm?: any;
+  onSave?: any;
+  cellData?: any;
+  selectedColumn?: any;
+  selectedCompany?: any;
+  financialInitData?: any;
+  company?: any;
+  refetch?: any;
+  term?: any;
+  currentData?: any;
+  selectTerm?: any;
+  onEdit?: boolean;
+}
+
 export interface AddUpdateMasterVariableProps {
   onSuccess?: any;
   onClose?: any;
