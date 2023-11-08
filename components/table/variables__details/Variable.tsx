@@ -5,6 +5,7 @@ import Loader from "@/components/loader";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import {
 	ADD_ROW_FOR_QUARTER_WISE_TABLE,
+	ADD_UPDATE_TERM_VERIABLE,
 	GET_VIEW_FOR_TERM,
 	UPDATE_MAPPED_VALUE,
 } from "@/utils/query";
@@ -267,7 +268,7 @@ export default function Variable({
 							</THR>
 						</thead>
 						<tbody className="w-full">
-							{rows.map((current, index) => {
+							{rows.map((current, index) => {								
 								return (
 									<TDR key={index}>
 										<>
@@ -275,7 +276,7 @@ export default function Variable({
 												<TD style="cursor-pointer"
 													onClick={() => {
 														setShowColor(true);
-														setCellData({ title: current.title })
+														setCellData({ title: current.title, id: current.cells[0].variableId??""})
 													}}>
 													{current.title ?? ""}
 												</TD>
@@ -396,7 +397,7 @@ export default function Variable({
 				)}
 				{showColor && (
 					<AddUpdateColorParaMeter
-						onClose={() => { setShowColor(false); setCellData(null); }}
+						onClose={() => { setShowColor(false); setCellData({}); }}
 						onSave={onSave}
 						cellData={cellData}
 						selectedColumn={selectedColumn}
@@ -547,19 +548,29 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 		</Modal>
 	);
 }
+
 function AddUpdateColorParaMeter(props: AddUpdateColorParameterProps) {
 
+	const { id } = props.cellData;	
+	const [addOrUpdateVariable] = useMutation(ADD_UPDATE_TERM_VERIABLE);
 	const [selectedOption, setSelectedOption] = useState(props.cellData?.highlightColor);
+
 	const handleOnSave = async () => {
-		if (!!props.onSave) {
-			props.onSave(
-				props.cellData.id,
-				props.cellData.groupKey,
-				props?.cellData?.quarterId,
-				props?.cellData?.termId,
-				props?.cellData?.variableId,
-				selectedOption
-			);
+		try{
+			if(!!id){
+				await addOrUpdateVariable({
+					variables:{
+						variableInfo:{
+							highlightColor:selectedOption,
+							id:id
+						},
+					}
+					 
+				})
+			}
+			!!props.onClose && props.onClose()
+		}catch(e){
+			!!props.onClose && props.onClose()
 		}
 	};
 
@@ -579,7 +590,7 @@ function AddUpdateColorParaMeter(props: AddUpdateColorParameterProps) {
 							htmlFor="value"
 							className="text-lg font-bold text-gray-700"
 						>
-							Cell Background:
+							Row Background:
 						</label>
 					</div>
 						<div className="mt-5">
