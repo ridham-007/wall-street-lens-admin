@@ -276,7 +276,7 @@ export default function Variable({
 												<TD style="cursor-pointer"
 													onClick={() => {
 														setShowColor(true);
-														setCellData({ title: current.title, id: current.cells[0].variableId??""})
+														setCellData({ title: current.title, id: current.cells[0].variableId??"", highlightColor:current.highlightColor })
 													}}>
 													{current.title ?? ""}
 												</TD>
@@ -398,10 +398,8 @@ export default function Variable({
 				{showColor && (
 					<AddUpdateColorParaMeter
 						onClose={() => { setShowColor(false); setCellData({}); }}
-						onSave={onSave}
+						onSave={() => refetchTermView()}
 						cellData={cellData}
-						selectedColumn={selectedColumn}
-						selectedTerm={selectedTerm}
 					/>
 				)}
 			</div>
@@ -568,8 +566,10 @@ function AddUpdateColorParaMeter(props: AddUpdateColorParameterProps) {
 					 
 				})
 			}
+			!!props.onSave && props.onSave()
 			!!props.onClose && props.onClose()
 		}catch(e){
+			!!props.onSave && props.onSave()
 			!!props.onClose && props.onClose()
 		}
 	};

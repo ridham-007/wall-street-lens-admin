@@ -167,6 +167,7 @@ export interface Header {
 export interface Row {
   title: string;
   cells: Cell[];
+  highlightColor: string;
 }
 export interface Cell {
   id: string;
