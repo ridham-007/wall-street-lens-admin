@@ -22,7 +22,7 @@ import {
 } from "@/utils/query";
 import { useRouter } from "next/router";
 import AccordionItem from "@/components/Accordian";
-import { AddRelationProps, AddUpdateMasterVariableProps, AddUpdateParameterProps, DeleteVariableProps } from "@/utils/data";
+import { AddRelationProps, AddUpdateMasterVariableProps, DeleteVariableProps, LayoutProps } from "@/utils/data";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
 import { toast } from "react-toastify";
@@ -30,7 +30,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
 
-export default function FinancialPage() {
+export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutProps) {
   const [show, setShow] = useState(false);
   const [industry, setIndustry] = useState('all');
   const [subIndustry, setSubIndustry] = useState('all');
@@ -42,6 +42,7 @@ export default function FinancialPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [onEdit, setOnEdit] = useState(false);
   const [varibleId, setVariableId] = useState('');
+  const [title, setTitle] = useState('');
 
   const router = useRouter();
 
@@ -98,7 +99,7 @@ export default function FinancialPage() {
     await addUpdateMasterVariable({
       variables: {
         variableInfo: {
-          id: perameters?.id,
+          ...(varibleId && { id: varibleId }),
           title: perameters?.name,
         },
       }
@@ -165,7 +166,7 @@ export default function FinancialPage() {
   }
 
   return (
-    <Layout title="Veriables" page={LayoutPages.variables}>
+    <Layout title="Veriables" page={LayoutPages.variables} {...props}>
       <>
         {showLoader && (<Loader />)}
 
@@ -303,13 +304,13 @@ export default function FinancialPage() {
             title={cur?.masterVariable?.title}
             content={getContent(cur?.mapping)}
             onDelete={() => { handleShowDelete(cur.masterVariable.id) }}
-            onEdit={() => { setShow(true), setOnEdit(true), setVariableId(cur.masterVariable.id) }}
+            onEdit={() => { setShow(true), setOnEdit(true), setVariableId(cur.masterVariable.id), setTitle(cur?.masterVariable?.title) }}
             onAdd={() => { setShowAdd(true), setVariableId(cur.masterVariable.id) }}
           />
 
         })}
 
-        {show && (<AddUpdateMasterVariable onClose={() => { setShow(false), setOnEdit(false), setVariableId('') }} onSuccess={onAddUpdateMasterVariable} onEdit={onEdit} data={varibleId} />)}
+        {show && (<AddUpdateMasterVariable onClose={() => { setShow(false); setOnEdit(false); setVariableId(''); setTitle('') }} onSuccess={onAddUpdateMasterVariable} onEdit={onEdit} data={varibleId} title={title} />)}
         {showDelete && (<DeleteVariable id={deleteId} onClose={() => { setShowDelete(false); setDeleteId(''); }} onSuccess={onDeleteVariable} />)}
         {showAdd && (<AddRelation onClose={() => { setShowAdd(false); setVariableId('') }} onSuccess={onAddRelation} data={varibleId} />)}
       </>
@@ -320,7 +321,7 @@ export default function FinancialPage() {
 function AddUpdateMasterVariable(props: AddUpdateMasterVariableProps) {
   const [val, setVal] = useState({
     id: props?.data,
-    name: '',
+    name: props?.title,
   });
 
   const handleOnSave = () => {

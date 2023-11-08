@@ -13,12 +13,12 @@ import { useRouter } from "next/router";
 import YearDropdown from "@/components/year_dropdown/year_dropdown";
 import { Modal } from "@/components/model";
 import { ADD_QUARTER } from "@/utils/query";
-import { KpiTerm } from "@/utils/data";
+import { KpiTerm, LayoutProps } from "@/utils/data";
 import { QuarterDataProps } from "@/utils/data";
 import { DeleteVariableProps } from "@/utils/data";
 import { EditQuarterProps } from "@/utils/data";
 
-export default function VariableDetails() {
+export default function VariableDetails(props: JSX.IntrinsicAttributes & LayoutProps) {
   const [termId, setTermId] = useState("");
   const [showLoader, setShowLoader] = useState(false);
   const [company, setCompany] = useState("");
@@ -148,7 +148,7 @@ export default function VariableDetails() {
     setDeleteId(identifier);
   };
   return (
-    <Layout title="Variable Details" page={LayoutPages.variable_details}>
+    <Layout title="Variable Details" page={LayoutPages.variable_details} {...props}>
       <>
         {showLoader && <Loader />}
         <div className="flex justify-between gap-[20px]">

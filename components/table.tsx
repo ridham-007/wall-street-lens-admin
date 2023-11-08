@@ -7,13 +7,13 @@ export function TD(props: { children?: JSX.Element | string, style?: string, onC
   }> {props.children}</td >;
 }
 
-export function THR(props: { children?: JSX.Element | string }) {
-  return <tr className="whitespace-nowrap w-full bg-gray-100 dark:bg-gray-200 border-collapse border-gray-300 border">{props.children}</tr>;
+export function THR(props: { children?: JSX.Element | string; style?: string; }) {
+  return <tr className={`whitespace-nowrap w-full bg-gray-100 dark:bg-gray-200 border-collapse border-gray-300 border ${props.style ? props.style : " text-start"}`}>{props.children}</tr>;
 }
 
-export function TDR(props: { children?: JSX.Element | string }) {
+export function TDR(props: { children?: JSX.Element | string; style?: string; }) {
   return (
-    <tr className="bg-white odd:bg-gray-50 border-collapse border-gray-300 border hover:bg-gray-100 dark:hover:bg-gray-100">
+    <tr className={`bg-white odd:bg-gray-50 border-collapse border-gray-300 border hover:bg-gray-100 dark:hover:bg-gray-100 ${props.style ? props.style : " text-start"}`}>
       {props.children}
     </tr>
   );

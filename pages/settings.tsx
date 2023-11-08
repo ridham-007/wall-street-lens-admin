@@ -10,10 +10,10 @@ import { ToastContainer } from 'react-toastify';
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { GET_COMPANIES, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 import { useRouter } from "next/router";
-import { ImportDataProps } from "@/utils/data"
+import { ImportDataProps, LayoutProps } from "@/utils/data"
 import { SheetValue } from "@/utils/data"
 
-export default function FinancialPage() {
+export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutProps) {
     const [showLoader, setShowLoader] = useState(false);
     const [refetch, setRefetch] = useState(false);
     const [company, setCompany] = useState('');
@@ -93,7 +93,7 @@ export default function FinancialPage() {
     };
 
     return (
-        <Layout title="Settings" page={LayoutPages.settings}>
+        <Layout title="Settings" page={LayoutPages.settings} {...props}>
             <>
                 {showLoader && (<Loader />)}
                 <div className="flex pr-4 gap-4">
@@ -154,7 +154,7 @@ function ImportData(props: ImportDataProps) {
         props.onClose && props.onClose()
     };
 
-    const convertDataToArrayOfObjects = (data: string | any[], table: Boolean) => {
+    const getDataForSingleTableForAllQuarters = (data: string | any[], table: Boolean) => {
         const attributes = data[0];
         const result = [];
 
@@ -185,7 +185,7 @@ function ImportData(props: ImportDataProps) {
         return result;
     }
 
-    const getArrayofObject = async (basicDetails: { [key: string]: any }[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) => {
+    const getRowsDataforQuarterSpecificTable = async (basicDetails: { [key: string]: any }[], rows: any[][], quarterWiseTable: boolean, summaryOnly: boolean) => {
         const {
             Quarter,
             Year,
@@ -224,18 +224,6 @@ function ImportData(props: ImportDataProps) {
 
         return arrays;
     }
-
-    function formatDateAsYYYYMMDDHHMMSS(date: Date): string {
-        const year = date.getFullYear().toString();
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
-        const hour = date.getHours().toString().padStart(2, "0");
-        const minute = date.getMinutes().toString().padStart(2, "0");
-        const second = date.getSeconds().toString().padStart(2, "0");
-
-        return `${year}${month}${day}${hour}${minute}${second}`;
-    }
-
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target?.files?.[0];
@@ -284,46 +272,73 @@ function ImportData(props: ImportDataProps) {
                         header,
                         rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
                     }));
-
                     let arrayOfObjects: Array<any> = [];
                     let basicDetails: Array<any> = [];
                     let quarterWiseTable = false;
                     let summaryOnly = false;
+                    let tables = [];
                     if (filteredTableData?.length > 1) {
-                        basicDetails = convertDataToArrayOfObjects(filteredTableData[0].rows, true);
+                        basicDetails = getDataForSingleTableForAllQuarters(filteredTableData[0].rows, true);
                         quarterWiseTable = basicDetails[0]?.QuaterSpecificTable === 'Enable';
                         summaryOnly = basicDetails[0]?.SummaryOnly === 'Enable';
                         if (quarterWiseTable || summaryOnly) {
-                            arrayOfObjects = await getArrayofObject(basicDetails, filteredTableData[1].rows, quarterWiseTable, summaryOnly)
+                            let i = 0;
+                            while (i < filteredTableData.length) {
+                                basicDetails = getDataForSingleTableForAllQuarters(filteredTableData[i].rows, true);
+                                arrayOfObjects = await getRowsDataforQuarterSpecificTable(basicDetails, filteredTableData[i+1].rows, quarterWiseTable, summaryOnly);
+                                const {
+                                    Quarter,
+                                    Year,
+                                } = basicDetails[0] || {};
+                                tables.push({
+                                    basicDetails,
+                                    arrayOfObjects,
+                                    summaryOnly,
+                                    quarterWiseTable,
+                                    quarter: Quarter,
+                                    year: Year,
+                                })
+                                i = i + 2;
+                            }
                         } else {
-                            arrayOfObjects = convertDataToArrayOfObjects(filteredTableData[1].rows, false);
+                            arrayOfObjects = getDataForSingleTableForAllQuarters(filteredTableData[1].rows, false);
+                            tables.push({
+                                arrayOfObjects,
+                                summaryOnly,
+                                quarterWiseTable,
+                                basicDetails,
+                            })
                         }
                     }
-                    let prevPriority: any;
-                    let prevCategory: any;
-                    sheetsArray.push({
-                        company: company?.toString(),
-                        name: sheetName,
-                        quarterWiseTable: quarterWiseTable || summaryOnly,
-                        summaryOnly: summaryOnly,
-                        title: basicDetails[0]?.Title || '',
-                        description: basicDetails[0]?.Description,
-                        variables: quarterWiseTable || summaryOnly ? arrayOfObjects : arrayOfObjects?.map(current => {
-                            prevPriority = !current?.Priority?.toString() ? prevPriority : current?.Priority?.toString();
-                            prevCategory = !current?.Category?.toString() ? prevCategory : current?.Category?.toString();
-                            return {
-                                title: current?.Variables?.toString() || '',
-                                category: prevCategory || '',
-                                priority: prevPriority || '0',
-                                yoy: current?.YoY?.toString() || '0',
-                                quarters: current?.quarters?.map((cur: { quarter: any; year: any; value: any; }) => {
-                                    return {
-                                        quarter: Number(cur?.quarter),
-                                        year: Number(cur?.year),
-                                        value: cur?.value?.toString() || '',
-                                    }
-                                })
-                            }
+                    tables.map(current => {
+                        let prevPriority: any;
+                        let prevCategory: any;
+                        sheetsArray.push({
+                            company: company?.toString(),
+                            name: sheetName,
+                            quarterWiseTable: current?.quarterWiseTable || current?.summaryOnly,
+                            summaryOnly: current?.summaryOnly,
+                            title: current?.basicDetails[0]?.Title || '',
+                            description: current?.basicDetails[0]?.Description,
+                            quarter: Number(current?.quarter),
+                            year: Number(current?.year),
+                            variables: current?.quarterWiseTable || current?.summaryOnly ? current?.arrayOfObjects : current?.arrayOfObjects?.map(cell => {
+                                prevPriority = !cell?.Priority?.toString() ? prevPriority : cell?.Priority?.toString();
+                                prevCategory = !cell?.Category?.toString() ? prevCategory : cell?.Category?.toString();
+                                return {
+                                    title: cell?.Variables?.toString() || '',
+                                    category: prevCategory || '',
+                                    priority: prevPriority || '0',
+                                    yoy: cell?.YoY?.toString() || '0',
+                                    quarters: cell?.quarters?.map((cur: { quarter: any; year: any; value: any; }) => {
+                                        return {
+                                            quarter: Number(cur?.quarter),
+                                            year: Number(cur?.year),
+                                            value: cur?.value?.toString() || '',
+                                        }
+                                    })
+                                }
+                            })
                         })
                     })
                 }

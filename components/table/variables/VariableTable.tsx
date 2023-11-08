@@ -2,7 +2,7 @@ import { Key, useEffect, useRef, useState } from "react";
 import { TD, TDR, TH, THR } from "../../table";
 import { Modal } from "@/components/model";
 import Loader from "@/components/loader";
-import { ADD_UPDATE_VARIABLE_MAPPING, DELETE_VARIABLE_MAPPINGS_BY_COMPANY, DELETE_VERIABLE_BY_ID } from "@/utils/query";
+import { ADD_UPDATE_VARIABLE_MAPPING, DELETE_VARIABLE_MAPPINGS_BY_COMPANY } from "@/utils/query";
 import { useMutation } from "@apollo/client";
 import { AddUpdateParameterProps } from "@/utils/data"
 import { DeleteVariableProps } from "@/utils/data"

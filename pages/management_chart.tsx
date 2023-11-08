@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ParameterTable from "@/components/table/chart/ParameterTable";
 import Multiselect from "multiselect-react-dropdown";
-import { AddUpdateParameterProps } from "@/utils/data"
+import { AddUpdateParameterProps, LayoutProps } from "@/utils/data"
 import { KpiTerm } from "@/utils/data"
 import { VariablesArray } from "@/utils/data"
 import {
@@ -18,7 +18,7 @@ import {
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
 
-export default function FinancialPage() {
+export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutProps) {
     const [addUpdateParameter, setAddUpdateParameter] = useState(false);
     const [refetch, setRefetch] = useState(false);
     const [term, setTerm] = useState("");
@@ -96,7 +96,7 @@ export default function FinancialPage() {
     }, [isOpenAction]);
     const selectTerm = termsData?.getKpiTermsByCompanyId?.find((cur: any) => cur?.id === term)
     return (
-        <Layout title="Management Chart" page={LayoutPages.management_chart}>
+        <Layout title="Management Chart" page={LayoutPages.management_chart} {...props}>
             <>
                 <div className="flex justify-between pr-4 gap-4 mb-4">
                     <div className="flex items-center">

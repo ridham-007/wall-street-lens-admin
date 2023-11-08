@@ -5,9 +5,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useLazyQuery } from "@apollo/client";
 import { GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM } from "@/utils/query";
 import { useRouter } from "next/router";
+import { LayoutProps } from "@/utils/data";
 
 
-export default function Tabs() {
+export default function Tabs(props: JSX.IntrinsicAttributes & LayoutProps) {
     const [refetch, setRefetch] = useState(false);
     const [company, setCompany] = useState('');
     const [term, setTerm] = useState('');
@@ -69,7 +70,7 @@ export default function Tabs() {
     }, [termsData])
 
     return (
-        <Layout title="Tabs" page={LayoutPages.tabs}>
+        <Layout title="Tabs" page={LayoutPages.tabs} {...props}>
             <TermsTable data={termsData} company={company} setRefetch={setRefetch} />
         </Layout >
     );

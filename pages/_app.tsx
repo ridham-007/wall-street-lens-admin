@@ -5,8 +5,9 @@ import { appConfig } from "@/config/app";
 import { LoginService } from "@/utils/login";
 import { UserContext } from "@/config/auth";
 import { useEffect, useState } from "react";
+import MainWrapper from "../components/main_warpper";
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App(appProps: AppProps) {
   const [user, setUser] = useState(null);
   const [mounted] = useState(true);
 
@@ -35,12 +36,12 @@ export default function App({ Component, pageProps }: AppProps) {
   return mounted && user ? (
     <ApolloProvider client={client}>
       <UserContext.Provider value={user}>
-        <Component {...pageProps} />
+        <MainWrapper {...appProps}></MainWrapper>
       </UserContext.Provider>
     </ApolloProvider>
   ) : (
     <ApolloProvider client={client}>
-      <Component {...pageProps}></Component>
+        <MainWrapper {...appProps}></MainWrapper>
     </ApolloProvider>
   );
 }

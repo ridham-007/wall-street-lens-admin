@@ -86,6 +86,7 @@ export interface AddUpdateMasterVariableProps {
   refetch?: any;
   data?: any;
   onEdit?: boolean;
+  title?: any;
 }
 
 export interface AddRelationProps {
@@ -111,6 +112,10 @@ export interface LayoutProps {
   title?: string;
   page?: LayoutPages;
   children?: JSX.Element;
+  companies?: any;
+  subIndustries?: any;
+  company?: any;
+  setCompany?: any;
 }
 export interface ModalOnClose {
   (reason?: string): void;
@@ -192,6 +197,8 @@ export interface SheetValue {
   variables: Variable[];
   title: string;
   description: string;
+  quarter: number;
+  year: number;
 }
 
 

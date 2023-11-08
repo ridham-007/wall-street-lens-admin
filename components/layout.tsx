@@ -44,32 +44,13 @@ const CHANGE_PASSWORD = gql`
 
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
-  const [showLoader, setShowLoader] = useState(false);
-
-  const [getCompanies, { data: companies }] = useLazyQuery(GET_COMPANIES, {
-    fetchPolicy: "network-only",
-  });
-
-  const [getSubIndustries, { data: subIndustries }] = useLazyQuery(
-    GET_SUB_INDUSTRIES,
-    {
-      fetchPolicy: "network-only",
-    }
-  );
 
   const [isOpenAction, setIsOpenAction] = useState(false);
   const [isChangePassword, setIsChangePassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [reEnterPassword, setReEnterPassword] = useState("");
   const ref = useRef<HTMLInputElement | null>(null);
-  const [company, setCompany] = useState(0);
   const router = useRouter();
-
-  useEffect(() => {
-    setShowLoader(true);
-    getCompanies();
-    getSubIndustries();
-  }, []);
 
   const [updatePassword, { data }] = useMutation(CHANGE_PASSWORD, {
     variables: {
@@ -117,11 +98,6 @@ export default function Layout(props: LayoutProps) {
     }
   });
 
-  useEffect(() => {
-    setShowLoader(false);
-    setCompany(companies?.getCompanies[0]?.id);
-  }, [companies]);
-
   const logout = () => {
     LoginService.deleteToken();
     LoginService.deleteUser();
@@ -151,15 +127,15 @@ export default function Layout(props: LayoutProps) {
   };
 
   useEffect(() => {
-    router.push(`${router.pathname}?company=${company}`);
-  }, [company]);
+    router.push(`${router.pathname}?company=${props.company}`);
+  }, [props.company]);
 
   const handleOnChange = (event: {
     target: { value: SetStateAction<string>; name: string };
   }) => {
     switch (event.target.name) {
       case 'company':
-        setCompany(Number(event.target.value));
+        props.setCompany(Number(event.target.value));
         break;
     }
   };
@@ -167,14 +143,14 @@ export default function Layout(props: LayoutProps) {
   let selectedSubIndustry;
 
   if (
-    companies?.getCompanies?.length &&
-    subIndustries?.getSubIndustries?.length
+    props.companies?.getCompanies?.length &&
+    props.subIndustries?.getSubIndustries?.length
   ) {
-    const selectedCompany = companies?.getCompanies?.find(
-      (cur: { id: number }) => cur.id === company
+    const selectedCompany = props.companies?.getCompanies?.find(
+      (cur: { id: number }) => cur.id === props.company
     );
     const subId = selectedCompany?.attributes?.subIndustries[0]?.id;
-    selectedSubIndustry = subIndustries?.getSubIndustries?.find(
+    selectedSubIndustry = props.subIndustries?.getSubIndustries?.find(
       (cur: { id: any }) => cur.id === subId
     );
   }
@@ -184,7 +160,6 @@ export default function Layout(props: LayoutProps) {
 
   return (
     <>
-      {showLoader && <Loader />}
       <Head>
         {props.title ? (
           <title>{`${props.title} | Admin | Wall Street Lens`}</title>
@@ -215,12 +190,12 @@ export default function Layout(props: LayoutProps) {
                 id="quarter"
                 name="company"
                 className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                value={company}
+                value={props.company}
                 onChange={handleOnChange}
               >
                 <option value="">Select a option</option>
                 {
-                  companies?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
+                  props.companies?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
                     return <option key={ele?.id?.toString()} value={ele?.id?.toString()}>{ele.attributes.name}</option>;
                   })
                 }
@@ -342,7 +317,7 @@ export default function Layout(props: LayoutProps) {
         <div className="flex flex-row overflow-auto" style={{ height: "90%" }}>
           <div className="w-1/6  border-r border-gray-200 pb-5 min-w-[185px]" >
             <div className="flex-1 py-4 space-y-1  divide-y divide-gray-200 dark:divide-gray-700">
-              <Link href={`/variables?company=${company}`}>
+              <Link href={`/variables?company=${props.company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.variables
                     ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
@@ -365,7 +340,7 @@ export default function Layout(props: LayoutProps) {
                   Variables
                 </button>
               </Link>
-              <Link href={`/tabs?company=${company}`}>
+              <Link href={`/tabs?company=${props.company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.tabs
                     ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
@@ -387,7 +362,7 @@ export default function Layout(props: LayoutProps) {
                   Tabs
                 </button>
               </Link>
-              <Link href={`/variable_details?company=${company}`}>
+              <Link href={`/variable_details?company=${props.company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.variable_details
                     ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
@@ -411,7 +386,7 @@ export default function Layout(props: LayoutProps) {
                   Tab Quarters
                 </button>
               </Link>
-              <Link href={`/management_chart?company=${company}`}>
+              <Link href={`/management_chart?company=${props.company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.management_chart
                     ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
@@ -435,7 +410,7 @@ export default function Layout(props: LayoutProps) {
                   Charts
                 </button>
               </Link>
-              <Link href={`/settings?company=${company}`}>
+              <Link href={`/settings?company=${props.company}`}>
                 <button
                   className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.settings
                     ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"

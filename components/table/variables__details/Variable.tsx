@@ -178,8 +178,9 @@ export default function Variable({
 			<div
 				style={{
 					maxHeight: "calc(100vh - 200px)",
+					maxWidth: '100%'
 				}}
-				className="w-[calc((w-screen)- (w-1/5)) overflow-scroll"
+				className="overflow-auto"
 			>
 				{selectedTerm?.quarterWiseTable && termView && (
 					<button
@@ -211,12 +212,14 @@ export default function Variable({
 					</button>
 				)}
 				{!selectedTerm?.summaryOnly && (
-					<table className="app-table w-full">
+					<table className="w-full relative">
 						<thead className="w-full sticky top-0 z-20">
 							<THR>
 								<>
 									{!selectedTerm?.quarterWiseTable ? (
-										<TH>Tab Variable</TH>
+										<TH
+											style="sticky left-0 w-[200px]"
+										>Tab Variable</TH>
 									) : (
 										<TH>Year</TH>
 									)}
@@ -273,13 +276,13 @@ export default function Variable({
 									<TDR key={index}>
 										<>
 											{!selectedTerm?.quarterWiseTable ? (
-												<TD style="cursor-pointer"
+												<TD
+													style={`cursor-pointer sticky left-0 w-[200px] ${index % 2 === 0 ? 'bg-[#f9fafb]' : 'bg-[#ffffff]'} mr-1`}
 													onClick={() => {
 														setShowColor(true);
 														setCellData({ title: current.title, id: current.cells[0].variableId??"", highlightColor:current.highlightColor })
-													}}>
-													{current.title ?? ""}
-												</TD>
+													}}
+												>{current.title ?? ""}</TD>
 											) : (
 												<TD>{year}</TD>
 											)}
