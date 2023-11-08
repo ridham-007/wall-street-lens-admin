@@ -141,7 +141,7 @@ export default function Variable({
 		setShowDelete(true);
 		setDeleteId(identifier);
 	};
-	console.log(cellData, "sssssssss")
+
 	const handleShowEdit = (current: any) => {
 		const nameParts = current.name?.split("-"); // Splitting the name into parts
 
