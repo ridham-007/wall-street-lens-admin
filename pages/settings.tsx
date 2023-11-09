@@ -143,12 +143,16 @@ function ImportData(props: ImportDataProps) {
     const [sheetsData, setSheetsData] = useState<SheetValue[]>([]);
     const [company, setCompany] = useState('')
     const [selectedFileName, setSelectedFileName] = useState('');
+    const [error, setError] = useState(false)
 
     const regex = new RegExp('Q[1-4]{1}-[0-9]{4}$');
     const handleOnSave = () => {
+
         if (!sheetsData.length) {
-            toast('Data is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+            toast('Data is required', { hideProgressBar: false, autoClose: false, type: 'error' });
             return;
+        }else{
+            toast('Data Sent', { hideProgressBar: false, autoClose: 7000, type: 'success' });            
         }
         props.onSuccess && props.onSuccess(sheetsData)
         props.onClose && props.onClose()
@@ -239,7 +243,7 @@ function ImportData(props: ImportDataProps) {
                 const arrayBuffer = e.target?.result as ArrayBuffer;
                 const workbook = XLSX.read(arrayBuffer, { type: 'array', raw: false });
                 const sheetsArray: SheetValue[] = [];
-                for (const sheetName of workbook.SheetNames) {
+                for (const sheetName of workbook.SheetNames) {                    
                     const worksheet = workbook.Sheets[sheetName];
                     const parsedData: Array<any> = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
                     let tableData: { tableName: string, header: string[], rows: any[][] }[] = [];
@@ -263,15 +267,36 @@ function ImportData(props: ImportDataProps) {
                             currentTable.push(sanitizedRow);
                         }
                     }
-                    if (currentTable) {
+                    if (currentTable) {                        
                         tableData.push({ tableName, header: header!, rows: currentTable });
                     }
+                    
 
                     const filteredTableData = tableData.map(({ tableName, header, rows }) => ({
                         tableName,
                         header,
-                        rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
-                    }));
+                        rows: rows.filter(row => row.some(cell => cell !== null && cell !== '',
+                        )),
+                    }));                    
+                    if(filteredTableData[0].rows[1][0] === "Disable"){
+                        const Msg = (toastProps:any ) => (
+                            <div>
+                              <p><b>Sheet Name : </b>{`${toastProps.sheetName}`}</p>
+                              <p><b>Name error in : </b>{`${toastProps.value}`} column, Change it</p>
+                            </div>
+                          )
+                        
+                        const array = ["Category","Priority","Variables","YoY"];
+                        {
+                            filteredTableData[1].rows[0].map((value) => {
+                                if(!(array.includes(value) || regex.test(value))){
+                                    setError(true);                         
+                                    return toast(<Msg sheetName={sheetName} value={value} /> ,{ hideProgressBar: true, autoClose:false, type: 'error' });
+                                }
+                            })
+                        }
+                    }
+                
                     let arrayOfObjects: Array<any> = [];
                     let basicDetails: Array<any> = [];
                     let quarterWiseTable = false;
@@ -355,6 +380,7 @@ function ImportData(props: ImportDataProps) {
             handleOnSave={handleOnSave}
             title="Import Data from Excel sheet"
             onClose={() => props.onClose && props.onClose()}
+            disabled={error}
         >
             <>
                 <form className="form">
@@ -401,9 +427,10 @@ function ImportData(props: ImportDataProps) {
                             />
                             <span> {selectedFileName}</span>
                         </div>
+                        
                     </div>
                 </form>
-                <ToastContainer />
+            <ToastContainer />
             </>
         </Modal>
     );

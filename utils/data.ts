@@ -129,6 +129,7 @@ export interface Props {
   confirmButton?: string;
   showNote?: boolean;
   message?: any;
+  disabled?:boolean;
 }
 export interface TableProps {
   data?: any;
