@@ -289,7 +289,7 @@ export default function Variable({
 										<>
 											{!selectedTerm?.quarterWiseTable ? (
 												<TD
-													style={`cursor-pointer sticky left-0 w-[200px] ${index % 2 === 0 ? 'bg-[#f9fafb]' : 'bg-[#ffffff]'} mr-1`}
+													style={`cursor-pointer sticky left-0 w-[200px] ${index % 2 === 0 ? 'bg-[#f9fafb]' : 'bg-[#ffffff]'} mr-1 ${getFontWeightText(current.fontWeight)}`}
 													onClick={() => {
 														setShowBolder(true);
 														setCellData({ title: current.title, id: current.cells[0].variableId??"", fontWeight:current.fontWeight })
