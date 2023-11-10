@@ -10,7 +10,7 @@ import {
 	UPDATE_MAPPED_VALUE,
 } from "@/utils/query";
 import SummaryView from "./SummaryView";
-import { AddUpdateParameterProps, AddUpdateFontWeightParameterProps } from "@/utils/data";
+import { AddUpdateParameterProps, AddUpdateFontWeightParameterProps, Cell } from "@/utils/data";
 import { TraverseMap } from "@/utils/data";
 
 import { TableProps, TableView, Row, Header } from "@/utils/data"
@@ -172,6 +172,18 @@ export default function Variable({
 		}
 	};
 
+	const getFontWeightText = (fontWeight: string = "") => {
+		if (!!fontWeight) {
+		  if (fontWeight == "bold") {
+			return `font-extrabold`;
+		  } else if (fontWeight == "semibold") {
+			return `font-bold`;
+		  } else {
+			return "";
+		  }
+		}
+	};
+
 	return (
 		<>
 			{showLoader && <Loader />}
@@ -292,8 +304,12 @@ export default function Variable({
 												const selectedColumn = headers[index];
 												return (
 													<TD
-														style={`cursor-pointer ${fetchColor(
+														style={`cursor-pointer 
+														${fetchColor(
 															cur.highlightColor || ''
+														)}
+														${getFontWeightText(
+															current.fontWeight || ''
 														)}`}
 														onClick={() => {
 															setShow(true);
