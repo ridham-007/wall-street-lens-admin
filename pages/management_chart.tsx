@@ -3,6 +3,7 @@ import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { useMutation, useLazyQuery } from "@apollo/client";
 import { toast } from "react-toastify";
+import Loader from "@/components/loader";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ParameterTable from "@/components/table/chart/ParameterTable";
@@ -21,6 +22,7 @@ import { useRouter } from "next/router";
 export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutProps) {
     const [addUpdateParameter, setAddUpdateParameter] = useState(false);
     const [refetch, setRefetch] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
     const [term, setTerm] = useState("");
     const [isOpenAction, setIsOpenAction] = useState("");
     const [company, setCompany] = useState("");
@@ -66,12 +68,14 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
         } else {
             setTerm("");
         }
+        setShowLoader(false)
     }, [termsData]);
 
     useEffect(() => {
         if (!!company?.length) {
             getTermsDetails();
         }
+        setShowLoader(true)
     }, [company]);
 
     const ref = useRef<HTMLInputElement | null>(null);
@@ -98,6 +102,7 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
     return (
         <Layout title="Management Chart" page={LayoutPages.management_chart} {...props}>
             <>
+                {showLoader && (<Loader />)}
                 <div className="flex justify-between pr-4 gap-4 mb-4">
                     <div className="flex items-center">
                         <label
@@ -221,6 +226,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
     useEffect(() => {
         getVariables();
+
     }, [val.term]);
 
 
@@ -296,7 +302,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
         // Iterate over the original data and group options by the "title" field
         originalData.forEach((item: VariablesArray) => {
-            const { masterVariable: {title} = {}, id } = item;
+            const { masterVariable: { title } = {}, id } = item;
 
             if (title) {
                 if (!groupedOptions[title]) {

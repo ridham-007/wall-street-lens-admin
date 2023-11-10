@@ -65,16 +65,19 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
     useEffect(() => {
         if (!!company?.length) {
             getTermsDetails();
+            setShowLoader(true)
         }
     }, [company])
 
     useEffect(() => {
+
         if (termsData?.getKpiTermsByCompanyId?.length) {
             setTerm(termsData?.getKpiTermsByCompanyId[0]?.id)
         } else {
             setTerm('');
         }
         getVariables();
+        setShowLoader(false)
     }, [termsData])
 
     const onAddUpdateParameter = async (sheetsData: any) => {
@@ -285,7 +288,7 @@ function ImportData(props: ImportDataProps) {
                             let i = 0;
                             while (i < filteredTableData.length) {
                                 basicDetails = getDataForSingleTableForAllQuarters(filteredTableData[i].rows, true);
-                                arrayOfObjects = await getRowsDataforQuarterSpecificTable(basicDetails, filteredTableData[i+1].rows, quarterWiseTable, summaryOnly);
+                                arrayOfObjects = await getRowsDataforQuarterSpecificTable(basicDetails, filteredTableData[i + 1].rows, quarterWiseTable, summaryOnly);
                                 const {
                                     Quarter,
                                     Year,
@@ -370,6 +373,7 @@ function ImportData(props: ImportDataProps) {
                                 }}
                             >
                                 <option value="">Select a option</option>
+                                <option value="TESLA">TESLA</option>
 
                                 {companies?.data?.getCompanies.map(
                                     (ele: {

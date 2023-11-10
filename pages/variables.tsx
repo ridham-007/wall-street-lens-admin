@@ -54,18 +54,9 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
     fetchPolicy: "network-only",
   });
 
-  const [getSubIndustries, { data: subIndustries }] = useLazyQuery(
-    GET_SUB_INDUSTRIES,
-    {
-      fetchPolicy: "network-only",
-    }
-  );
-
-  useEffect(() => {
-    getCompanies();
-    getIndustries();
-    getSubIndustries();
-  }, []);
+  const [getSubIndustries, { data: subIndustries }] = useLazyQuery(GET_SUB_INDUSTRIES, {
+    fetchPolicy: "network-only",
+  });
 
   const [addUpdateMasterVariable] = useMutation(ADD_UPDATE_MASTER_VERIABLE);
   const [addUpdateVariableMapping] = useMutation(ADD_UPDATE_VARIABLE_MAPPING);
@@ -92,6 +83,7 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
       };
     }).filter((item: { mapping: string | any[]; showFilter: boolean }) => item.showFilter);
     setFilterData(filteredData);
+    setShowLoader(false);
   }, [company, industry, subIndustry, masterVariables])
 
   const onAddUpdateMasterVariable = async (perameters: any) => {
@@ -136,7 +128,10 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
   }, []);
 
   useEffect(() => {
-    getVariablesMapping();
+    if (!!company?.length) {
+      getVariablesMapping();
+      setShowLoader(true);
+    }
   }, []);
 
   const getContent = (data: any) => {
@@ -421,7 +416,7 @@ function AddRelation(props: AddRelationProps) {
       onClose={() => props.onClose && props.onClose()}
     >
       <>
-        <ToastContainer/>
+        <ToastContainer />
         <form className="form w-100">
           <div className="grid grid-cols-1 gap-4">
             <div className="flex flex-col">
