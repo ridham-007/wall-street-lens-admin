@@ -10,7 +10,7 @@ import {
 	UPDATE_MAPPED_VALUE,
 } from "@/utils/query";
 import SummaryView from "./SummaryView";
-import { AddUpdateParameterProps, AddUpdateColorParameterProps } from "@/utils/data";
+import { AddUpdateParameterProps, AddUpdateFontWeightParameterProps } from "@/utils/data";
 import { TraverseMap } from "@/utils/data";
 
 import { TableProps, TableView, Row, Header } from "@/utils/data"
@@ -70,7 +70,7 @@ export default function Variable({
 	}, [year, quarter, refetch]);
 
 	const [show, setShow] = useState(false);
-	const [showColor, setShowColor] = useState(false);
+	const [showBolder, setShowBolder] = useState(false);
 	const [cellData, setCellData] = useState<TraverseMap>();
 
 
@@ -98,7 +98,7 @@ export default function Variable({
 		});
 		setShowLoader(false);
 		setShow(false);
-		setShowColor(false)
+		setShowBolder(false)
 		refetchTermView();
 	};
 
@@ -128,7 +128,7 @@ export default function Variable({
 			},
 		});
 		setShow(false);
-		setShowColor(false)
+		setShowBolder(false)
 		refetchTermView();
 	};
 
@@ -279,8 +279,8 @@ export default function Variable({
 												<TD
 													style={`cursor-pointer sticky left-0 w-[200px] ${index % 2 === 0 ? 'bg-[#f9fafb]' : 'bg-[#ffffff]'} mr-1`}
 													onClick={() => {
-														setShowColor(true);
-														setCellData({ title: current.title, id: current.cells[0].variableId??"", highlightColor:current.highlightColor })
+														setShowBolder(true);
+														setCellData({ title: current.title, id: current.cells[0].variableId??"", fontWeight:current.fontWeight })
 													}}
 												>{current.title ?? ""}</TD>
 											) : (
@@ -398,9 +398,9 @@ export default function Variable({
 						selectedTerm={selectedTerm}
 					/>
 				)}
-				{showColor && (
-					<AddUpdateColorParaMeter
-						onClose={() => { setShowColor(false); setCellData({}); }}
+				{showBolder && (
+					<AddUpdateFontWeightParaMeter
+						onClose={() => { setShowBolder(false); setCellData({}); }}
 						onSave={() => refetchTermView()}
 						cellData={cellData}
 					/>
@@ -550,11 +550,11 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 	);
 }
 
-function AddUpdateColorParaMeter(props: AddUpdateColorParameterProps) {
+function AddUpdateFontWeightParaMeter(props: AddUpdateFontWeightParameterProps) {
 
 	const { id } = props.cellData;	
 	const [addOrUpdateVariable] = useMutation(ADD_UPDATE_TERM_VERIABLE);
-	const [selectedOption, setSelectedOption] = useState(props.cellData?.highlightColor);
+	const [selectedOption, setSelectedOption] = useState(props.cellData?.fontWeight);
 
 	const handleOnSave = async () => {
 		try{
@@ -562,7 +562,7 @@ function AddUpdateColorParaMeter(props: AddUpdateColorParameterProps) {
 				await addOrUpdateVariable({
 					variables:{
 						variableInfo:{
-							highlightColor:selectedOption,
+							fontWeight:selectedOption,
 							id:id
 						},
 					}
@@ -601,35 +601,35 @@ function AddUpdateColorParaMeter(props: AddUpdateColorParameterProps) {
 								<input
 									type="radio"
 									name="options"
-									value="red"
-									checked={selectedOption === "red"}
-									onChange={() => { setSelectedOption('red') }}
+									value="bold"
+									checked={selectedOption === "bold"}
+									onChange={() => { setSelectedOption('bold') }}
 									className="m-1"
 								/>
-								Red
+								bold
 							</label>
 
 							<label className="mr-3">
 								<input
 									type="radio"
 									name="options"
-									value="green"
-									checked={selectedOption === "green"}
-									onChange={() => { setSelectedOption('green') }}
+									value="semibold"
+									checked={selectedOption === "semibold"}
+									onChange={() => { setSelectedOption('semibold') }}
 									className="m-1"
 								/>
-								Green
+								semibold
 							</label>
 							<label>
 								<input
 									type="radio"
 									name="options"
-									value="green"
-									checked={selectedOption === "none"}
-									onChange={() => { setSelectedOption('none') }}
+									value="normal"
+									checked={selectedOption === "normal"}
+									onChange={() => { setSelectedOption('normal') }}
 									className="m-1"
 								/>
-								None
+								None	
 							</label>
 						</div></div>)}
 

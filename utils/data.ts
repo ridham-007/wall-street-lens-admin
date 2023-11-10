@@ -60,7 +60,7 @@ export interface AddUpdateParameterProps {
   onEdit?: boolean;
 }
 
-export interface AddUpdateColorParameterProps {
+export interface AddUpdateFontWeightParameterProps {
   onSuccess?: any;
   onClose?: any;
   data?: any;
@@ -174,6 +174,7 @@ export interface Row {
   title: string;
   cells: Cell[];
   highlightColor: string;
+  fontWeight:string;
 }
 export interface Cell {
   id: string;
@@ -229,6 +230,7 @@ export interface TraverseMap {
   variableId?: string;
   columnIndex?: number;
   highlightColor?: string;
+  fontWeight?: string;
 }
 export interface DeleteVariableProps {
   onSuccess?: any;
