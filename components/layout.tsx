@@ -30,6 +30,7 @@ export enum LayoutPages {
   "vihicle_capacity" = "vihicle_capacity",
   "outlook" = "outlook",
   "settings" = "settings",
+  "seo_settings" = "seo_settings",
   "variable_details" = "variable_details",
   "management_chart" = "management_chart",
   "variables" = "variables",
@@ -135,7 +136,7 @@ export default function Layout(props: LayoutProps) {
   }) => {
     switch (event.target.name) {
       case 'company':
-        props.setCompany(Number(event.target.value));
+        props.setCompany(event.target.value);
         break;
     }
   };
@@ -184,7 +185,7 @@ export default function Layout(props: LayoutProps) {
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Wall Street Lens
           </h1>
-         {props?.page !== LayoutPages.variables &&( <div className="mr-auto flex gap-[15px]">
+          {props?.page !== LayoutPages.variables && (<div className="mr-auto flex gap-[15px]">
             <div className="flex gap-[20px] mr-[10px] items-center">
               <select
                 id="quarter"
@@ -194,6 +195,7 @@ export default function Layout(props: LayoutProps) {
                 onChange={handleOnChange}
               >
                 <option value="">Select a option</option>
+                <option value="TESLA">TESLA</option>
                 {
                   props.companies?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
                     return <option key={ele?.id?.toString()} value={ele?.id?.toString()}>{ele.attributes.name}</option>;
@@ -325,7 +327,7 @@ export default function Layout(props: LayoutProps) {
                     }`}
                 >
                   <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                     className="mr-4 w-6 min-w-[22px] h-6"
+                    className="mr-4 w-6 min-w-[22px] h-6"
                     width="25.000000pt" height="25.000000pt" viewBox="0 0 64.000000 64.000000"
                     preserveAspectRatio="xMidYMid meet">
 
@@ -432,6 +434,30 @@ export default function Layout(props: LayoutProps) {
                     />
                   </svg>
                   Settings
+                </button>
+              </Link>
+              <Link href={`/seo_settings?company=${props.company}`}>
+                <button
+                  className={`text-lg flex items-center text-left px-4 py-4 hover:bg-blue-400 active:bg-blue-600  w-full font-medium ${props?.page === LayoutPages.seo_settings
+                    ? "bg-blue-600 border-l-4 border-2-l border-emerald-500 text-white"
+                    : "bg-slate-50 text-black"
+                    }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="mr-4 w-6 min-w-[22px] h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l1.41-.513M5.106 17.785l1.15-.964m11.49-9.642l1.149-.964M7.501 19.795l.75-1.3m7.5-12.99l.75-1.3m-6.063 16.658l.26-1.477m2.605-14.772l.26-1.477m0 17.726l-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205L12 12m6.894 5.785l-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864l-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495"
+                    />
+                  </svg>
+                  SEO Settings
                 </button>
               </Link>
             </div>

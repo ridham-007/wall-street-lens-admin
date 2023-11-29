@@ -15,10 +15,17 @@ export interface QuarterDataProps {
   onClose?: any;
   data?: any;
 }
+
+export interface AddMetaProps {
+  onSuccess?: any;
+  onClose?: any;
+  data?: any;
+}
 export interface DeleteVariableProps {
   onSuccess?: any;
   onClose?: any;
   id?: any;
+  selectTerm?: any;
 }
 export interface EditQuarterProps {
   onClose?: any;
