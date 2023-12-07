@@ -135,7 +135,7 @@ export default function Layout(props: LayoutProps) {
   }) => {
     switch (event.target.name) {
       case 'company':
-        props.setCompany(Number(event.target.value));
+        props.setCompany(event.target.value);
         break;
     }
   };
@@ -184,7 +184,7 @@ export default function Layout(props: LayoutProps) {
           <h1 className="text-3xl text-center font-normal p-2">
             Greetings | Wall Street Lens
           </h1>
-         {props?.page !== LayoutPages.variables &&( <div className="mr-auto flex gap-[15px]">
+          {props?.page !== LayoutPages.variables && (<div className="mr-auto flex gap-[15px]">
             <div className="flex gap-[20px] mr-[10px] items-center">
               <select
                 id="quarter"
@@ -194,8 +194,9 @@ export default function Layout(props: LayoutProps) {
                 onChange={handleOnChange}
               >
                 <option value="">Select a option</option>
+                <option value="TESLA">Tesla</option>
                 {
-                  props.companies?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
+                  [{ id: 1, attributes: { slug: "TESLA", name: "TESLA" } }].map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
                     return <option key={ele?.id?.toString()} value={ele?.id?.toString()}>{ele.attributes.name}</option>;
                   })
                 }
@@ -325,7 +326,7 @@ export default function Layout(props: LayoutProps) {
                     }`}
                 >
                   <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                     className="mr-4 w-6 min-w-[22px] h-6"
+                    className="mr-4 w-6 min-w-[22px] h-6"
                     width="25.000000pt" height="25.000000pt" viewBox="0 0 64.000000 64.000000"
                     preserveAspectRatio="xMidYMid meet">
 

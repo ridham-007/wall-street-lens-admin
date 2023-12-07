@@ -43,7 +43,7 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
         {
             variables: {
                 termId: term || '',
-            },
+            }
         }
     );
 
@@ -74,8 +74,14 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
         } else {
             setTerm('');
         }
-        getVariables();
+        // getVariables();
     }, [termsData])
+
+    useEffect(() => {
+        if (term?.length > 0) {
+            getVariables();
+        }
+    }, [term])
 
     const onAddUpdateParameter = async (sheetsData: any) => {
         setShowLoader(true);
@@ -151,8 +157,8 @@ function ImportData(props: ImportDataProps) {
         if (!sheetsData.length) {
             toast('Data is required', { hideProgressBar: false, autoClose: false, type: 'error' });
             return;
-        }else{
-            toast('Data Sent', { hideProgressBar: false, autoClose: 7000, type: 'success' });            
+        } else {
+            toast('Data Sent', { hideProgressBar: false, autoClose: 7000, type: 'success' });
         }
         props.onSuccess && props.onSuccess(sheetsData)
         props.onClose && props.onClose()
@@ -243,7 +249,7 @@ function ImportData(props: ImportDataProps) {
                 const arrayBuffer = e.target?.result as ArrayBuffer;
                 const workbook = XLSX.read(arrayBuffer, { type: 'array', raw: false });
                 const sheetsArray: SheetValue[] = [];
-                for (const sheetName of workbook.SheetNames) {                    
+                for (const sheetName of workbook.SheetNames) {
                     const worksheet = workbook.Sheets[sheetName];
                     const parsedData: Array<any> = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
                     let tableData: { tableName: string, header: string[], rows: any[][] }[] = [];
@@ -267,36 +273,37 @@ function ImportData(props: ImportDataProps) {
                             currentTable.push(sanitizedRow);
                         }
                     }
-                    if (currentTable) {                        
+                    if (currentTable) {
                         tableData.push({ tableName, header: header!, rows: currentTable });
                     }
-                    
+
 
                     const filteredTableData = tableData.map(({ tableName, header, rows }) => ({
                         tableName,
                         header,
                         rows: rows.filter(row => row.some(cell => cell !== null && cell !== '',
                         )),
-                    }));                    
-                    if(filteredTableData[0].rows[1][0] === "Disable"){
-                        const Msg = (toastProps:any ) => (
+                    }));
+                    if (filteredTableData[0].rows[1][0] === "Disable") {
+                        const Msg = (toastProps: any) => (
                             <div>
-                              <p><b>Sheet Name : </b>{`${toastProps.sheetName}`}</p>
-                              <p><b>Name error in : </b>{`${toastProps.value}`} column, Change it</p>
+                                <p><b>Sheet Name : </b>{`${toastProps.sheetName}`}</p>
+                                <p><b>Name error in : </b>{`${toastProps.value}`} column, Change it</p>
                             </div>
-                          )
-                        
-                        const array = ["Category","Priority","Variables","YoY"];
+                        )
+
+                        const array = ["Category", "Priority", "Variables", "YoY"];
                         {
+
                             filteredTableData[1].rows[0].map((value) => {
-                                if(!(array.includes(value) || regex.test(value))){
-                                    setError(true);                         
-                                    return toast(<Msg sheetName={sheetName} value={value} /> ,{ hideProgressBar: true, autoClose:false, type: 'error' });
+                                if (!(array.includes(value) || regex.test(value))) {
+                                    setError(true);
+                                    return toast(<Msg sheetName={sheetName} value={value} />, { hideProgressBar: true, autoClose: false, type: 'error' });
                                 }
                             })
                         }
                     }
-                
+
                     let arrayOfObjects: Array<any> = [];
                     let basicDetails: Array<any> = [];
                     let quarterWiseTable = false;
@@ -310,7 +317,7 @@ function ImportData(props: ImportDataProps) {
                             let i = 0;
                             while (i < filteredTableData.length) {
                                 basicDetails = getDataForSingleTableForAllQuarters(filteredTableData[i].rows, true);
-                                arrayOfObjects = await getRowsDataforQuarterSpecificTable(basicDetails, filteredTableData[i+1].rows, quarterWiseTable, summaryOnly);
+                                arrayOfObjects = await getRowsDataforQuarterSpecificTable(basicDetails, filteredTableData[i + 1].rows, quarterWiseTable, summaryOnly);
                                 const {
                                     Quarter,
                                     Year,
@@ -396,8 +403,9 @@ function ImportData(props: ImportDataProps) {
                                 }}
                             >
                                 <option value="">Select a option</option>
+                                <option value="TESLA">Tesla</option>
 
-                                {companies?.data?.getCompanies.map(
+                                {[{ id: 1, attributes: { slug: "TESLA", name: "TESLA" } }].map(
                                     (ele: {
                                         id: readonly string[] | Key | null | undefined;
                                         attributes: {
@@ -427,10 +435,10 @@ function ImportData(props: ImportDataProps) {
                             />
                             <span> {selectedFileName}</span>
                         </div>
-                        
+
                     </div>
                 </form>
-            <ToastContainer />
+                <ToastContainer />
             </>
         </Modal>
     );

@@ -57,14 +57,19 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
     }, [refetch]);
 
     useEffect(() => {
-        getChartDetails();
+        if (term.length > 0) {
+            getChartDetails();
+        }
+        // if (!!term) {
+        //     getChartDetails({ variables: { termId: { termId: term } } });
+        // }
     }, [term]);
 
     useEffect(() => {
         if (termsData?.getKpiTermsByCompanyId.length) {
             setTerm(termsData?.getKpiTermsByCompanyId[0]?.id);
         } else {
-            setTerm("");
+            setTerm('');
         }
     }, [termsData]);
 
@@ -296,7 +301,7 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 
         // Iterate over the original data and group options by the "title" field
         originalData.forEach((item: VariablesArray) => {
-            const { masterVariable: {title} = {}, id } = item;
+            const { masterVariable: { title } = {}, id } = item;
 
             if (title) {
                 if (!groupedOptions[title]) {

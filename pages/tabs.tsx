@@ -66,8 +66,14 @@ export default function Tabs(props: JSX.IntrinsicAttributes & LayoutProps) {
         } else {
             setTerm('');
         }
-        getVariables();
+        // getVariables();
     }, [termsData])
+
+    useEffect(() => {
+        if (term.length > 0) {
+            getVariables();
+        }
+    }, [term])
 
     return (
         <Layout title="Tabs" page={LayoutPages.tabs} {...props}>
