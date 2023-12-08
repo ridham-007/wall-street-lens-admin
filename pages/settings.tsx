@@ -444,7 +444,7 @@ function ImportData(props: ImportDataProps) {
                                 >
                                     <option value="">Select a option</option>
 
-                                    {[{ id: 1, attributes: { slug: "TESLA", name: "TESLA" } }].map(
+                                    {companies?.data?.getCompanies.map(
                                         (ele: {
                                             id: readonly string[] | Key | null | undefined;
                                             attributes: {
