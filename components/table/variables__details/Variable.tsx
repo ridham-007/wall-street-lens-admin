@@ -164,23 +164,23 @@ export default function Variable({
 
 	const fetchColor = (color: any) => {
 		if (color === "red") {
-			return " bg-red-200 text-red-600";
+			return " !bg-red-200 text-red-600";
 		} else if (color === "green") {
-			return " bg-green-200 text-green-600";
+			return " !bg-green-200 text-green-600";
 		} else {
-			return " bg-transparent";
+			return "bg-transparent";
 		}
 	};
 
 	const getFontWeightText = (fontWeight: string = "") => {
 		if (!!fontWeight) {
-		  if (fontWeight == "bold") {
-			return `font-extrabold`;
-		  } else if (fontWeight == "semibold") {
-			return `font-bold`;
-		  } else {
-			return "";
-		  }
+			if (fontWeight == "bold") {
+				return `font-extrabold`;
+			} else if (fontWeight == "semibold") {
+				return `font-bold`;
+			} else {
+				return "";
+			}
 		}
 	};
 
@@ -279,11 +279,16 @@ export default function Variable({
 											</TH>
 										);
 									})}
+									{!selectedTerm?.quarterWiseTable && <TH key={"YoY_QuarterWise_Table"}>
+										<div className="flex">
+											YoY
+										</div>
+									</TH>}
 								</>
 							</THR>
 						</thead>
 						<tbody className="w-full">
-							{rows.map((current, index) => {								
+							{rows.map((current, index) => {
 								return (
 									<TDR key={index}>
 										<>
@@ -292,7 +297,7 @@ export default function Variable({
 													style={`cursor-pointer sticky left-0 w-[200px] ${index % 2 === 0 ? 'bg-[#f9fafb]' : 'bg-[#ffffff]'} mr-1 ${getFontWeightText(current.fontWeight)}`}
 													onClick={() => {
 														setShowBolder(true);
-														setCellData({ title: current.title, id: current.cells[0].variableId??"", fontWeight:current.fontWeight })
+														setCellData({ title: current.title, id: current.cells[0].variableId ?? "", fontWeight: current.fontWeight })
 													}}
 												>{current.title ?? ""}</TD>
 											) : (
@@ -363,6 +368,21 @@ export default function Variable({
 													</TD>
 												);
 											})}
+											{!selectedTerm?.quarterWiseTable && (
+												<TD
+													style={`cursor-pointer sticky left-0 w-[200px] ${index % 2 === 0 ? 'bg-[#f9fafb]' : 'bg-[#ffffff]'} mr-1 ${getFontWeightText(current.fontWeight)} ${fetchColor(current.highlightColor || '')}`}
+													onClick={() => {
+														setShowBolder(true);
+														setCellData({
+															title: current.title,
+															value: current.yoy,
+															id: current.cells[0].variableId ?? "",
+															fontWeight: current.fontWeight,
+															isUpdatingYoy: true
+														})
+													}}
+												>{current.yoy ?? ""}</TD>
+											)}
 										</>
 									</TDR>
 								);
@@ -567,27 +587,35 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 }
 
 function AddUpdateFontWeightParaMeter(props: AddUpdateFontWeightParameterProps) {
-
-	const { id } = props.cellData;	
+	console.log(props);
+	const { id } = props.cellData;
+	const [val, setVal] = useState<string | undefined>(props.cellData?.value);
 	const [addOrUpdateVariable] = useMutation(ADD_UPDATE_TERM_VERIABLE);
+	const [isUpdatingYoY, setIsUpdatingYoY] = useState(props.cellData?.isUpdatingYoy ?? false);
+	const [selectedColor, setSelectedColor] = useState(props.cellData?.highlightColor??"");
 	const [selectedOption, setSelectedOption] = useState(props.cellData?.fontWeight);
-
+	const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
+		const value = e.target.value;
+		setVal(value);
+	};
 	const handleOnSave = async () => {
-		try{
-			if(!!id){
+		try {
+			if (!!id) {
 				await addOrUpdateVariable({
-					variables:{
-						variableInfo:{
-							fontWeight:selectedOption,
-							id:id
+					variables: {
+						variableInfo: {
+							...(!!val && { yoy: val }),
+							...(!!selectedOption && {fontWeight: selectedOption}),
+							...(!!selectedColor && {highlightColor: selectedColor}),
+							id: id
 						},
 					}
-					 
+
 				})
 			}
 			!!props.onSave && props.onSave()
 			!!props.onClose && props.onClose()
-		}catch(e){
+		} catch (e) {
 			!!props.onSave && props.onSave()
 			!!props.onClose && props.onClose()
 		}
@@ -603,13 +631,24 @@ function AddUpdateFontWeightParaMeter(props: AddUpdateFontWeightParameterProps) 
 		>
 			<>
 				<form className="form w-100">
-
-					{(!props.selectedTerm?.quarterWiseTable && props.selectedColumn?.name !== "VisibleToChart") && (<div><div className="flex items-center gap-[20px] mt-[20px]">
+					{(!props.selectedTerm?.quarterWiseTable && isUpdatingYoY) && (
+						<div>
+							<input
+								type="text"
+								value={val}
+								onChange={handleOnChange}
+								required
+								className="w-full mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+							/>
+						</div>
+					)}
+					{(!props.selectedTerm?.quarterWiseTable && isUpdatingYoY) && (
+						<div><div className="flex items-center gap-[20px] mt-[20px]">
 						<label
 							htmlFor="value"
 							className="text-lg font-bold text-gray-700"
 						>
-							Row Background:
+							Cell Background:
 						</label>
 					</div>
 						<div className="mt-5">
@@ -617,37 +656,86 @@ function AddUpdateFontWeightParaMeter(props: AddUpdateFontWeightParameterProps) 
 								<input
 									type="radio"
 									name="options"
-									value="bold"
-									checked={selectedOption === "bold"}
-									onChange={() => { setSelectedOption('bold') }}
+									value="red"
+									checked={selectedColor === "red"}
+									onChange={() => { setSelectedColor('red') }}
 									className="m-1"
 								/>
-								bold
+								Red
 							</label>
 
 							<label className="mr-3">
 								<input
 									type="radio"
 									name="options"
-									value="semibold"
-									checked={selectedOption === "semibold"}
-									onChange={() => { setSelectedOption('semibold') }}
+									value="green"
+									checked={selectedColor === "green"}
+									onChange={() => { setSelectedColor('green') }}
 									className="m-1"
 								/>
-								semibold
+								Green
 							</label>
 							<label>
 								<input
 									type="radio"
 									name="options"
-									value="normal"
-									checked={selectedOption === "normal"}
-									onChange={() => { setSelectedOption('normal') }}
+									value="green"
+									checked={selectedColor === "none"}
+									onChange={() => { setSelectedColor('none') }}
 									className="m-1"
 								/>
-								None	
+								None
 							</label>
-						</div></div>)}
+						</div></div>
+					)}
+					{(!props.selectedTerm?.quarterWiseTable && props.selectedColumn?.name !== "VisibleToChart" && !isUpdatingYoY) && (
+						<div>
+							<div className="flex items-center gap-[20px] mt-[20px]">
+								<label
+									htmlFor="value"
+									className="text-lg font-bold text-gray-700"
+								>
+									Row Background:
+								</label>
+							</div>
+							<div className="mt-5">
+								<label className="mr-3">
+									<input
+										type="radio"
+										name="options"
+										value="bold"
+										checked={selectedOption === "bold"}
+										onChange={() => { setSelectedOption('bold') }}
+										className="m-1"
+									/>
+									bold
+								</label>
+
+								<label className="mr-3">
+									<input
+										type="radio"
+										name="options"
+										value="semibold"
+										checked={selectedOption === "semibold"}
+										onChange={() => { setSelectedOption('semibold') }}
+										className="m-1"
+									/>
+									semibold
+								</label>
+								<label>
+									<input
+										type="radio"
+										name="options"
+										value="normal"
+										checked={selectedOption === "normal"}
+										onChange={() => { setSelectedOption('normal') }}
+										className="m-1"
+									/>
+									None
+								</label>
+							</div>
+						</div>
+					)}
 
 				</form>
 			</>

@@ -71,6 +71,7 @@ export interface AddUpdateFontWeightParameterProps {
   selectedColumn?: any;
   selectedCompany?: any;
   financialInitData?: any;
+  highlightColor?: any;
   company?: any;
   refetch?: any;
   term?: any;
@@ -172,6 +173,7 @@ export interface Header {
 
 export interface Row {
   title: string;
+  yoy: string;
   cells: Cell[];
   highlightColor: string;
   fontWeight:string;
@@ -231,6 +233,7 @@ export interface TraverseMap {
   columnIndex?: number;
   highlightColor?: string;
   fontWeight?: string;
+  isUpdatingYoy?: boolean;
 }
 export interface DeleteVariableProps {
   onSuccess?: any;
