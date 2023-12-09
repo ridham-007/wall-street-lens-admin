@@ -378,6 +378,7 @@ export default function Variable({
 															value: current.yoy,
 															id: current.cells[0].variableId ?? "",
 															fontWeight: current.fontWeight,
+															highlightColor: current.highlightColor,
 															isUpdatingYoy: true
 														})
 													}}
@@ -587,7 +588,6 @@ function AddUpdateParaMeter(props: AddUpdateParameterProps) {
 }
 
 function AddUpdateFontWeightParaMeter(props: AddUpdateFontWeightParameterProps) {
-	console.log(props);
 	const { id } = props.cellData;
 	const [val, setVal] = useState<string | undefined>(props.cellData?.value);
 	const [addOrUpdateVariable] = useMutation(ADD_UPDATE_TERM_VERIABLE);
@@ -695,7 +695,7 @@ function AddUpdateFontWeightParaMeter(props: AddUpdateFontWeightParameterProps) 
 									htmlFor="value"
 									className="text-lg font-bold text-gray-700"
 								>
-									Row Background:
+									Row FontStyle:
 								</label>
 							</div>
 							<div className="mt-5">
