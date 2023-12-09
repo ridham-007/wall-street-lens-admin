@@ -285,7 +285,7 @@ function ImportData(props: ImportDataProps) {
                         header,
                         rows: rows.filter(row => row.some(cell => cell !== null && cell !== '',
                         )),
-                    }));                    
+                    }));                  
                     if(filteredTableData[0]?.rows[1][0] === "Disable"){
                         const array = ["Category","Priority","Variables","YoY"];
                         {
@@ -314,6 +314,25 @@ function ImportData(props: ImportDataProps) {
                             })
                         }              
                     } else if(filteredTableData[0]?.rows[1][0] === "Enable"){
+                        const basicDetailsRow = filteredTableData[0]?.rows[0];
+                        const quarterIndex = basicDetailsRow?.findIndex(cur => cur === 'Quarter');
+                        const yearIndex = basicDetailsRow?.findIndex(cur => cur === 'Quarter');
+
+                        if(quarterIndex > -1){
+                            if(!filteredTableData[0]?.rows[1][quarterIndex]){
+                             errors.push({ type: 'Basic', sheetName, error:'Missing Quarter value in basic details table'});
+                            }
+                        } else {
+                            errors.push({ type: 'Basic', sheetName, error:'Missing Quarter value in basic details table'});
+                        }
+
+                        if(yearIndex > -1){
+                            if(!filteredTableData[0]?.rows[1][yearIndex]){
+                             errors.push({ type: 'Basic', sheetName, error:'Missing Year value in basic details'});
+                            }
+                        } else {
+                            errors.push({ type: 'Basic', sheetName, error:'Missing Year value in basic details'});
+                        }
                         filteredTableData[1]?.rows.map((value:any, index: number) => {
                             if(index === 0){                       
                                 let count = 0;             
@@ -413,7 +432,7 @@ function ImportData(props: ImportDataProps) {
 
     const errorMessage = (item:any) => {
         const regex = /[a-pR-Z]/i;
-        if(item.type == 'column'){
+        if(item.type == 'column' || item.type == 'Basic'){
             return (
                 <div>
                     <b style={{color:'red'}}>Error : </b>
