@@ -220,7 +220,7 @@ function ImportData(props: ImportDataProps) {
                 quarters.push({
                     quarter: Number(Quarter),
                     year: Number(Year),
-                    value: values[index].toString(),
+                    value: values[index]?.toString() || '',
                     groupKey: timeStamp[i],
                 })
             }
@@ -285,20 +285,23 @@ function ImportData(props: ImportDataProps) {
                         header,
                         rows: rows.filter(row => row.some(cell => cell !== null && cell !== '',
                         )),
-                    }));     
-                                                 
-                    if(filteredTableData[0]?.rows[1][0] === "Disable" || filteredTableData[0]?.rows[1][0].length > 0){
+                    }));                    
+                    if(filteredTableData[0]?.rows[1][0] === "Disable"){
                         const array = ["Category","Priority","Variables","YoY"];
                         {
-                            filteredTableData[1]?.rows.map((value:any, index) => {
+                            filteredTableData[1]?.rows.map((value:any, index: number) => {
                                 if(index === 0){                                    
+                                    let count = 0;  
                                     value.map((item:any) => {
-                                        
+                                        count = count + 1;
                                         if (!(array.includes(item) || regex.test(item))) {
                                             errors.push({ sheetName, item,error:''});
                                         }
                                     })
-                                }else{
+                                    if(value?.length > count){
+                                        errors.push({ type: 'column', sheetName, error:'One of the column name is missing for data table'});
+                                    }
+                                } else {
                                     if(value[2] === undefined){
                                         value.map((item:any) => {
                                             if(item.length > 0){
@@ -310,6 +313,21 @@ function ImportData(props: ImportDataProps) {
                                 }
                             })
                         }              
+                    } else if(filteredTableData[0]?.rows[1][0] === "Enable"){
+                        filteredTableData[1]?.rows.map((value:any, index: number) => {
+                            if(index === 0){                       
+                                let count = 0;             
+                                value.map((item:any) => {
+                                    count = count + 1;
+                                    if (!item?.length) {
+                                        errors.push({ sheetName, item,error:''});
+                                    }
+                                })
+                                if(value?.length > count){
+                                    errors.push({ type: 'column', sheetName, error:'One of the column name is missing for data table'});
+                                }
+                            }
+                        })
                     }
                 
                     let arrayOfObjects: Array<any> = [];
@@ -382,10 +400,11 @@ function ImportData(props: ImportDataProps) {
                         })
                     })
                 }
-                setSheetsData(sheetsArray);
                 if(errors.length > 0){                    
                     setListOfError(errors);
                     setOpen(true);
+                } else {
+                    setSheetsData(sheetsArray);
                 }                
             };
             reader.readAsArrayBuffer(file);
@@ -394,8 +413,15 @@ function ImportData(props: ImportDataProps) {
 
     const errorMessage = (item:any) => {
         const regex = /[a-pR-Z]/i;
-
-        if(item?.error.length > 0){
+        if(item.type == 'column'){
+            return (
+                <div>
+                    <b style={{color:'red'}}>Error : </b>
+                    <b>{item?.error} </b>
+                </div>
+            )
+        }
+        else if(item?.error.length > 0){
             return (
                 <div>
                     <b style={{color:'red'}}>Error : </b>{`For cell value `}
