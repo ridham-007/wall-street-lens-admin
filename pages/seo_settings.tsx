@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { AddMetaProps, LayoutProps, KpiTerm } from "@/utils/data"
 import { GET_TERMS_BY_COMPANY, GET_CHART_BY_KPI_TERM } from "@/utils/query";
 import SeoSettingsTable from "@/components/table/seo/SeoSettingsTable";
+import ChipTextField from "@/components/ChipTextField";
 
 export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutProps) {
     const [showLoader, setShowLoader] = useState(false);
@@ -69,10 +70,8 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
 }
 function AddMeta(props: AddMetaProps) {
 
-
-
-
     const [refetch, setRefetch] = useState(false);
+    const [selectedChips, setSelectedChips] = useState<string[]>([]);
     const [term, setTerm] = useState("");
     const [company, setCompany] = useState("");
     const router = useRouter();
@@ -139,6 +138,11 @@ function AddMeta(props: AddMetaProps) {
         }));
     };
 
+    const handleChipsChange = (chips: string[]) => {
+        setSelectedChips(chips);
+        console.log(selectedChips, "dsfsdbhfsd");
+    };
+
     return (
         <Modal
             showModal={true}
@@ -149,7 +153,7 @@ function AddMeta(props: AddMetaProps) {
             <>
                 <form className="form w-100">
                     <div className="grid gap-4">
-                        <div className="flex flex-col gap-5">
+                        <div className="flex gap-5">
                             <div className="flex flex-col">
                                 <label
                                     htmlFor="quarter"
@@ -191,23 +195,31 @@ function AddMeta(props: AddMetaProps) {
                                     className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
                                 />
                             </div>
-                            <div className="flex flex-col mb-[20px]">
-                                <label
-                                    className="text-sm font-medium text-gray-700"
-                                >
-                                    description
-                                </label>
-                                <input
-                                    type="text"
-                                    id="title"
-                                    name="description"
-                                    value={val.description}
-                                    onChange={handleOnInputChange}
-                                    required
-                                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                />
+                        </div>
+                        <div className="flex flex-col mb-[20px]">
+                            <label
+                                className="text-sm font-medium text-gray-700"
+                            >
+                                description
+                            </label>
+                            <input
+                                type="text"
+                                id="description"
+                                name="description"
+                                value={val.description}
+                                onChange={handleOnInputChange}
+                                required
+                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
 
-                            </div>
+                        </div>
+                        <div className="flex flex-col mb-[20px]">
+                            <label
+                                className="text-sm font-medium text-gray-700"
+                            >
+                                Add key word
+                            </label>
+                            <ChipTextField onChipsChange={handleChipsChange} />
                         </div>
                     </div>
                 </form>

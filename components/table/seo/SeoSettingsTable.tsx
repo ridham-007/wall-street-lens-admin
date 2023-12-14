@@ -26,7 +26,7 @@ const SeoSettingsTable = (props: SeoSettingsTableProps) => {
                             <TH>Term</TH>
                             <TH>Title</TH>
                             <TH>Description</TH>
-
+                            <TH>Key word</TH>
                         </>
                     </THR>
                 </thead>
