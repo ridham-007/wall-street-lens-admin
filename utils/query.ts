@@ -42,6 +42,8 @@ const GET_VIEW_FOR_TERM = gql`query getViewForTerm(
       rows{
         title
         highlightColor
+        fontWeight
+        yoy
         cells{
           id
           value

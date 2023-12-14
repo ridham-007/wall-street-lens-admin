@@ -6,12 +6,12 @@ import { Modal } from "@/components/model";
 import * as XLSX from 'xlsx';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { GET_COMPANIES, GET_TERMS_BY_COMPANY, GET_VARIBALES_KPI_TERM, PROCCESS_BULK_UPLOAD } from "@/utils/query";
 import { useRouter } from "next/router";
 import { ImportDataProps, LayoutProps } from "@/utils/data"
 import { SheetValue } from "@/utils/data"
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, } from '@mui/material';
 
 export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutProps) {
     const [showLoader, setShowLoader] = useState(false);
@@ -146,12 +146,24 @@ function ImportData(props: ImportDataProps) {
     const [sheetsData, setSheetsData] = useState<SheetValue[]>([]);
     const [company, setCompany] = useState('')
     const [selectedFileName, setSelectedFileName] = useState('');
+    const [error, setError] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [listOfError, setListOfError] = useState([]);
 
-    const regex = new RegExp('Q[1-4]{1}-[0-9]{4}$');
+
+    const regex = new RegExp('Q([1-4]{1})-([0-9]{4})\\s*(.*)$');
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     const handleOnSave = () => {
+
         if (!sheetsData.length) {
-            toast('Data is required', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+            toast('Data is required', { hideProgressBar: false, autoClose: false, type: 'error' });
             return;
+        } else {
+            toast('Data Sent', { hideProgressBar: false, autoClose: 7000, type: 'success' });
         }
         props.onSuccess && props.onSuccess(sheetsData)
         props.onClose && props.onClose()
@@ -211,7 +223,7 @@ function ImportData(props: ImportDataProps) {
                 quarters.push({
                     quarter: Number(Quarter),
                     year: Number(Year),
-                    value: values[index].toString(),
+                    value: values[index]?.toString() || '',
                     groupKey: timeStamp[i],
                 })
             }
@@ -230,6 +242,7 @@ function ImportData(props: ImportDataProps) {
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target?.files?.[0];
+
         if (file) {
             setSelectedFileName(file.name);
         } else {
@@ -239,6 +252,7 @@ function ImportData(props: ImportDataProps) {
             const reader = new FileReader();
 
             reader.onload = async (e) => {
+                let errors: any = [];
                 const arrayBuffer = e.target?.result as ArrayBuffer;
                 const workbook = XLSX.read(arrayBuffer, { type: 'array', raw: false });
                 const sheetsArray: SheetValue[] = [];
@@ -269,12 +283,75 @@ function ImportData(props: ImportDataProps) {
                     if (currentTable) {
                         tableData.push({ tableName, header: header!, rows: currentTable });
                     }
-
                     const filteredTableData = tableData.map(({ tableName, header, rows }) => ({
                         tableName,
                         header,
-                        rows: rows.filter(row => row.some(cell => cell !== null && cell !== '')),
+                        rows: rows.filter(row => row.some(cell => cell !== null && cell !== '',
+                        )),
                     }));
+                    if (filteredTableData[0]?.rows[1][0] === "Disable") {
+                        const array = ["Category", "Priority", "Variables", "YoY"];
+                        {
+                            filteredTableData[1]?.rows.map((value: any, index: number) => {
+                                if (index === 0) {
+                                    let count = 0;
+                                    value.map((item: any) => {
+                                        count = count + 1;
+                                        if (!(array.includes(item) || regex.test(item))) {
+                                            errors.push({ sheetName, item, error: '' });
+                                        }
+                                    })
+                                    if (value?.length > count) {
+                                        errors.push({ type: 'column', sheetName, error: 'One of the column name is missing for data table' });
+                                    }
+                                } else {
+                                    if (value[2] === undefined) {
+                                        value.map((item: any) => {
+                                            if (item.length > 0) {
+                                                errors.push({ sheetName, item, error: `${item}` });
+                                                return;
+                                            }
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    } else if (filteredTableData[0]?.rows[1][0] === "Enable") {
+                        const basicDetailsRow = filteredTableData[0]?.rows[0];
+                        const quarterIndex = basicDetailsRow?.findIndex(cur => cur === 'Quarter');
+                        const yearIndex = basicDetailsRow?.findIndex(cur => cur === 'Quarter');
+
+                        if (quarterIndex > -1) {
+                            if (!filteredTableData[0]?.rows[1][quarterIndex]) {
+                                errors.push({ type: 'Basic', sheetName, error: 'Missing Quarter value in basic details table' });
+                            }
+                        } else {
+                            errors.push({ type: 'Basic', sheetName, error: 'Missing Quarter value in basic details table' });
+                        }
+
+                        if (yearIndex > -1) {
+                            if (!filteredTableData[0]?.rows[1][yearIndex]) {
+                                errors.push({ type: 'Basic', sheetName, error: 'Missing Year value in basic details' });
+                            }
+                        } else {
+                            errors.push({ type: 'Basic', sheetName, error: 'Missing Year value in basic details' });
+                        }
+                        filteredTableData[1]?.rows.map((value: any, index: number) => {
+                            if (index === 0) {
+                                let count = 0;
+                                value.map((item: any) => {
+                                    count = count + 1;
+                                    if (!item?.length) {
+                                        errors.push({ sheetName, item, error: '' });
+                                    }
+                                })
+                                if (value?.length > count) {
+                                    errors.push({ type: 'column', sheetName, error: 'One of the column name is missing for data table' });
+                                }
+                            }
+                        })
+                    }
+
                     let arrayOfObjects: Array<any> = [];
                     let basicDetails: Array<any> = [];
                     let quarterWiseTable = false;
@@ -345,70 +422,154 @@ function ImportData(props: ImportDataProps) {
                         })
                     })
                 }
-                setSheetsData(sheetsArray);
+                if (errors.length > 0) {
+                    setListOfError(errors);
+                    setOpen(true);
+                } else {
+                    setSheetsData(sheetsArray);
+                }
             };
-
             reader.readAsArrayBuffer(file);
         }
     };
 
-    return (
-        <Modal
-            showModal={true}
-            handleOnSave={handleOnSave}
-            title="Import Data from Excel sheet"
-            onClose={() => props.onClose && props.onClose()}
-        >
-            <>
-                <form className="form">
-                    <div className="flex  gap-[20px]">
-                        <div className="flex items-start">
-                            <select
-                                id="quarter"
-                                name="company"
-                                className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                value={company}
-                                onChange={(event) => {
-                                    setCompany(event.target.value);
-                                }}
-                            >
-                                <option value="">Select a option</option>
-                                <option value="TESLA">TESLA</option>
-
-                                {companies?.data?.getCompanies.map(
-                                    (ele: {
-                                        id: readonly string[] | Key | null | undefined;
-                                        attributes: {
-                                            slug: Key | null | undefined;
-                                            name: string;
-                                        };
-                                    }) => {
-                                        return (
-                                            <option
-                                                key={ele.attributes.slug}
-                                                value={ele?.id?.toString()}
-                                            >
-                                                {ele.attributes.name}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
-                        </div>
-                        <div className="flex items-center flex-col">
-                            <input
-                                type="file"
-                                accept=".xlsx, .xls"
-                                onChange={handleFileUpload}
-                                disabled={!company}
-                                className=" text-white font-bold py-2 px-4 w-[150px] rounded-full"
-                            />
-                            <span> {selectedFileName}</span>
-                        </div>
+    const errorMessage = (item: any) => {
+        const regex = /[a-pR-Z]/i;
+        if (item.type == 'column' || item.type == 'Basic') {
+            return (
+                <div>
+                    <b style={{ color: 'red' }}>Error : </b>
+                    <b>{item?.error} </b>
+                </div>
+            )
+        }
+        else if (item?.error.length > 0) {
+            return (
+                <div>
+                    <b style={{ color: 'red' }}>Error : </b>{`For cell value `}
+                    <b>{item?.error}, </b>{'Variable name is missing.'}
+                </div>
+            )
+        } else {
+            if (regex.test(item?.item)) {
+                return (
+                    <div>
+                        <b style={{ color: 'red' }}>Error : </b>{`In Data Table's header, `}
+                        <b>{item?.item} </b>{"Spelling mistake."}
                     </div>
-                </form>
-                <ToastContainer />
-            </>
-        </Modal>
+                )
+            } else {
+                return (
+                    <div>
+                        <b style={{ color: 'red' }}>Error : </b>{`In Data Table's header- `}
+                        <b>{item?.item}</b>{`, It should be 'Q[1-4]-YEAR.'`}
+                    </div>
+                )
+            }
+        }
+    }
+    return (
+        <>
+            <Modal
+                showModal={true}
+                handleOnSave={handleOnSave}
+                title="Import Data from Excel sheet"
+                onClose={() => props.onClose && props.onClose()}
+                disabled={error}
+            >
+                <>
+                    <form className="form">
+                        <div className="flex  gap-[20px]">
+                            <div className="flex items-start">
+                                <select
+                                    id="quarter"
+                                    name="company"
+                                    className="mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    value={company}
+                                    onChange={(event) => {
+                                        setCompany(event.target.value);
+                                    }}
+                                >
+                                    <option value="">Select a option</option>
+
+                                    {companies?.data?.getCompanies.map(
+                                        (ele: {
+                                            id: readonly string[] | Key | null | undefined;
+                                            attributes: {
+                                                slug: Key | null | undefined;
+                                                name: string;
+                                            };
+                                        }) => {
+                                            return (
+                                                <option
+                                                    key={ele.attributes.slug}
+                                                    value={ele?.id?.toString()}
+                                                >
+                                                    {ele.attributes.name}
+                                                </option>
+                                            );
+                                        }
+                                    )}
+                                </select>
+                            </div>
+                            <div className="flex items-center flex-col">
+                                <input
+                                    type="file"
+                                    accept=".xlsx, .xls"
+                                    onChange={handleFileUpload}
+                                    disabled={!company}
+                                    className=" text-white font-bold py-2 px-4 w-[150px] rounded-full"
+                                />
+                                <span> {selectedFileName}</span>
+                            </div>
+                        </div>
+                        <div style={{ color: 'red', textAlign: 'center', marginTop: '1rem' }}>{error ? "Upload valid sheet" : ''}</div>
+                    </form>
+                    <Dialog
+                        open={open}
+                        onClose={() => { handleClose(); props.onClose() }}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            "& .MuiDialog-container": {
+                                "& .MuiPaper-root": {
+                                    width: { xs: '90vw', sm: "50rem" },
+                                    maxHeight: '30rem'
+                                },
+                            },
+                        }}
+                    >
+                        <div style={{ height: '30%' }}>
+                            <DialogTitle id="alert-dialog-title" sx={{ fontSize: '1.875rem', fontWeight: 400, marginBottom: '-1rem' }}>{"Errors"}</DialogTitle>
+                            <DialogContent sx={{ borderBottom: '2px solid #e2e8f0' }}>
+                                <DialogContentText id="alert-dialog-description">
+                                    {listOfError.map((item: any, index) => (
+                                        <div
+                                            key={index}
+                                            style={{
+                                                padding: '1rem',
+                                                border: '1px solid black',
+                                                borderRadius: '0.7rem',
+                                                marginTop: '1rem',
+                                                fontWeight: 'bold',
+                                            }}
+                                        >
+                                            <div><b style={{ color: '#1d1e22' }}>Sheet Name :</b> {item?.sheetName}</div>
+                                            {errorMessage(item)}
+                                        </div>
+                                    ))}
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions sx={{ marginRight: '1rem' }}>
+                                <Button onClick={() => { handleClose(); props.onClose(); }} sx={{ width: '7rem', display: 'flex', justifyContent: 'center', alignItems: 'centre', color: 'red', border: '1px solid black' }}><b>Close</b></Button>
+                            </DialogActions>
+                        </div>
+                    </Dialog>
+                </>
+
+            </Modal>
+        </>
     );
 }

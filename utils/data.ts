@@ -67,7 +67,7 @@ export interface AddUpdateParameterProps {
   onEdit?: boolean;
 }
 
-export interface AddUpdateColorParameterProps {
+export interface AddUpdateFontWeightParameterProps {
   onSuccess?: any;
   onClose?: any;
   data?: any;
@@ -78,6 +78,7 @@ export interface AddUpdateColorParameterProps {
   selectedColumn?: any;
   selectedCompany?: any;
   financialInitData?: any;
+  highlightColor?: any;
   company?: any;
   refetch?: any;
   term?: any;
@@ -136,6 +137,7 @@ export interface Props {
   confirmButton?: string;
   showNote?: boolean;
   message?: any;
+  disabled?:boolean;
 }
 export interface TableProps {
   data?: any;
@@ -178,8 +180,10 @@ export interface Header {
 
 export interface Row {
   title: string;
+  yoy: string;
   cells: Cell[];
   highlightColor: string;
+  fontWeight:string;
 }
 export interface Cell {
   id: string;
@@ -235,6 +239,8 @@ export interface TraverseMap {
   variableId?: string;
   columnIndex?: number;
   highlightColor?: string;
+  fontWeight?: string;
+  isUpdatingYoy?: boolean;
 }
 export interface DeleteVariableProps {
   onSuccess?: any;
