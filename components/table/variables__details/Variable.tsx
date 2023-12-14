@@ -164,9 +164,9 @@ export default function Variable({
 
 	const fetchColor = (color: any) => {
 		if (color === "red") {
-			return " !bg-red-200 text-red-600";
+			return "!bg-red-200 text-red-600";
 		} else if (color === "green") {
-			return " !bg-green-200 text-green-600";
+			return "!bg-green-200 text-green-600";
 		} else {
 			return "bg-transparent";
 		}
