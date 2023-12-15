@@ -6,22 +6,39 @@ import { useMutation, useLazyQuery } from "@apollo/client";
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/router";
 import { AddMetaProps, LayoutProps, KpiTerm } from "@/utils/data"
-import { GET_TERMS_BY_COMPANY, GET_CHART_BY_KPI_TERM } from "@/utils/query";
+import { GET_TERMS_BY_COMPANY, ADD_UPDATE_SEO } from "@/utils/query";
 import SeoSettingsTable from "@/components/table/seo/SeoSettingsTable";
 import ChipTextField from "@/components/ChipTextField";
+import { json } from "node:stream/consumers";
 
 export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutProps) {
     const [showLoader, setShowLoader] = useState(false);
     const [showSeoModal, setShowSeoModal] = useState(false);
+    const [addOrUpdateSeo] = useMutation(ADD_UPDATE_SEO);
 
     const metadata = [
         { id: "Financial Summary", term: "Financial Summary", title: "Financial summary title", description: "This is finacial summary", keywords: [''] },
         { id: "Outlook", term: "Outlook", title: "Outlook title", description: "This is Outlook", },
         { id: "Paypal Matrics", term: "Paypal Matrics", title: "Paypal Matrics title", description: "This is Paypal Matrics", keywords: [''] }]
 
+    const onAddUpdateSeo = async (perameters: any) => {
+        setShowLoader(true);
+        const { data }: any = await addOrUpdateSeo({
+            variables: {
+                seoInfo: {
+
+                    value: JSON.stringify(perameters)
+
+                },
+                termId: perameters?.term
+            }
+        })
+        setShowLoader(false);
+    }
 
 
     return (
+
         <Layout title="seo_Settings" page={LayoutPages.seo_settings} {...props}>
             <>
                 {showLoader && (<Loader />)}
@@ -59,10 +76,11 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
                 </div>
                 {showSeoModal &&
                     <AddMeta
-                        onSuccess={() => { }}
+                        onSuccess={onAddUpdateSeo}
                         onClose={() => {
                             setShowSeoModal(false);
                         }}
+
                     />}
             </>
         </Layout >
@@ -83,13 +101,8 @@ function AddMeta(props: AddMetaProps) {
     });
 
     const handleOnSave = () => {
-
-        props.onSuccess && props.onSuccess();
+        props.onSuccess && props.onSuccess(val);
         props.onClose && props.onClose();
-
-        console.log(val, "vvvvvvvvv")
-
-
     };
 
     useEffect(() => {

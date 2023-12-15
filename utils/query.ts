@@ -136,6 +136,18 @@ const ADD_UPDATE_KPI_TERM = gql`mutation addUpdateKpiTerm(
   }
 }`;
 
+const ADD_UPDATE_SEO = gql`mutation addUpdateSeo(
+  $seoInfo:AddUpdateSeo!
+  $termId:String!
+  ){
+    addUpdateSeo(
+      seoInfo: $seoInfo
+      termId: $termId
+  ){
+    id
+  }
+}`;
+
 const DELETE_VERIABLE_BY_ID = gql`mutation deleteVariableByVariableId(
   $variableId: String!
   ){
@@ -459,6 +471,7 @@ export {
   UPDATE_MAPPED_VALUE,
   ADD_UPDATE_TERM_VERIABLE,
   ADD_UPDATE_KPI_TERM,
+  ADD_UPDATE_SEO,
   DELETE_KPI_BY_ID,
   DELETE_VERIABLE_BY_ID,
   ADD_UPDATE_TERM_CHART_MUTATION,
