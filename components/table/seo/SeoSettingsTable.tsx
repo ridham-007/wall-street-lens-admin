@@ -11,6 +11,7 @@ export interface data {
     term: string,
     title: string,
     description: string,
+
 }
 const SeoSettingsTable = (props: SeoSettingsTableProps) => {
 
@@ -41,6 +42,7 @@ const SeoSettingsTable = (props: SeoSettingsTableProps) => {
                                         <TD>{data.term}</TD>
                                         <TD>{data.title}</TD>
                                         <TD>{data.description}</TD>
+
                                     </>
                                 </TDR>
                             )

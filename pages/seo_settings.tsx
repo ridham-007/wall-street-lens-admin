@@ -13,10 +13,11 @@ import ChipTextField from "@/components/ChipTextField";
 export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutProps) {
     const [showLoader, setShowLoader] = useState(false);
     const [showSeoModal, setShowSeoModal] = useState(false);
+
     const metadata = [
-        { id: "Financial Summary", term: "Financial Summary", title: "Financial summary title", description: "This is finacial summary" },
-        { id: "Outlook", term: "Outlook", title: "Outlook title", description: "This is Outlook" },
-        { id: "Paypal Matrics", term: "Paypal Matrics", title: "Paypal Matrics title", description: "This is Paypal Matrics" }]
+        { id: "Financial Summary", term: "Financial Summary", title: "Financial summary title", description: "This is finacial summary", keywords: [''] },
+        { id: "Outlook", term: "Outlook", title: "Outlook title", description: "This is Outlook", },
+        { id: "Paypal Matrics", term: "Paypal Matrics", title: "Paypal Matrics title", description: "This is Paypal Matrics", keywords: [''] }]
 
 
 
@@ -71,7 +72,6 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
 function AddMeta(props: AddMetaProps) {
 
     const [refetch, setRefetch] = useState(false);
-    const [selectedChips, setSelectedChips] = useState<string[]>([]);
     const [term, setTerm] = useState("");
     const [company, setCompany] = useState("");
     const router = useRouter();
@@ -79,6 +79,7 @@ function AddMeta(props: AddMetaProps) {
         title: "",
         description: "",
         term: "",
+        selectedChips: [] as string[],
     });
 
     const handleOnSave = () => {
@@ -138,10 +139,15 @@ function AddMeta(props: AddMetaProps) {
         }));
     };
 
+    // const handleChipsChange = (chips: string[]) => {
+    //     setSelectedChips(chips);
+    //     console.log(selectedChips, "dsfsdbhfsd");
+    // };
+
     const handleChipsChange = (chips: string[]) => {
-        setSelectedChips(chips);
-        console.log(selectedChips, "dsfsdbhfsd");
+        setVal((prevVal) => ({ ...prevVal, selectedChips: chips }));
     };
+
 
     return (
         <Modal
@@ -183,7 +189,7 @@ function AddMeta(props: AddMetaProps) {
 
                                     className="text-sm font-medium text-gray-700"
                                 >
-                                    title
+                                    Title
                                 </label>
                                 <input
                                     type="text"
@@ -200,7 +206,7 @@ function AddMeta(props: AddMetaProps) {
                             <label
                                 className="text-sm font-medium text-gray-700"
                             >
-                                description
+                                Description
                             </label>
                             <input
                                 type="text"
@@ -217,9 +223,9 @@ function AddMeta(props: AddMetaProps) {
                             <label
                                 className="text-sm font-medium text-gray-700"
                             >
-                                Add key word
+                                Add keywords
                             </label>
-                            <ChipTextField onChipsChange={handleChipsChange} />
+                            <ChipTextField onChipsChange={handleChipsChange} chips={val.selectedChips} />
                         </div>
                     </div>
                 </form>

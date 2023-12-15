@@ -195,7 +195,6 @@ export default function Layout(props: LayoutProps) {
                 onChange={handleOnChange}
               >
                 <option value="">Select a option</option>
-                <option value="TESLA">TESLA</option>
                 {
                   props.companies?.getCompanies.map((ele: { id: readonly string[] | Key | null | undefined; attributes: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; }; }) => {
                     return <option key={ele?.id?.toString()} value={ele?.id?.toString()}>{ele.attributes.name}</option>;

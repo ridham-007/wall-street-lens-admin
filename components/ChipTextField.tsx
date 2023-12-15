@@ -3,16 +3,19 @@ import { Autocomplete, Chip, TextField } from "@mui/material";
 
 interface ChipTextFieldProps {
     onChipsChange: (tags: string[]) => void;
+    chips: string[];
 }
 
 const ChipTextField = (props: ChipTextFieldProps) => {
     return (
         <Autocomplete
-            sx={{ maxWidth: '365px', marginTop: "4px" }}
+            sx={{ maxWidth: '365px', marginTop: "4px", }}
             clearIcon={false}
             options={[]}
             freeSolo
             multiple
+            onChange={(_, value) => props.onChipsChange(value)}
+            value={props.chips}
             renderTags={(value, getTagProps) => (
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                     {value.map((option, index) => {
@@ -29,9 +32,10 @@ const ChipTextField = (props: ChipTextFieldProps) => {
                     color: '#374151',
                     fontSize: '16px',
                     padding: "1px",
+                    overflowY: "auto"
                 },
             }} {...val} />}
-            onChange={(_, value) => props.onChipsChange(value)}
+
         />
     );
 };
