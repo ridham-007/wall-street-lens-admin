@@ -20,6 +20,10 @@ const GET_TERMS_BY_COMPANY = gql`query getKpiTermsByCompanyId(
       summaryOnly
       updatedAt
       company
+      seo {
+        id
+        value
+      }
   }
 }`;
 
@@ -179,6 +183,13 @@ const DELETE_CHART_BY_ID = gql`mutation deleteTermChartById(
   }
 }`;
 
+const DELETE_SEO_BY_ID = gql`mutation deleteSeoById($seoId:String!){
+  deleteSeoById(seoId:$seoId){
+    success
+    affectedRow
+  }
+}`;
+
 const ADD_UPDATE_TERM_CHART_MUTATION = gql`
   mutation AddUpdateTermChart(
     $chartInfo: addUpdateTermChart!, 
@@ -291,6 +302,17 @@ const GET_COMPANIES = gql`query getCompanies {
           name
         }
       }
+  }
+}`;
+
+const GET_SEO_BY_COMPANIES = gql`query getSeoByCompanyId($companyId:String!){
+  getSeoByCompanyId(companyId:$companyId){
+    id
+    value 
+    kpiTerm {
+      name
+      id
+    }
   }
 }`;
 
@@ -468,6 +490,7 @@ export {
   GET_TERMS_BY_COMPANY,
   GET_VIEW_FOR_TERM,
   GET_VARIBALES_KPI_TERM,
+  GET_SEO_BY_COMPANIES,
   UPDATE_MAPPED_VALUE,
   ADD_UPDATE_TERM_VERIABLE,
   ADD_UPDATE_KPI_TERM,
@@ -495,4 +518,5 @@ export {
   ADD_BULK_TERM_VARIABLE,
   CREATE_DEFAULT_MAPPING_IN_BULK,
   DELETE_VARIABLE_MAPPINGS_BY_COMPANY,
+  DELETE_SEO_BY_ID,
 }

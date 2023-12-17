@@ -9,6 +9,15 @@ export interface KpiTerm {
   updatedAt: Date;
   company: string;
   title: ReactNode;
+  seo? : Seo;
+}
+export interface Seo {
+  id: string;
+  value: any;
+  kpiTerm : {
+    name: string;
+    id: string;
+  }
 }
 export interface QuarterDataProps {
   onSuccess?: any;
@@ -19,8 +28,21 @@ export interface QuarterDataProps {
 export interface AddMetaProps {
   onSuccess?: any;
   onClose?: any;
-  data?: any;
+  data?:{
+    id:string,
+    title:string,
+    description:string
+    termId: string
+    keyword: string[],
+    isEdit: boolean,
+  };
 }
+export interface DeleteSeoProps {
+  onSuccess?: any;
+  onClose?: any;
+  id?: any;
+}
+
 export interface DeleteVariableProps {
   onSuccess?: any;
   onClose?: any;
