@@ -338,7 +338,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                         (cur: VariablesArray) => {
                                             return (
                                                 <option key={cur.id} value={cur?.id}>
-                                                    {cur?.title}
+                                                    {cur?.masterVariable?.title}
                                                 </option>
                                             );
                                         }
@@ -365,7 +365,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                     (cur: VariablesArray) => {
                                         return (
                                             <option key={cur.id} value={cur?.id}>
-                                                {cur?.title}
+                                                {cur?.masterVariable?.title}
                                             </option>
                                         );
                                     }
@@ -392,7 +392,7 @@ function UpdateChart(props: AddUpdateParameterProps) {
                                     (cur: VariablesArray) => {
                                         return (
                                             <option key={cur.id} value={cur?.id}>
-                                                {cur?.title}
+                                                {cur?.masterVariable?.title}
                                             </option>
                                         );
                                     }

@@ -80,8 +80,8 @@ export default function FinancialPage(props: JSX.IntrinsicAttributes & LayoutPro
         info.value = JSON.parse(seo.value);
 
         let keyword:Array<string> = [];
-        if(Array.isArray(info?.value?.selectedChips)){
-            keyword = [...(info?.value?.selectedChips)]
+        if(Array.isArray(info?.value?.keywords)){
+            keyword = [...(info?.value?.keywords)]
         }
         console.log(keyword);
         let seoTableRow: SeoTableData = {
@@ -183,7 +183,7 @@ function AddMeta(props: AddMetaProps) {
       title: props?.data?.title?? "",
       description: props.data?.description??"",
       term:props.data?.termId??"",
-      selectedChips:props.data?.keyword??[],
+      keywords:props.data?.keyword??[],
     });
     const [getTermsDetails, { data: termsData, refetch: refetchTerms }] =
       useLazyQuery(GET_TERMS_BY_COMPANY, {
@@ -208,7 +208,7 @@ function AddMeta(props: AddMetaProps) {
           title: "",
           description: "",
           term: selectedTerm,
-          selectedChips: [] as string[],
+          keywords: [] as string[],
         });
     }
 
@@ -221,7 +221,7 @@ function AddMeta(props: AddMetaProps) {
     };
 
     const handleChipsChange = (chips: string[]) => {
-        setVal((prevVal) => ({ ...prevVal, selectedChips: chips }));
+        setVal((prevVal) => ({ ...prevVal, keywords: chips }));
     };
 
     useEffect(() => {
@@ -340,7 +340,7 @@ function AddMeta(props: AddMetaProps) {
                             >
                                 Add keywords
                             </label>
-                            <ChipTextField onChipsChange={handleChipsChange} chips={val.selectedChips} />
+                            <ChipTextField onChipsChange={handleChipsChange} chips={val.keywords} />
                         </div>
                     </div>
                 </form>
